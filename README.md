@@ -35,7 +35,7 @@ python Tracker_FaceNet_export_mappingfile.py --video_dir video/ --output_path da
 ### 6. Combine Tracker + FaceNet + Cosine Similarity to perform face recognition on Video
 We apply **SORT** Tracker to track every face and put them into clusters. Clusters will be generated and stored in **"data/cluster/{video_name}/clusterid"**. After that, the system will try to guess the label for each cluster using **majority rule**. A cosine similarity computed between each vector of features in our face training dataset and the ones from each face in our cluster labled from the previous step is the third step. A cluster is considered to be recognized as a known person if the mean of the three maximum cosine similarities between each face in the cluster and each face in that person training dataset is higher than 0.62.
 </br>
-</br>Execute the following commands in order:
+</br>Execute the following command:
 ```sh
 python Tracker_FaceNet_Making_Clusters.py --video_dir video/ --frame_interval 1 --threshold 0.7 --output_path data/cluster/ --classifer_path classifier/gg/svm_classifier_for_6_persons.pkl --model_path model/20180402-114759.pb --dominant_ratio 0.8 --merge_cluster 1
 ```
