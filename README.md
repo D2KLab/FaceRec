@@ -1,22 +1,8 @@
 # Face-Celebrity-Recognition
-### 1. Create a raw image directory
-Create a directory for raw images utilized for training such that images of different persons are in different subdirectories. The names of images do not matter, 
-and each person can have a different number of images. The images should be formatted as jpg or png and have a lowercase extension.
+### 1. Building a Training Dataset
+Create a directory for raw images utilized for training. In order to download automatically images of celebrity to build the training dataset we need to call the following command:
 ```sh
-$ tree data/raw
-person-1
-├── image-1.jpg
-├── image-2.png
-...
-└── image-p.png
-
-...
-
-person-m
-├── image-1.png
-├── image-2.jpg
-...
-└── image-q.png
+python crawler.py --keyword "Franco Francesco" --max_num 20 --image_dir data/img_for_training_gg/FrancoFrancesco
 ```
 ### 2. Preprocess the raw images (Face detection)
 Face alignment using MTCNN
@@ -45,4 +31,11 @@ python Tracker_FaceNet_export_mappingfile.py --video_dir video/ --output_path da
 ```
 ```sh
  python Tracker_FaceNet_export_frames.py --video_dir video --folder_containing_frame data/BrigitteBardot --obid_mapping_classnames_file obid_mapping_classnames_BrigitteBardot_1.txt --output_path data/cluster --classifer_path classifier/11_7_2019/svm_classifier_for_6_persons.pkl --model_path model/20180402-114759.pb --final_output_name_frame_bounding_box BrigitteBardot_1.txt
+```
+### 6. Combine Tracker + FaceNet + Cosine Similarity to perform face recognition on Video
+We apply **SORT** Tracker to track every face and put them into clusters. Clusters will be generated and stored in **"data/cluster/{video_name}/clusterid"**. After that, the system will try to guess the label for each cluster using **majority rule**. A cosine similarity computed between each vector of features in our face training dataset and the ones from each face in our cluster labled from the previous step is the third step. A cluster is considered to be recognized as a known person if the mean of the three maximum cosine similarities between each face in the cluster and each face in that person training dataset is higher than 0.62.
+</br>
+</br>Execute the following commands in order:
+```sh
+python Tracker_FaceNet_Making_Clusters.py --video_dir video/ --frame_interval 1 --threshold 0.7 --output_path data/cluster/ --classifer_path classifier/gg/svm_classifier_for_6_persons.pkl --model_path model/20180402-114759.pb --dominant_ratio 0.8 --merge_cluster 1
 ```
