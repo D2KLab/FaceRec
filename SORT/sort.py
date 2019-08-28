@@ -35,6 +35,7 @@ class Sort:
         NOTE:as in practical realtime MOT, the detector doesn't run on every single frame
         """
         self.frame_count += 1
+        #time_dict = dict()
         # get predicted locations from existing trackers.
         trks = np.zeros((len(self.trackers), 5))
         to_del = []
@@ -81,6 +82,9 @@ class Sort:
                
                 if (len(trk.face_addtional_attribute) >= 5):
                     utils.save_to_file(root_dic, trk)
+                    #time_dict.update({trk.id : self.frame_count})
+                    with open('tracker_saved_greater_5.txt', 'a+') as f:
+                         f.write(str(trk.id)+'.'+ str(self.frame_count) + "\n")
 
                 self.trackers.pop(i)
         if (len(ret) > 0):
