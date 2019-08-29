@@ -121,7 +121,6 @@ def main():
                     id_cluster = int(i.split('.')[0])
                     id_frame = int(i.split('.')[1])
                     time_dict.update({id_cluster:id_frame})
-                #print(time_dict)
                 dataset = facenet.get_dataset(directoryname)
                 paths, labels = facenet.get_image_paths_and_labels(dataset)
                 label_name = [cls.name.replace('_', ' ') for cls in dataset]
@@ -156,8 +155,6 @@ def main():
                     images = facenet.load_data(paths_batch, False, False, image_size)
                     feed_dict = {images_placeholder: images, phase_train_placeholder: False}
                     emb_array[start_index:end_index, :] = sess.run(embeddings, feed_dict=feed_dict)
-                print('---------lables---------')
-                print(labels)
                 emb_array_added_lables = np.hstack((emb_array, np.atleast_2d(labels).T))
                 emb_array_added_lables = pd.DataFrame(data=emb_array_added_lables)
                 embedding_training = pd.read_csv('data/embedding/embedding.csv',header = None)
@@ -202,101 +199,54 @@ def main():
                             #print("cluster Id {} : {} appear on {}".format(key,name,str(datetime.timedelta(seconds=time_dict[int(key)]*1/fps))))
                     except:
                         name ="Unknow"
-                BrigitteBardot = []
-                CharlesDeGaulle = []
-                ElisabethReine = []
-                FrancoFrancesco = []
-                JeanPaulBelmondo = []
-                SalazarOliveira = []
-                for i, j in interest_cluster.items():
-                    if j == "BrigitteBardot":
-                       BrigitteBardot.append(i)
-                    elif j == "CharlesDeGaulle":
-                         CharlesDeGaulle.append(i)
-                    elif j == "ElisabethReine":
-                         ElisabethReine.append(i)
-                    elif j == "FrancoFrancesco":
-                         FrancoFrancesco.append(i)
-                    elif j == "JeanPaulBelmondo":
-                         JeanPaulBelmondo.append(i)
-                    else:
-                         SalazarOliveira.append(i)
-                if merge_cluster:
-                   BrigitteBardot = merge_consecutive_cluster(BrigitteBardot,directoryname)
-                   CharlesDeGaulle = merge_consecutive_cluster(CharlesDeGaulle,directoryname)
-                   ElisabethReine = merge_consecutive_cluster(ElisabethReine,directoryname)
-                   FrancoFrancesco = merge_consecutive_cluster(FrancoFrancesco,directoryname)
-                   SalazarOliveira = merge_consecutive_cluster(SalazarOliveira,directoryname)
-                for i in BrigitteBardot:
-                    print("cluster Id {} - BrigitteBardot appear on {}".format(i,str(datetime.timedelta(seconds=time_dict[int(i)]*1/fps))))
-                for i in CharlesDeGaulle:
-                    print("cluster Id {} - CharlesDeGaulle appear on {}".format(i,str(datetime.timedelta(seconds=time_dict[int(i)]*1/fps))))
-                for i in ElisabethReine:
-                    print("cluster Id {} - ElisabethReine appear on {}".format(i,str(datetime.timedelta(seconds=time_dict[int(i)]*1/fps))))
-                for i in FrancoFrancesco:
-                    print("cluster Id {} - FrancoFrancesco appear on {}".format(i,str(datetime.timedelta(seconds=time_dict[int(i)]*1/fps))))
-                for i in JeanPaulBelmondo:
-                    print("cluster Id {} - JeanPaulBelmondo appear on {}".format(i,str(datetime.timedelta(seconds=time_dict[int(i)]*1/fps))))
-                for i in SalazarOliveira:
-                    print("cluster Id {} - SalazarOliveira appear on {}".format(i,str(datetime.timedelta(seconds=time_dict[int(i)]*1/fps)))) 	
-                print("BrigitteBardot:", BrigitteBardot) 
-                print("CharlesDeGaulle:", CharlesDeGaulle)
-                print("ElisabethReine:", ElisabethReine)
-                print("FrancoFrancesco:", FrancoFrancesco)
-                print("JeanPaulBelmondo:", JeanPaulBelmondo)
-                print("SalazarOliveira:", SalazarOliveira) 
                 print("Total frames of the video:", total_frame)
-                print("The frame rate of the video:",fps)
-                if BrigitteBardot:
-                   print("-----BrigitteBardot-----")
-                   count_frames_for_cluster(BrigitteBardot,directoryname)
-                if CharlesDeGaulle:
-                   print("-----CharlesDeGaulle-----")
-                   count_frames_for_cluster(CharlesDeGaulle,directoryname) 
-                if ElisabethReine:
-                   print("-----ElisabethReine-----")
-                   count_frames_for_cluster(ElisabethReine,directoryname)  
-                if FrancoFrancesco:
-                   print("-----FrancoFrancesco-----")
-                   count_frames_for_cluster(FrancoFrancesco,directoryname) 
-                if JeanPaulBelmondo:
-                   print("-----JeanPaulBelmondo-----") 
-                   count_frames_for_cluster(JeanPaulBelmondo,directoryname) 
-                if SalazarOliveira:
-                   print("-----SalazarOliveira-----")
-                   count_frames_for_cluster(SalazarOliveira,directoryname) 
-                if BrigitteBardot: 
-                   for i in BrigitteBardot:
-                       emb_array_testing0 = cluster_subset(emb_array_added_lables,i)
-                       list1= distance_among_2_clusters(emb_array_testing0,emb_array_training0)
-                       print("Cluster ID {} - BrigitteBardot - Cosine distance Mean: {}".format(i, mean3maxelements(list1)))
-                if CharlesDeGaulle:
-                   for i in CharlesDeGaulle:
-                       emb_array_testing1 = cluster_subset(emb_array_added_lables,i)
-                       list1= distance_among_2_clusters(emb_array_testing1,emb_array_training1)
-                       print("Cluster ID {} - CharlesDeGaulle - Cosine distance Mean: {}".format(i, mean3maxelements(list1)))
-                if ElisabethReine:
-                   for i in ElisabethReine:
-                       emb_array_testing2 = cluster_subset(emb_array_added_lables,i)
-                       list1= distance_among_2_clusters(emb_array_testing2,emb_array_training2)
-                       print("Cluster ID {} - ElisabethReine - Cosine distance Mean: {}".format(i, mean3maxelements(list1))) 
-                if FrancoFrancesco:
-                   for i in FrancoFrancesco:
-                       emb_array_testing3 = cluster_subset(emb_array_added_lables,i)
-                       list1= distance_among_2_clusters(emb_array_testing3,emb_array_training3)
-                       print("Cluster ID {} - FrancoFrancesco - Cosine distance Mean: {}".format(i, mean3maxelements(list1)))
-                if JeanPaulBelmondo:
-                   for i in JeanPaulBelmondo:
-                       emb_array_testing4 = cluster_subset(emb_array_added_lables,i)
-                       list1= distance_among_2_clusters(emb_array_testing4,emb_array_training4)
-                       print("Cluster ID {} - JeanPaulBelmondo - Cosine distance Mean: {}".format(i, mean3maxelements(list1)))  
-                if SalazarOliveira:
-                   for i in SalazarOliveira:
-                       emb_array_testing5 = cluster_subset(emb_array_added_lables,i)
-                       list1= distance_among_2_clusters(emb_array_testing5,emb_array_training5)
-                       print("Cluster ID {} - SalazarOliveira Cosine distance Mean: {}".format(i, mean3maxelements(list1)))
-                       
-
+                print("The frame rate of the video:",fps) 
+                famous_persons = []
+                for i, j in interest_cluster.items():
+                    famous_persons.append(j) 
+                famous_persons = list(set(famous_persons))           
+                for famous_person in famous_persons:
+                    cluster_id_famous_person_list = []
+                    for i, j in interest_cluster.items():
+                        if j == famous_person:
+                           cluster_id_famous_person_list.append(i)
+                    if merge_cluster:
+                       cluster_id_famous_person_list = merge_consecutive_cluster(cluster_id_famous_person_list,directoryname)
+                    print("{}: {}".format(famous_person,cluster_id_famous_person_list))
+                    if cluster_id_famous_person_list:
+                       count_frames_for_cluster(cluster_id_famous_person_list,directoryname)  
+                       if famous_person == "BrigitteBardot":
+                          for i in cluster_id_famous_person_list:
+                              emb_array_testing0 = cluster_subset(emb_array_added_lables,i)
+                              list1= distance_among_2_clusters(emb_array_testing0,emb_array_training0)
+                              print("Cluster ID {} - BrigitteBardot - Cosine distance Mean: {}".format(i, mean3maxelements(list1)))
+                       if famous_person == "CharlesDeGaulle":
+                          for i in cluster_id_famous_person_list:
+                              emb_array_testing1 = cluster_subset(emb_array_added_lables,i)
+                              list1= distance_among_2_clusters(emb_array_testing1,emb_array_training1)
+                              print("Cluster ID {} - CharlesDeGaulle - Cosine distance Mean: {}".format(i, mean3maxelements(list1)))  
+                       if famous_person == "ElisabethReine": 
+                          for i in cluster_id_famous_person_list:
+                              emb_array_testing2 = cluster_subset(emb_array_added_lables,i)
+                              list1= distance_among_2_clusters(emb_array_testing2,emb_array_training2)
+                              print("Cluster ID {} - ElisabethReine - Cosine distance Mean: {}".format(i, mean3maxelements(list1))) 
+                       if famous_person == "FrancoFrancesco":
+                          for i in cluster_id_famous_person_list:
+                              emb_array_testing3 = cluster_subset(emb_array_added_lables,i)
+                              list1= distance_among_2_clusters(emb_array_testing3,emb_array_training3)
+                              print("Cluster ID {} - FrancoFrancesco - Cosine distance Mean: {}".format(i, mean3maxelements(list1))) 
+                       if famous_person == "JeanPaulBelmondo":
+                          for i in cluster_id_famous_person_list:
+                              emb_array_testing4 = cluster_subset(emb_array_added_lables,i)
+                              list1= distance_among_2_clusters(emb_array_testing4,emb_array_training4)
+                              print("Cluster ID {} - JeanPaulBelmondo - Cosine distance Mean: {}".format(i, mean3maxelements(list1)))     
+                       if famous_person == "SalazarOliveira": 
+                          for i in cluster_id_famous_person_list:
+                              emb_array_testing5 = cluster_subset(emb_array_added_lables,i)
+                              list1= distance_among_2_clusters(emb_array_testing5,emb_array_training5)
+                              print("Cluster ID {} - SalazarOliveira Cosine distance Mean: {}".format(i, mean3maxelements(list1)))
+                    for i in cluster_id_famous_person_list:
+                        print("cluster Id {} - {} appear on {}".format(i,famous_person,str(datetime.timedelta(seconds=time_dict[int(i)]*1/fps))))
 
 def checkConsecutive(l):
     return sorted(l) == list(range(min(l), max(l)+1))
@@ -327,11 +277,13 @@ def merge_consecutive_cluster(humanname,directoryname):
                   break 
     humanname = list(map(str,humanname)) 
     return humanname        
+
 def count_frames(path):
     frames = 0    
     for _, _, filenames in os.walk(path):
         frames += len(filenames)
         print(frames) 
+
 def count_frames_for_cluster(humanname,directoryname):
     if humanname:
        for i in humanname:
@@ -370,7 +322,8 @@ def distance_among_2_clusters(a,b):
             k = 1 - distance.cosine(i,j)
             distance1.append(k)
     return distance1 
-                                                                                                                             
+
+
 def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser()
