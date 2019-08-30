@@ -161,13 +161,6 @@ def main():
                 label_training = pd.read_csv('data/embedding/label.csv',header = None)
                 embedding_training_added_lables = pd.concat([embedding_training,label_training], axis=1,ignore_index=True)
                 embedding_training_added_lables = embedding_training_added_lables.drop(embedding_training_added_lables.columns[[-1]], axis=1)
-                #subset of training clusters 
-                emb_array_training0 = cluster_subset(embedding_training_added_lables,0)
-                emb_array_training1 = cluster_subset(embedding_training_added_lables,1)
-                emb_array_training2 = cluster_subset(embedding_training_added_lables,2)
-                emb_array_training3 = cluster_subset(embedding_training_added_lables,3)
-                emb_array_training4 = cluster_subset(embedding_training_added_lables,4)
-                emb_array_training5 = cluster_subset(embedding_training_added_lables,5)
 
                 print('for testing...')
                 predictions = classifier.predict_proba(emb_array)
@@ -215,36 +208,11 @@ def main():
                     print("{}: {}".format(famous_person,cluster_id_famous_person_list))
                     if cluster_id_famous_person_list:
                        count_frames_for_cluster(cluster_id_famous_person_list,directoryname)  
-                       if famous_person == "BrigitteBardot":
-                          for i in cluster_id_famous_person_list:
-                              emb_array_testing0 = cluster_subset(emb_array_added_lables,i)
-                              list1= distance_among_2_clusters(emb_array_testing0,emb_array_training0)
-                              print("Cluster ID {} - BrigitteBardot - Cosine distance Mean: {}".format(i, mean3maxelements(list1)))
-                       if famous_person == "CharlesDeGaulle":
-                          for i in cluster_id_famous_person_list:
-                              emb_array_testing1 = cluster_subset(emb_array_added_lables,i)
-                              list1= distance_among_2_clusters(emb_array_testing1,emb_array_training1)
-                              print("Cluster ID {} - CharlesDeGaulle - Cosine distance Mean: {}".format(i, mean3maxelements(list1)))  
-                       if famous_person == "ElisabethReine": 
-                          for i in cluster_id_famous_person_list:
-                              emb_array_testing2 = cluster_subset(emb_array_added_lables,i)
-                              list1= distance_among_2_clusters(emb_array_testing2,emb_array_training2)
-                              print("Cluster ID {} - ElisabethReine - Cosine distance Mean: {}".format(i, mean3maxelements(list1))) 
-                       if famous_person == "FrancoFrancesco":
-                          for i in cluster_id_famous_person_list:
-                              emb_array_testing3 = cluster_subset(emb_array_added_lables,i)
-                              list1= distance_among_2_clusters(emb_array_testing3,emb_array_training3)
-                              print("Cluster ID {} - FrancoFrancesco - Cosine distance Mean: {}".format(i, mean3maxelements(list1))) 
-                       if famous_person == "JeanPaulBelmondo":
-                          for i in cluster_id_famous_person_list:
-                              emb_array_testing4 = cluster_subset(emb_array_added_lables,i)
-                              list1= distance_among_2_clusters(emb_array_testing4,emb_array_training4)
-                              print("Cluster ID {} - JeanPaulBelmondo - Cosine distance Mean: {}".format(i, mean3maxelements(list1)))     
-                       if famous_person == "SalazarOliveira": 
-                          for i in cluster_id_famous_person_list:
-                              emb_array_testing5 = cluster_subset(emb_array_added_lables,i)
-                              list1= distance_among_2_clusters(emb_array_testing5,emb_array_training5)
-                              print("Cluster ID {} - SalazarOliveira Cosine distance Mean: {}".format(i, mean3maxelements(list1)))
+                       for i in cluster_id_famous_person_list:
+                           emb_array_training = cluster_subset(embedding_training_added_lables,[i for i,x in enumerate(class_names) if x == famous_person][0])
+                           emb_array_testing = cluster_subset(emb_array_added_lables,i)
+                           list1= distance_among_2_clusters(emb_array_testing,emb_array_training)
+                           print("Cluster ID {} - {} - Cosine distance Mean: {}".format(i,famous_person, mean3maxelements(list1)))
                     for i in cluster_id_famous_person_list:
                         print("cluster Id {} - {} appear on {}".format(i,famous_person,str(datetime.timedelta(seconds=time_dict[int(i)]*1/fps))))
 
