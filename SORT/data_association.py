@@ -10,11 +10,10 @@ see https://github.com/nwojke/deep_sort
 """
 
 import numpy as np
-#from numba import jit
-from sklearn.utils.linear_assignment_ import linear_assignment
+from scipy.optimize import linear_sum_assignment
 
 
-#@jit
+# @jit
 def iou(bb_test, bb_gt):
     """
     Computes IUO between two bboxes in the form [x1,y1,x2,y2]
@@ -28,7 +27,7 @@ def iou(bb_test, bb_gt):
     wh = w * h
     o = wh / ((bb_test[2] - bb_test[0]) * (bb_test[3] - bb_test[1])
               + (bb_gt[2] - bb_gt[0]) * (bb_gt[3] - bb_gt[1]) - wh)
-    return (o)
+    return o
 
 
 def associate_detections_to_trackers(detections, trackers, iou_threshold=0.25):
@@ -37,35 +36,39 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.25):
 
     Returns 3 lists of matches, unmatched_detections and unmatched_trackers
     """
-    if (len(trackers) == 0):
+    if len(trackers) == 0:
         return np.empty((0, 2), dtype=int), np.arange(len(detections)), np.empty((0, 5), dtype=int)
     iou_matrix = np.zeros((len(detections), len(trackers)), dtype=np.float32)
 
     for d, det in enumerate(detections):
         for t, trk in enumerate(trackers):
             iou_matrix[d, t] = iou(det, trk)
-    '''The linear assignment module tries to minimise the total assignment cost.
-    In our case we pass -iou_matrix as we want to maximise the total IOU between track predictions and the frame detection.'''
-    matched_indices = linear_assignment(-iou_matrix)
+    '''
+    The linear assignment module tries to minimise the total assignment cost.
+    In our case we pass -iou_matrix as we want to maximise the total IOU
+     between track predictions and the frame detection.
+    '''
+    matched_indices = linear_sum_assignment(-iou_matrix)
+    matched_indices = np.transpose(np.asarray(matched_indices))
 
     unmatched_detections = []
     for d, det in enumerate(detections):
-        if (d not in matched_indices[:, 0]):
+        if d not in matched_indices[:, 0]:
             unmatched_detections.append(d)
     unmatched_trackers = []
     for t, trk in enumerate(trackers):
-        if (t not in matched_indices[:, 1]):
+        if t not in matched_indices[:, 1]:
             unmatched_trackers.append(t)
 
     # filter out matched with low IOU
     matches = []
     for m in matched_indices:
-        if (iou_matrix[m[0], m[1]] < iou_threshold):
+        if iou_matrix[m[0], m[1]] < iou_threshold:
             unmatched_detections.append(m[0])
             unmatched_trackers.append(m[1])
         else:
             matches.append(m.reshape(1, 2))
-    if (len(matches) == 0):
+    if len(matches) == 0:
         matches = np.empty((0, 2), dtype=int)
     else:
         matches = np.concatenate(matches, axis=0)

@@ -1,0 +1,12 @@
+six
+imageio
+pandas
+scikit-learn
+numpy
+scipy
+icrawler
+tensorflow
+opencv-python
+face_recognition
+Pillow
+filterpy
