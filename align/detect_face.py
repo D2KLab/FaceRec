@@ -31,7 +31,7 @@ import os
 
 import cv2
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from six import string_types, iteritems
 
 
@@ -87,10 +87,10 @@ class Network(object):
         data_dict = np.load(data_path, encoding='latin1', allow_pickle=True).item()  # pylint: disable=no-member
 
         for op_name in data_dict:
-            with tf.compat.v1.variable_scope(op_name, reuse=True):
+            with tf.variable_scope(op_name, reuse=True):
                 for param_name, data in iteritems(data_dict[op_name]):
                     try:
-                        var = tf.compat.v1.get_variable(param_name)
+                        var = tf.get_variable(param_name)
                         session.run(var.assign(data))
                     except ValueError:
                         if not ignore_missing:
@@ -124,7 +124,7 @@ class Network(object):
 
     def make_var(self, name, shape):
         """Creates a new TensorFlow variable."""
-        return tf.compat.v1.get_variable(name, shape, trainable=self.trainable)
+        return tf.get_variable(name, shape, trainable=self.trainable)
 
     def validate_padding(self, padding):
         """Verifies that the padding is one of the supported ones."""
@@ -152,7 +152,7 @@ class Network(object):
         assert c_o % group == 0
         # Convolution for a given input and kernel
         convolve = lambda i, k: tf.nn.conv2d(i, k, [1, s_h, s_w, 1], padding=padding)
-        with tf.compat.v1.variable_scope(name) as scope:
+        with tf.variable_scope(name) as scope:
             kernel = self.make_var('weights', shape=[k_h, k_w, c_i // group, c_o])
             # This is the common-case. Convolve the input without any further complications.
             output = convolve(inp, kernel)
@@ -167,7 +167,7 @@ class Network(object):
 
     @layer
     def prelu(self, inp, name):
-        with tf.compat.v1.variable_scope(name):
+        with tf.variable_scope(name):
             i = int(inp.get_shape()[-1])
             alpha = self.make_var('alpha', shape=(i,))
             output = tf.nn.relu(inp) + tf.multiply(alpha, -tf.nn.relu(-inp))
@@ -184,7 +184,7 @@ class Network(object):
 
     @layer
     def fc(self, inp, num_out, name, relu=True):
-        with tf.compat.v1.variable_scope(name):
+        with tf.variable_scope(name):
             input_shape = inp.get_shape()
             if input_shape.ndims == 4:
                 # The input is spatial. Vectorize it first.
@@ -196,7 +196,7 @@ class Network(object):
                 feed_in, dim = (inp, input_shape[-1].value)
             weights = self.make_var('weights', shape=[dim, num_out])
             biases = self.make_var('biases', [num_out])
-            op = tf.nn.relu_layer if relu else tf.compat.v1.nn.xw_plus_b
+            op = tf.nn.relu_layer if relu else tf.nn.xw_plus_b
             fc = op(feed_in, weights, biases, name=name)
             return fc
 
@@ -283,16 +283,16 @@ def create_mtcnn(sess, model_path):
     if not model_path:
         model_path, _ = os.path.split(os.path.realpath(__file__))
 
-    with tf.compat.v1.variable_scope('pnet'):
-        data = tf.compat.v1.placeholder(tf.float32, (None, None, None, 3), 'input')
+    with tf.variable_scope('pnet'):
+        data = tf.placeholder(tf.float32, (None, None, None, 3), 'input')
         pnet = PNet({'data': data})
         pnet.load(os.path.join(model_path, 'det1.npy'), sess)
-    with tf.compat.v1.variable_scope('rnet'):
-        data = tf.compat.v1.placeholder(tf.float32, (None, 24, 24, 3), 'input')
+    with tf.variable_scope('rnet'):
+        data = tf.placeholder(tf.float32, (None, 24, 24, 3), 'input')
         rnet = RNet({'data': data})
         rnet.load(os.path.join(model_path, 'det2.npy'), sess)
-    with tf.compat.v1.variable_scope('onet'):
-        data = tf.compat.v1.placeholder(tf.float32, (None, 48, 48, 3), 'input')
+    with tf.variable_scope('onet'):
+        data = tf.placeholder(tf.float32, (None, 48, 48, 3), 'input')
         onet = ONet({'data': data})
         onet.load(os.path.join(model_path, 'det3.npy'), sess)
 

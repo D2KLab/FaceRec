@@ -33,7 +33,7 @@ import math
 import pickle
 import argparse
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import utils.facenet as facenet
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
@@ -48,8 +48,8 @@ def main(args):
         with tf.Session() as sess:
 
             np.random.seed(seed=args.seed)
-            embeddingdir = "data/embedding/"
-            os.makedirs(embeddingdir, exist_ok=True)
+            embedding_dir = "data/embedding/"
+            os.makedirs(embedding_dir, exist_ok=True)
 
             if args.use_split_dataset:
                 dataset_tmp = facenet.get_dataset(args.data_dir)
@@ -79,9 +79,9 @@ def main(args):
             facenet.load_model(args.model)
 
             # Get input and output tensors
-            images_placeholder = tf.compat.v1.get_default_graph().get_tensor_by_name("input:0")
-            embeddings = tf.compat.v1.get_default_graph().get_tensor_by_name("embeddings:0")
-            phase_train_placeholder = tf.compat.v1.get_default_graph().get_tensor_by_name("phase_train:0")
+            images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
+            embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
+            phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
             embedding_size = embeddings.get_shape()[1]
             print(embedding_size)
 
@@ -98,12 +98,13 @@ def main(args):
                 feed_dict = {images_placeholder: images, phase_train_placeholder: False}
                 emb_array[start_index:end_index, :] = sess.run(embeddings, feed_dict=feed_dict)
             # Store embedding and labels
-            np.savetxt(embeddingdir + 'embedding.csv', emb_array, delimiter=",")
-            with open(embeddingdir + 'label.csv', 'w') as f:
+            np.savetxt(embedding_dir + 'embedding.csv', emb_array, delimiter=",")
+            with open(embedding_dir + 'label.csv', 'w') as f:
                 writer = csv.writer(f)
                 writer.writerows(zip(labels, paths))
 
             classifier_filename_exp = os.path.expanduser(args.classifier_filename)
+            os.makedirs(os.path.dirname(classifier_filename_exp), exist_ok=True)
 
             if args.mode == 'TRAIN':
                 # Train classifier

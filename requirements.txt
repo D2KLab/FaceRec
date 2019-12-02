@@ -5,7 +5,7 @@ scikit-learn
 numpy
 scipy
 icrawler
-tensorflow
+tensorflow==1.15
 opencv-python
 face_recognition
 Pillow

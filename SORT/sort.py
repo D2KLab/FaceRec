@@ -4,8 +4,8 @@ As implemented in https://github.com/abewley/sort but with some modifications
 
 from __future__ import print_function
 
-import utils.sort_utils as utils
 import numpy as np
+import utils.sort_utils as utils
 from SORT.correlation_tracker import CorrelationTracker
 from SORT.data_association import associate_detections_to_trackers
 from SORT.kalman_tracker import KalmanBoxTracker
@@ -78,7 +78,6 @@ class Sort:
             i -= 1
             # remove dead tracklet
             if trk.time_since_update >= self.max_age or d[2] < 0 or d[3] < 0 or d[0] > img_size[1] or d[1] > img_size[0]:
-
                 if len(trk.face_addtional_attribute) >= 5:
                     utils.save_to_file(root_dic, trk)
                     # time_dict.update({trk.id : self.frame_count})

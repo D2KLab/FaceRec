@@ -4,7 +4,7 @@ import pickle
 
 import cv2
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 import align.detect_face as detect_face
 import utils.facenet as facenet
@@ -36,18 +36,18 @@ def main():
     tracker = Sort()  # create instance of the SORT tracker
 
     print('Start track and extract......')
-    with tf.compat.v1.Graph().as_default():
-        with tf.compat.v1.Session(
-                config=tf.compat.v1.ConfigProto(gpu_options=tf.compat.v1.GPUOptions(allow_growth=True),
+    with tf.Graph().as_default():
+        with tf.Session(
+                config=tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True),
                                                 log_device_placement=False)) as sess:
             project_dir = os.path.dirname(os.path.abspath(__file__))
             pnet, rnet, onet = detect_face.create_mtcnn(sess, os.path.join(project_dir, "align"))
             facenet_model_path = args.model_path
             # facenet_model_path ="model\\20180402-114759.pb"
             facenet.load_model(facenet_model_path)
-            images_placeholder = tf.compat.v1.get_default_graph().get_tensor_by_name("input:0")
-            embeddings = tf.compat.v1.get_default_graph().get_tensor_by_name("embeddings:0")
-            phase_train_placeholder = tf.compat.v1.get_default_graph().get_tensor_by_name("phase_train:0")
+            images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
+            embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
+            phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
             embedding_size = embeddings.get_shape()[1]
 
             margin = 40  # if the face is big in your video ,you can set it bigger for tracking easiler
@@ -123,8 +123,6 @@ def main():
                     # f.write(" ".join(map(str, trackers)) + "\n")
                     c += 1
                     for d in trackers:
-                        obid_map_classname = []
-                        print(d)
                         d = [int(i) for i in d]
                         print(d)
                         if all(i >= 0 for i in d):

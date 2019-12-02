@@ -1,6 +1,7 @@
 .DS_Store
 /data/
 /video/
+/classifier/
 output.txt
 
 .idea
