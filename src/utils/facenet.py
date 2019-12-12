@@ -349,8 +349,7 @@ def get_dataset(paths, has_class_directories=True):
     dataset = []
     for path in paths.split(':'):
         path_exp = os.path.expanduser(path)
-        classes = os.listdir(path_exp)
-        classes = [x for x in classes if '.DS_Store' not in x]
+        classes = [file for file in os.listdir(path_exp) if os.path.isdir(os.path.join(path_exp, file))]
         classes.sort()
         nrof_classes = len(classes)
         for i in range(nrof_classes):

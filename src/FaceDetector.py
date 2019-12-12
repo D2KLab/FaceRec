@@ -32,29 +32,27 @@ import imageio
 import argparse
 import numpy as np
 from PIL import Image
-import tensorflow as tf
-import utils.facenet as facenet
-import align.detect_face
-from time import sleep
+import tensorflow.compat.v1 as tf
+from .utils import facenet
+from .align import detect_face
 
 
-def main(args):
-    sleep(random.random())
-    output_dir = os.path.expanduser(args.output_dir)
-    print(output_dir)
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+def main(input_dir='data/training_img', output_dir='data/training_img_aligned', image_size=182, margin=44,
+         random_order=False, detect_multiple_faces=False):
+    output_dir = os.path.expanduser(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
+
     # Store some git revision info in a text file in the log directory
     src_path, _ = os.path.split(os.path.realpath(__file__))
     facenet.store_revision_info(src_path, output_dir, ' '.join(sys.argv))
-    dataset = facenet.get_dataset(args.input_dir)
+    dataset = facenet.get_dataset(input_dir)
     print('Creating networks and loading parameters')
 
     with tf.Graph().as_default():
-        gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
-        sess = tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
+        gpu_options = tf.GPUOptions(allow_growth=True)
+        sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
         with sess.as_default():
-            pnet, rnet, onet = align.detect_face.create_mtcnn(sess, None)
+            pnet, rnet, onet = detect_face.create_mtcnn(sess, None)
 
     minsize = 20  # minimum size of face
     threshold = [0.6, 0.7, 0.7]  # three steps's threshold
@@ -67,14 +65,15 @@ def main(args):
     with open(bounding_boxes_filename, "w") as text_file:
         nrof_images_total = 0
         nrof_successfully_aligned = 0
-        if args.random_order:
+        if random_order:
             random.shuffle(dataset)
         for cls in dataset:
             output_class_dir = os.path.join(output_dir, cls.name)
-            if not os.path.exists(output_class_dir):
-                os.makedirs(output_class_dir)
-                if args.random_order:
-                    random.shuffle(cls.image_paths)
+            os.makedirs(output_class_dir, exist_ok=True)
+
+            if random_order:
+                random.shuffle(cls.image_paths)
+
             for image_path in cls.image_paths:
                 nrof_images_total += 1
                 filename = os.path.splitext(os.path.split(image_path)[1])[0]
@@ -94,15 +93,14 @@ def main(args):
                             img = facenet.to_rgb(img)
                         img = img[:, :, 0:3]
 
-                        bounding_boxes, _ = align.detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold,
-                                                                          factor)
+                        bounding_boxes, _ = detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold, factor)
                         nrof_faces = bounding_boxes.shape[0]
                         if nrof_faces > 0:
                             det = bounding_boxes[:, 0:4]
                             det_arr = []
                             img_size = np.asarray(img.shape)[0:2]
                             if nrof_faces > 1:
-                                if args.detect_multiple_faces:
+                                if detect_multiple_faces:
                                     for i in range(nrof_faces):
                                         det_arr.append(np.squeeze(det[i]))
                                 else:
@@ -120,17 +118,16 @@ def main(args):
                             for i, det in enumerate(det_arr):
                                 det = np.squeeze(det)
                                 bb = np.zeros(4, dtype=np.int32)
-                                bb[0] = np.maximum(det[0] - args.margin / 2, 0)
-                                bb[1] = np.maximum(det[1] - args.margin / 2, 0)
-                                bb[2] = np.minimum(det[2] + args.margin / 2, img_size[1])
-                                bb[3] = np.minimum(det[3] + args.margin / 2, img_size[0])
+                                bb[0] = np.maximum(det[0] - margin / 2, 0)
+                                bb[1] = np.maximum(det[1] - margin / 2, 0)
+                                bb[2] = np.minimum(det[2] + margin / 2, img_size[1])
+                                bb[3] = np.minimum(det[3] + margin / 2, img_size[0])
                                 cropped = img[bb[1]:bb[3], bb[0]:bb[2], :]
-                                # scaled = misc.imresize(cropped, (args.image_size, args.image_size), interp='bilinear')
-                                scaled = np.array(Image.fromarray(cropped).resize((args.image_size, args.image_size),
+                                scaled = np.array(Image.fromarray(cropped).resize((image_size, image_size),
                                                                                   resample=Image.BILINEAR))
                                 nrof_successfully_aligned += 1
                                 filename_base, file_extension = os.path.splitext(output_filename)
-                                if args.detect_multiple_faces:
+                                if detect_multiple_faces:
                                     output_filename_n = "{}_{}{}".format(filename_base, i, file_extension)
                                 else:
                                     output_filename_n = "{}{}".format(filename_base, file_extension)
@@ -147,21 +144,21 @@ def main(args):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('input_dir', type=str, help='Directory with unaligned images.')
-    parser.add_argument('output_dir', type=str, help='Directory with aligned face thumbnails.')
-    parser.add_argument('--image_size', type=int,
-                        help='Image size (height, width) in pixels.', default=182)
-    parser.add_argument('--margin', type=int,
-                        help='Margin for the crop around the bounding box (height, width) in pixels.', default=44)
-    parser.add_argument('--random_order',
-                        help='Shuffles the order of images to enable alignment using multiple processes.',
-                        action='store_true')
-    parser.add_argument('--gpu_memory_fraction', type=float,
-                        help='Upper bound on the amount of GPU memory that will be used by the process.', default=1.0)
-    parser.add_argument('--detect_multiple_faces', type=bool,
-                        help='Detect and align multiple faces per image.', default=False)
+    parser.add_argument('input_dir', type=str, default='data/training_img',
+                        help='Directory with unaligned images')
+    parser.add_argument('output_dir', type=str, default='data/training_img_aligned',
+                        help='Directory with aligned face thumbnails')
+    parser.add_argument('--image_size', type=int, default=182,
+                        help='Image size (height, width) in pixels')
+    parser.add_argument('--margin', type=int, default=44,
+                        help='Margin for the crop around the bounding box (height, width) in pixels')
+    parser.add_argument('--random_order', action='store_true',
+                        help='Shuffles the order of images to enable alignment using multiple processes')
+    parser.add_argument('--detect_multiple_faces', type=bool, default=False,
+                        help='Detect and align multiple faces per image')
     return parser.parse_args(argv)
 
 
 if __name__ == '__main__':
-    main(parse_arguments(sys.argv[1:]))
+    args = parse_arguments(sys.argv[1:])
+    main(args.input_dir, args.output_dir, args.image_size, args.margin, args.random_order, args.detect_multiple_faces)

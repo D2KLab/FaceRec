@@ -10,3 +10,5 @@ opencv-python
 face_recognition
 Pillow
 filterpy
+flask
+tinydb
