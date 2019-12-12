@@ -11,9 +11,26 @@ from .utils import facenet
 from .align import detect_face
 
 
-def main(video_dir='./video', output_path='data/cluster', model_path='model/20180402-114759.pb',
+def rect2xywh(x, y, x2, y2):
+    w = x2 - x  # width
+    h = y2 - y  # height
+
+    return {'x': int(x), 'y': int(y), 'w': int(w), 'h': int(h)}
+
+
+def frame2npt(frame, fps):
+    return frame / fps
+
+
+def main(video_path, output_path='data/cluster', model_path='model/20180402-114759.pb',
          classifier_path='classifier/classifier.pkl', video_speedup=50, folder_containing_frame='./data/frames',
          confidence_threshold=0.795):
+    video_name = os.path.join('video', video_path.replace('/', '_') + '.mp4')
+    if not os.path.isfile(video_name):
+        video_name = video_path
+    if not os.path.isfile(video_name):  # still
+        raise FileNotFoundError('video not found: %s' % video_name)
+
     os.makedirs(folder_containing_frame, exist_ok=True)
 
     minsize = 20
@@ -46,13 +63,16 @@ def main(video_dir='./video', output_path='data/cluster', model_path='model/2018
             # Start video capture
             person_detected = collections.Counter()
 
-            for filename in os.listdir(video_dir):
-                suffix = filename.split('.')[-1]
-                if suffix != 'mp4' and suffix != 'avi':
-                    continue
-                video_name = os.path.join(video_dir, filename)
-                print(video_name)
-                video_capture = cv2.VideoCapture(video_name)
+            # for filename in os.listdir(video_dir):
+            #     suffix = filename.split('.')[-1]
+            #     if suffix != 'mp4' and suffix != 'avi':
+            #         continue
+            #     video_name = os.path.join(video_dir, filename)
+            print(video_name)
+            video_capture = cv2.VideoCapture(video_name)
+
+            # frames per second
+            fps = video_capture.get(cv2.CAP_PROP_FPS)
 
             total_frames_passed = -1
 
@@ -110,17 +130,13 @@ def main(video_dir='./video', output_path='data/cluster', model_path='model/2018
                                         1, (0, 0, 255), thickness=1, lineType=2)
                             person_detected[best_name] += 1
 
-                            x = bb[i][0]
-                            y = bb[i][1]
-                            w = bb[i][2] - x  # width
-                            h = bb[i][3] - y  # height
-
                             matches.append({
                                 'name': best_name,
                                 'confidence': best_class_probabilities,
+                                'video': video_path,
                                 'frame': total_frames_passed,
-                                'bounding':
-                                    {'x': int(x), 'y': int(y), 'w': int(w), 'h': int(h)}
+                                'npt': frame2npt(total_frames_passed, fps),
+                                'bounding': rect2xywh(bb[i][0], bb[i][1], bb[i][2], bb[i][3])
                             })
 
                             with open(output_path, 'a+') as f:
@@ -136,9 +152,8 @@ def main(video_dir='./video', output_path='data/cluster', model_path='model/2018
 def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--video_dir", type=str,
-                        help='Path to the data directory containing videos.',
-                        default="./video")
+    parser.add_argument("--video", type=str, required=True,
+                        help='Path to the video to be converted.')
     parser.add_argument('--output_path', type=str,
                         help='Path to the txt output file',
                         default='data/cluster')
@@ -161,5 +176,5 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    main(args.video_dir, args.output_path, args.model_path, args.classifier_path,
+    main(args.video, args.output_path, args.model_path, args.classifier_path,
          args.video_speedup, args.folder_containing_frame, args.confidence_threshold)
