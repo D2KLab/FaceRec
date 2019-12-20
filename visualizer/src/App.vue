@@ -1,17 +1,14 @@
 <template>
   <div id="app">
-    <AnnotatedVideo msg="Welcome to Your Vue.js App"/>
+    Visualizer
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import AnnotatedVideo from './components/AnnotatedVideo.vue';
 
 export default {
   name: 'app',
-  components: {
-    AnnotatedVideo,
-  },
 };
 </script>
 
