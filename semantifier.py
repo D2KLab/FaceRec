@@ -49,10 +49,12 @@ def semantify(res):
 
         g.add((frag, a, EBUCORE['MediaFragment']))
         g.add((frag, EBUCORE['isMediaFragmentOf'], video))
+
         g.add((body, a, NIF['Annotation']))
         g.add((body, a, MEMAD['VisualPersonIdentification']))
         g.add((body, RDF['value'], Literal(d['name'])))
         g.add((body, NIF['taIdentProv'], EURECOM_FACEREC))
+        g.add((body, NIF['taIdentConf'], Literal(d['confidence'], datatype=XSD['decimal'])))
 
         annotation = URIRef('http://data.memad.eu/annotation/video-annotation/%s' % uuid)
 

@@ -11,6 +11,7 @@ face_recognition
 Pillow
 filterpy
 flask
+flask-cors
 tinydb
 rdflib
 uuid

@@ -2,6 +2,7 @@ import argparse
 import collections
 import os
 import pickle
+import re
 
 import cv2
 import numpy as np
@@ -22,15 +23,31 @@ def frame2npt(frame, fps):
     return frame / fps
 
 
-def main(video_path, output_path='data/cluster', model_path='model/20180402-114759.pb',
-         classifier_path='classifier/classifier.pkl', video_speedup=50, folder_containing_frame='./data/frames',
-         confidence_threshold=0.795):
-    video_name = os.path.join('video', video_path.replace('/', '_') + '.mp4')
-    if not os.path.isfile(video_name):
-        video_name = video_path
-    if not os.path.isfile(video_name):  # still
-        raise FileNotFoundError('video not found: %s' % video_name)
+def get_capture(video_path):
+    if video_path.startswith('http'):  # it is a uri!
+        pass
+    else:
+        # TODO remove me when connected to KG
+        video_name = os.path.join('video', video_path.replace('/', '_') + '.mp4')
+        if not os.path.isfile(video_name):
+            video_name = video_path
+        if not os.path.isfile(video_name):  # still
+            raise FileNotFoundError('video not found: %s' % video_name)
 
+    return cv2.VideoCapture(video_path)
+
+
+def main(video_path, output_path='data/cluster', model_path='model/20180402-114759.pb',
+         classifier_path='classifier/classifier.pkl', video_speedup=50, folder_containing_frame=None,
+         confidence_threshold=0.6):
+    video_capture = get_capture(video_path)
+
+    if folder_containing_frame is None:
+        temp = re.sub(r'[:/]', '_', video_path)
+        if '?' in temp:
+            temp = temp.split('?')[0]
+        folder_containing_frame = os.path.join('./data/frames', temp)
+    print(folder_containing_frame)
     os.makedirs(folder_containing_frame, exist_ok=True)
 
     minsize = 20
@@ -68,8 +85,6 @@ def main(video_path, output_path='data/cluster', model_path='model/20180402-1147
             #     if suffix != 'mp4' and suffix != 'avi':
             #         continue
             #     video_name = os.path.join(video_dir, filename)
-            print(video_name)
-            video_capture = cv2.VideoCapture(video_name)
 
             # frames per second
             fps = video_capture.get(cv2.CAP_PROP_FPS)
@@ -96,6 +111,7 @@ def main(video_path, output_path='data/cluster', model_path='model/20180402-1147
 
                     bb = np.zeros((faces_found, 4), dtype=np.int32)
                     for i in range(faces_found):
+                        # TODO why this? (following 4 lines)
                         bb[i][0] = det[i][0]
                         bb[i][1] = det[i][1]
                         bb[i][2] = det[i][2]
@@ -152,23 +168,23 @@ def main(video_path, output_path='data/cluster', model_path='model/20180402-1147
 def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--video", type=str, required=True,
-                        help='Path to the video to be converted.')
+    parser.add_argument('-v', '--video', type=str, required=True,
+                        help='Path or URI of the video to be converted.')
     parser.add_argument('--output_path', type=str,
                         help='Path to the txt output file',
                         default='data/cluster')
     parser.add_argument('--model_path', type=str,
                         help='Path to embedding model',
                         default="model/20180402-114759.pb")
-    parser.add_argument('--classifer_path', type=str,
+    parser.add_argument('--classifier_path', type=str,
                         help='Path to KNN classifier',
                         default="classifier/classifier.pkl")
     parser.add_argument('--video_speedup', type=int,
                         help='Speed up for the video', default=50)
     parser.add_argument("--folder_containing_frame", type=str,
                         help='Path to the out data directory containing frames.',
-                        default="./data/frames")
-    parser.add_argument("--confidence_threshold", type=str,
+                        default=None)
+    parser.add_argument("--confidence_threshold", type=float,
                         help='Confidence threshold for having a positive face match.',
                         default=0.795)
     return parser.parse_args()

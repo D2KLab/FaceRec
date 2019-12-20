@@ -1,15 +1,20 @@
 import os
+import time
 import datetime
 from tinydb import TinyDB, Query
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, send_from_directory
+from flask_cors import CORS
 
 import semantifier
 from src import *
+
+VIDEO_DIR = os.path.join(os.getcwd(), 'video')
 
 TRAINING_IMG = 'data/training_img'
 os.makedirs('database', exist_ok=True)
 
 app = Flask(__name__)
+CORS(app)
 db = TinyDB('database/db.json')
 
 
@@ -19,6 +24,8 @@ def now():
 
 @app.route('/crawler')
 def crawl():
+    start_time = time.time()
+
     q = request.args.get('q')
     if q is None:
         raise ValueError('Missing required parameter: q')
@@ -27,17 +34,21 @@ def crawl():
     return jsonify({
         'task': 'crawl',
         'time': now(),
+        'execution_time': (time.time() - start_time),
         'status': 'ok'
     })
 
 
 @app.route('/train')
 def train():
+    start_time = time.time()
+
     FaceDetector.main()
     classifier.main('TRAIN', classifier='SVM', batch_size=200)
     return jsonify({
         'task': 'train',
         'time': now(),
+        'execution_time': (time.time() - start_time),
         'status': 'ok'
     })
 
@@ -47,6 +58,8 @@ def train():
 # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/eurovaalit-2019-kuka-johtaa-eurooppaa/d9d05488b35db559cdef35bac95f518ee0dda76a
 @app.route('/recognise')
 def recognise():
+    start_time = time.time()
+
     video = request.args.get('video')
     speedup = request.args.get('speedup', type=int, default=1)
     no_cache = 'no_cache' in request.args.to_dict()
@@ -62,6 +75,7 @@ def recognise():
         results = {
             'task': 'recognise',
             'status': 'ok',
+            'execution_time': (time.time() - start_time),
             'time': now(),
             'video': video,
             'results': r
@@ -76,6 +90,11 @@ def recognise():
         return Response(semantifier.semantify(results), mimetype='text/turtle')
 
     return jsonify(results)
+
+
+@app.route('/video/<path:path>')
+def send_video(path):
+    return send_from_directory(VIDEO_DIR, path, as_attachment=True)
 
 
 @app.errorhandler(ValueError)
