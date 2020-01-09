@@ -5,10 +5,10 @@ As implemented in https://github.com/abewley/sort but with some modifications
 from __future__ import print_function
 
 import numpy as np
-import utils.sort_utils as utils
-from SORT.correlation_tracker import CorrelationTracker
-from SORT.data_association import associate_detections_to_trackers
-from SORT.kalman_tracker import KalmanBoxTracker
+from . import sort_utils as utils
+from .correlation_tracker import CorrelationTracker
+from .data_association import associate_detections_to_trackers
+from .kalman_tracker import KalmanBoxTracker
 
 
 class Sort:
@@ -48,7 +48,7 @@ class Sort:
         trks = np.ma.compress_rows(np.ma.masked_invalid(trks))
         for t in reversed(to_del):
             self.trackers.pop(t)
-        if dets != []:
+        if len(dets) > 0:
             matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(dets, trks)
 
             # update matched trackers with assigned detections
@@ -56,35 +56,37 @@ class Sort:
                 if t not in unmatched_trks:
                     d = matched[np.where(matched[:, 1] == t)[0], 0]
                     trk.update(dets[d, :][0], img)  # for dlib re-intialize the trackers ?!
-                    trk.face_addtional_attribute.append(additional_attribute_list[d[0]])
+                    trk.face_additional_attribute.append(additional_attribute_list[d[0]])
 
             # create and initialise new trackers for unmatched detections
             for i in unmatched_dets:
                 if not self.use_dlib:
                     trk = KalmanBoxTracker(dets[i, :])
-                    trk.face_addtional_attribute.append(additional_attribute_list[i])
-
+                    trk.face_additional_attribute.append(additional_attribute_list[i])
                 else:
                     trk = CorrelationTracker(dets[i, :], img)
                 self.trackers.append(trk)
 
         i = len(self.trackers)
         for trk in reversed(self.trackers):
-            if dets == []:
+            if len(dets) == 0:
                 trk.update([], img)
             d = trk.get_state()
             if (trk.time_since_update < 1) and (trk.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
                 ret.append(np.concatenate((d, [trk.id + 1])).reshape(1, -1))  # +1 as MOT benchmark requires positive
             i -= 1
             # remove dead tracklet
-            if trk.time_since_update >= self.max_age or d[2] < 0 or d[3] < 0 or d[0] > img_size[1] or d[1] > img_size[0]:
-                if len(trk.face_addtional_attribute) >= 5:
+            if trk.time_since_update >= self.max_age or d[2] < 0 or d[3] < 0 or d[0] > img_size[1] or d[1] > img_size[
+                0]:
+                if len(trk.face_additional_attribute) >= 5:
                     utils.save_to_file(root_dic, trk)
                     # time_dict.update({trk.id : self.frame_count})
-                    with open('tracker_saved_greater_5.txt', 'a+') as f:
+                    # TODO make this path a parameter
+                    with open('data/tracker_saved_greater_5.txt', 'a+') as f:
                         f.write(str(trk.id) + '.' + str(self.frame_count) + "\n")
 
                 self.trackers.pop(i)
         if len(ret) > 0:
             return np.concatenate(ret)
+
         return np.empty((0, 5))

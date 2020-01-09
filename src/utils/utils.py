@@ -2,6 +2,43 @@
 
 import numpy as np
 import math
+import cv2
+import os
+import re
+
+
+def rect2xywh(x, y, x2, y2):
+    w = x2 - x  # width
+    h = y2 - y  # height
+
+    return {'x': int(x), 'y': int(y), 'w': int(w), 'h': int(h)}
+
+
+def frame2npt(frame, fps):
+    return frame / fps
+
+
+def get_capture(video_path):
+    if video_path.startswith('http'):  # it is a uri!
+        pass
+    else:
+        # TODO remove me when connected to KG
+        video_name = os.path.join('video', video_path.replace('/', '_') + '.mp4')
+        if not os.path.isfile(video_name):
+            video_name = video_path
+        if not os.path.isfile(video_name):  # still
+            raise FileNotFoundError('video not found: %s' % video_name)
+
+    return cv2.VideoCapture(video_path)
+
+
+def generate_output_path(base, video_path):
+    temp = re.sub(r'[:/]', '_', video_path)
+    if '?' in temp:
+        temp = temp.split('?')[0]
+    out = os.path.join(base, temp)
+    os.makedirs(out, exist_ok=True)
+    return out
 
 
 def compute_kl(mean_1, log_prec_1, mean_2, log_prec_2):
@@ -15,8 +52,8 @@ def compute_kl(mean_1, log_prec_1, mean_2, log_prec_2):
     len_1 = len(mean_1)
     len_2 = len(mean_2)
     len_max = max(len_1, len_2)
-    var_1, var_2 = np.exp(-log_prec_1), np.exp(-log_prec_2)     # computationally more stable?
-    kl = 0.5 * ( log_prec_1 - log_prec_2 - 1 + np.exp(log_prec_2 - log_prec_1) + np.power(mean_1-mean_2,2)/var_2 )
+    var_1, var_2 = np.exp(-log_prec_1), np.exp(-log_prec_2)  # computationally more stable?
+    kl = 0.5 * (log_prec_1 - log_prec_2 - 1 + np.exp(log_prec_2 - log_prec_1) + np.power(mean_1 - mean_2, 2) / var_2)
     # when log_prec_2 > -np.inf, log_prec_1=-np.inf leads to infinite kl
     if len_1 == 1:
         cond = np.logical_and(np.isinf(log_prec_1), log_prec_1 < 0)
@@ -55,14 +92,14 @@ def compute_kl(mean_1, log_prec_1, mean_2, log_prec_2):
 
 
 def test_compute_kl():
-    compute_kl(0*np.ones(2), np.inf*np.ones(2), 0*np.ones(1), np.inf*np.ones(1))
-    compute_kl(0*np.ones(2), -np.inf*np.ones(2), 0*np.ones(1), np.inf*np.ones(1))
-    compute_kl(0*np.ones(2), np.inf*np.ones(2), 0*np.ones(1), -np.inf*np.ones(1))
-    compute_kl(0*np.ones(2), -np.inf*np.ones(2), 0*np.ones(1), -np.inf*np.ones(1))
-    compute_kl(0*np.ones(1), np.inf*np.ones(1), 0*np.ones(2), np.inf*np.ones(2))
-    compute_kl(0*np.ones(1), -np.inf*np.ones(1), 0*np.ones(2), np.inf*np.ones(2))
-    compute_kl(0*np.ones(1), np.inf*np.ones(1), 0*np.ones(2), -np.inf*np.ones(2))
-    compute_kl(0*np.ones(1), -np.inf*np.ones(1), 0*np.ones(2), -np.inf*np.ones(2))
+    compute_kl(0 * np.ones(2), np.inf * np.ones(2), 0 * np.ones(1), np.inf * np.ones(1))
+    compute_kl(0 * np.ones(2), -np.inf * np.ones(2), 0 * np.ones(1), np.inf * np.ones(1))
+    compute_kl(0 * np.ones(2), np.inf * np.ones(2), 0 * np.ones(1), -np.inf * np.ones(1))
+    compute_kl(0 * np.ones(2), -np.inf * np.ones(2), 0 * np.ones(1), -np.inf * np.ones(1))
+    compute_kl(0 * np.ones(1), np.inf * np.ones(1), 0 * np.ones(2), np.inf * np.ones(2))
+    compute_kl(0 * np.ones(1), -np.inf * np.ones(1), 0 * np.ones(2), np.inf * np.ones(2))
+    compute_kl(0 * np.ones(1), np.inf * np.ones(1), 0 * np.ones(2), -np.inf * np.ones(2))
+    compute_kl(0 * np.ones(1), -np.inf * np.ones(1), 0 * np.ones(2), -np.inf * np.ones(2))
 
 
 def multiply_gaussians(*params):
@@ -86,16 +123,16 @@ def divide_gaussians(mean_precision_num, mean_precision_den):
     """
     precision_op = mean_precision_num[1] - mean_precision_den[1]
     try:
-        assert precision_op >= 0.        #   making it > so that mean_op is not inf
+        assert precision_op >= 0.  # making it > so that mean_op is not inf
     except AssertionError:
         print('inputs = %s, %s' % (mean_precision_num, mean_precision_den))
-        print('precision_op = %s' % (precision_op))
+        print('precision_op = %s' % precision_op)
         raise AssertionError
     if precision_op == 0.:
         mean_op = 0.
     else:
         mean_op = (mean_precision_num[0] * mean_precision_num[1] \
-                     - mean_precision_den[0] * mean_precision_den[1] ) / precision_op
+                   - mean_precision_den[0] * mean_precision_den[1]) / precision_op
     return np.array([mean_op, precision_op])
 
 
@@ -156,22 +193,24 @@ def softmax(x):
 
 def assert_no_nan(mat, name='matrix'):
     try:
-        assert(not any(np.isnan(mat)))
+        assert (not any(np.isnan(mat)))
     except AssertionError:
         print('%s contains NaN' % name)
         print(mat)
         raise AssertionError
 
+
 def check_if_one(val):
     try:
-        assert(np.abs(val - 1) < 1e-9)
+        assert (np.abs(val - 1) < 1e-9)
     except AssertionError:
         print('val = %s (needs to be equal to 1)' % val)
         raise AssertionError
 
+
 def check_if_zero(val):
     try:
-        assert(np.abs(val) < 1e-9)
+        assert (np.abs(val) < 1e-9)
     except AssertionError:
         print('val = %s (needs to be equal to 0)' % val)
         raise AssertionError
@@ -179,18 +218,18 @@ def check_if_zero(val):
 
 def linear_regression(x, y):
     ls = np.linalg.lstsq(x, y)
-    #print ls
+    # print ls
     coef = ls[0]
     if ls[1]:
-        sum_squared_residuals = float(ls[1])    # sum of squared residuals
+        sum_squared_residuals = float(ls[1])  # sum of squared residuals
     else:
-        sum_squared_residuals = np.sum(np.dot(x, coef) - y)    # sum of squared residuals
-    return (coef, sum_squared_residuals)
+        sum_squared_residuals = np.sum(np.dot(x, coef) - y)  # sum of squared residuals
+    return coef, sum_squared_residuals
 
 
 def sample_multinomial(prob):
     try:
-        k = int(np.where(np.random.multinomial(1, prob, size=1)[0]==1)[0])
+        k = int(np.where(np.random.multinomial(1, prob, size=1)[0] == 1)[0])
     except TypeError:
         print('problem in sample_multinomial: prob = ')
         print(prob)
@@ -229,14 +268,14 @@ def get_kth_minimum(x, k=1):
         based on the incomplete selection sort pseudocode """
     n = len(x)
     for i in range(n):
-        minIndex = i
-        minValue = x[i]
-        for j in range(i+1, n):
-            if x[j] < minValue:
-                minIndex = j
-                minValue = x[j]
-        x[i], x[minIndex] = x[minIndex], x[i]
-    return x[k-1]
+        min_index = i
+        min_value = x[i]
+        for j in range(i + 1, n):
+            if x[j] < min_value:
+                min_index = j
+                min_value = x[j]
+        x[i], x[min_index] = x[min_index], x[i]
+    return x[k - 1]
 
 
 class empty(object):
@@ -252,7 +291,8 @@ def sigmoid(x):
 def compute_m_sd(x):
     m = np.mean(x)
     s = np.sqrt(np.var(x))
-    return (m, s)
+    return m, s
+
 
 if __name__ == "__main__":
     test_compute_kl()

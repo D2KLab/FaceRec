@@ -1,5 +1,6 @@
 """ Tensorflow implementation of the face detection / alignment algorithm found at
 https://github.com/kpzhang93/MTCNN_face_detection_alignment
+Edited again from: https://github.com/davidsandberg/facenet/blob/master/src/align/detect_face.py
 """
 # MIT License
 # 
@@ -177,10 +178,10 @@ class Network(object):
     def max_pool(self, inp, k_h, k_w, s_h, s_w, name, padding='SAME'):
         self.validate_padding(padding)
         return tf.nn.max_pool2d(inp,
-                              ksize=[1, k_h, k_w, 1],
-                              strides=[1, s_h, s_w, 1],
-                              padding=padding,
-                              name=name)
+                                ksize=[1, k_h, k_w, 1],
+                                strides=[1, s_h, s_w, 1],
+                                padding=padding,
+                                name=name)
 
     @layer
     def fc(self, inp, num_out, name, relu=True):
@@ -370,7 +371,7 @@ def detect_face(img, minsize, pnet, rnet, onet, threshold, factor):
             if tmp.shape[0] > 0 and tmp.shape[1] > 0 or tmp.shape[0] == 0 and tmp.shape[1] == 0:
                 tempimg[:, :, :, k] = imresample(tmp, (24, 24))
             else:
-                return np.empty()
+                return np.empty((0, 0))
         tempimg = (tempimg - 127.5) * 0.0078125
         tempimg1 = np.transpose(tempimg, (3, 1, 0, 2))
         out = rnet(tempimg1)
@@ -398,7 +399,7 @@ def detect_face(img, minsize, pnet, rnet, onet, threshold, factor):
             if tmp.shape[0] > 0 and tmp.shape[1] > 0 or tmp.shape[0] == 0 and tmp.shape[1] == 0:
                 tempimg[:, :, :, k] = imresample(tmp, (48, 48))
             else:
-                return np.empty()
+                return np.empty((0, 0))
         tempimg = (tempimg - 127.5) * 0.0078125
         tempimg1 = np.transpose(tempimg, (3, 1, 0, 2))
         out = onet(tempimg1)
@@ -422,7 +423,7 @@ def detect_face(img, minsize, pnet, rnet, onet, threshold, factor):
             total_boxes = total_boxes[pick, :]
             points = points[:, pick]
 
-    return total_boxes, points
+    return np.maximum(total_boxes, np.zeros_like(total_boxes)), points
 
 
 def bulk_detect_face(images, detection_window_size_ratio, pnet, rnet, onet, threshold, factor):
@@ -527,7 +528,7 @@ def bulk_detect_face(images, detection_window_size_ratio, pnet, rnet, onet, thre
                     if tmp.shape[0] > 0 and tmp.shape[1] > 0 or tmp.shape[0] == 0 and tmp.shape[1] == 0:
                         tempimg[:, :, :, k] = imresample(tmp, (24, 24))
                     else:
-                        return np.empty()
+                        return np.empty((0, 0))
 
                 tempimg = (tempimg - 127.5) * 0.0078125
                 image_obj['rnet_input'] = np.transpose(tempimg, (3, 1, 0, 2))
@@ -582,7 +583,7 @@ def bulk_detect_face(images, detection_window_size_ratio, pnet, rnet, onet, thre
                     if tmp.shape[0] > 0 and tmp.shape[1] > 0 or tmp.shape[0] == 0 and tmp.shape[1] == 0:
                         tempimg[:, :, :, k] = imresample(tmp, (48, 48))
                     else:
-                        return np.empty()
+                        return np.empty((0, 0))
                 tempimg = (tempimg - 127.5) * 0.0078125
                 image_obj['onet_input'] = np.transpose(tempimg, (3, 1, 0, 2))
 

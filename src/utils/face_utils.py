@@ -2,15 +2,16 @@ import numpy as np
 
 
 def judge_side_face(facial_landmarks):
-    wide_dist = np.linalg.norm(facial_landmarks[0] - facial_landmarks[1])
-    high_dist = np.linalg.norm(facial_landmarks[0] - facial_landmarks[3])
+    fl = np.array(facial_landmarks)
+    wide_dist = np.linalg.norm(fl[0] - fl[1])
+    high_dist = np.linalg.norm(fl[0] - fl[3])
     dist_rate = high_dist / wide_dist
 
     # cal std
-    vec_A = facial_landmarks[0] - facial_landmarks[2]
-    vec_B = facial_landmarks[1] - facial_landmarks[2]
-    vec_C = facial_landmarks[3] - facial_landmarks[2]
-    vec_D = facial_landmarks[4] - facial_landmarks[2]
+    vec_A = fl[0] - fl[2]
+    vec_B = fl[1] - fl[2]
+    vec_C = fl[3] - fl[2]
+    vec_D = fl[4] - fl[2]
     dist_A = np.linalg.norm(vec_A)
     dist_B = np.linalg.norm(vec_B)
     dist_C = np.linalg.norm(vec_C)

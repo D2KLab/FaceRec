@@ -8,30 +8,32 @@ import optparse
 import pickle
 import numpy as np
 import random
-#from itertools import izip
+# from itertools import izip
 import scipy.io
 from warnings import warn
+
 try:
     from scipy.special import gammaln, digamma
-    from scipy.special import gdtrc         # required only for regression
-    from scipy.optimize import fsolve       # required only for regression
+    from scipy.special import gdtrc  # required only for regression
+    from scipy.optimize import fsolve  # required only for regression
     import scipy.stats
     from scipy.stats.stats import pearsonr
 except:
     print('Error loading scipy modules; might cause error later')
 from copy import copy
+
 try:
     from sklearn import feature_selection
 except:
     print('Error loading sklearn; might cause error later')
 try:
-    import matplotlib.pyplot as plt       # uncomment if you need to plot
+    import matplotlib.pyplot as plt  # uncomment if you need to plot
     from mpl_toolkits.mplot3d import Axes3D
 except:
     print('Error loading matplotlib; might cause error later')
 from utils.utils import hist_count, logsumexp, softmax, sample_multinomial, \
-        sample_multinomial_scores, empty, assert_no_nan, linear_regression, \
-        check_if_zero, check_if_one, logsumexp_array
+    sample_multinomial_scores, empty, assert_no_nan, linear_regression, \
+    check_if_zero, check_if_one, logsumexp_array
 
 
 class Forest(object):
@@ -43,8 +45,8 @@ class Forest(object):
             pred_forest = {'pred_prob': np.zeros((x.shape[0], data['n_class']))}
         else:
             pred_forest = {'pred_mean': np.zeros(x.shape[0]), 'pred_var': np.zeros(x.shape[0]), \
-                            'pred_prob': np.zeros(x.shape[0]), 'log_pred_prob': -np.inf*np.ones(x.shape[0]), \
-                            'pred_sample': np.zeros(x.shape[0])}
+                           'pred_prob': np.zeros(x.shape[0]), 'log_pred_prob': -np.inf * np.ones(x.shape[0]), \
+                           'pred_sample': np.zeros(x.shape[0])}
         if settings.debug:
             check_if_one(weights.sum())
         if settings.verbose >= 2:
@@ -61,7 +63,7 @@ class Forest(object):
                 pred_forest['pred_var'] += weights[i_t] * pred_all['pred_second_moment']
                 pred_forest['pred_sample'] += weights[i_t] * pred_all['pred_sample']
                 pred_forest['log_pred_prob'] = logsumexp_array(pred_forest['log_pred_prob'], \
-                        np.log(weights[i_t]) + pred_all['log_pred_prob'])
+                                                               np.log(weights[i_t]) + pred_all['log_pred_prob'])
         if settings.optype == 'real':
             pred_forest['pred_var'] -= pred_forest['pred_mean'] ** 2
             pred_forest['pred_prob'] = np.exp(pred_forest['log_pred_prob'])
@@ -91,7 +93,8 @@ class Forest(object):
                 print('Averaging over all trees, accuracy = %f' % metrics['acc'])
             else:
                 print('Averaging over all trees, mse = %f, rmse = %f, log_prob = %f' % (metrics['mse'], \
-                        math.sqrt(metrics['mse']), metrics['log_prob']))
+                                                                                        math.sqrt(metrics['mse']),
+                                                                                        metrics['log_prob']))
         return (pred_forest, metrics)
 
 
@@ -101,10 +104,10 @@ def evaluate_predictions_tree(tree, x, y, data, param, settings):
         pred_all = {'pred_prob': pred_prob}
     else:
         pred_mean, pred_var, pred_second_moment, log_pred_prob, pred_sample = \
-                tree.predict_real(x, y, param, settings)
-        pred_all =  {'log_pred_prob': log_pred_prob, 'pred_mean': pred_mean, \
-                        'pred_second_moment': pred_second_moment, 'pred_var': pred_var, \
-                        'pred_sample': pred_sample}
+            tree.predict_real(x, y, param, settings)
+        pred_all = {'log_pred_prob': log_pred_prob, 'pred_mean': pred_mean, \
+                    'pred_second_moment': pred_second_moment, 'pred_var': pred_var, \
+                    'pred_sample': pred_sample}
     return pred_all
 
 
@@ -113,7 +116,7 @@ def compute_gaussian_pdf(e_x, e_x2, x):
     sd = np.sqrt(variance)
     z = (x - e_x) / sd
     # pdf = np.exp(-(z**2) / 2.) / np.sqrt(2*math.pi) / sd
-    log_pdf = -0.5*(z**2) -np.log(sd) -0.5*np.log(2*math.pi)
+    log_pdf = -0.5 * (z ** 2) - np.log(sd) - 0.5 * np.log(2 * math.pi)
     pdf = np.exp(log_pdf)
     return pdf
 
@@ -122,81 +125,83 @@ def compute_gaussian_logpdf(e_x, variance, x):
     assert np.all(variance > 0)
     sd = np.sqrt(variance)
     z = (x - e_x) / sd
-    log_pdf = -0.5*(z**2) -np.log(sd) -0.5*np.log(2*math.pi)
+    log_pdf = -0.5 * (z ** 2) - np.log(sd) - 0.5 * np.log(2 * math.pi)
     return log_pdf
 
 
 def parser_add_common_options():
     parser = optparse.OptionParser()
     parser.add_option('--dataset', dest='dataset', default='toy-mf',
-            help='name of the dataset  [default: %default]')
+                      help='name of the dataset  [default: %default]')
     parser.add_option('--normalize_features', dest='normalize_features', default=1, type='int',
-            help='do you want to normalize features in 0-1 range? (0=False, 1=True) [default: %default]')
+                      help='do you want to normalize features in 0-1 range? (0=False, 1=True) [default: %default]')
     parser.add_option('--select_features', dest='select_features', default=0, type='int',
-            help='do you wish to apply feature selection? (1=True, 0=False) (supported only for regression) [default: %default]') 
+                      help='do you wish to apply feature selection? (1=True, 0=False) (supported only for regression) [default: %default]')
     parser.add_option('--optype', dest='optype', default='class',
-            help='nature of outputs in your dataset (class/real) '\
-            'for (classification/regression)  [default: %default]')
+                      help='nature of outputs in your dataset (class/real) ' \
+                           'for (classification/regression)  [default: %default]')
     parser.add_option('--data_path', dest='data_path', default='../../process_data/',
-            help='path of the dataset [default: %default]')
+                      help='path of the dataset [default: %default]')
     parser.add_option('--debug', dest='debug', default='0', type='int',
-            help='debug or not? (0=False, 1=everything, 2=special stuff only) [default: %default]')
-    parser.add_option('--op_dir', dest='op_dir', default='results', 
-            help='output directory for pickle files (NOTE: make sure directory exists) [default: %default]')
-    parser.add_option('--tag', dest='tag', default='', 
-            help='additional tag to identify results from a particular run [default: %default]')
+                      help='debug or not? (0=False, 1=everything, 2=special stuff only) [default: %default]')
+    parser.add_option('--op_dir', dest='op_dir', default='results',
+                      help='output directory for pickle files (NOTE: make sure directory exists) [default: %default]')
+    parser.add_option('--tag', dest='tag', default='',
+                      help='additional tag to identify results from a particular run [default: %default]')
     parser.add_option('--save', dest='save', default=0, type='int',
-            help='do you wish to save the results? (1=True, 0=False) [default: %default]') 
-    parser.add_option('-v', '--verbose',dest='verbose', default=1, type='int',
-            help='verbosity level (0 is minimum, 4 is maximum) [default: %default]')
+                      help='do you wish to save the results? (1=True, 0=False) [default: %default]')
+    parser.add_option('-v', '--verbose', dest='verbose', default=1, type='int',
+                      help='verbosity level (0 is minimum, 4 is maximum) [default: %default]')
     parser.add_option('--init_id', dest='init_id', default=1, type='int',
-            help='init_id (changes random seed for multiple initializations) [default: %default]')
+                      help='init_id (changes random seed for multiple initializations) [default: %default]')
     return parser
 
 
 def parser_add_mf_options(parser):
     group = optparse.OptionGroup(parser, "Mondrian forest options")
     group.add_option('--n_mondrians', dest='n_mondrians', default=10, type='int',
-            help='number of trees in mondrian forest [default: %default]')   
+                     help='number of trees in mondrian forest [default: %default]')
     group.add_option('--budget', dest='budget', default=-1, type='float',
-            help='budget for mondrian tree prior [default: %default]' \
-                    ' NOTE: budget=-1 will be treated as infinity')   
+                     help='budget for mondrian tree prior [default: %default]' \
+                          ' NOTE: budget=-1 will be treated as infinity')
     group.add_option('--discount_factor', dest='discount_factor', default=10, type='float',
-            help='value of discount_factor parameter for HNSP (optype=class) [default: %default] '
-            'NOTE: actual discount parameter = discount_factor * num_dimensions')   
+                     help='value of discount_factor parameter for HNSP (optype=class) [default: %default] '
+                          'NOTE: actual discount parameter = discount_factor * num_dimensions')
     group.add_option('--n_minibatches', dest='n_minibatches', default=1, type='int',
-            help='number of minibatches [default: %default]')   
+                     help='number of minibatches [default: %default]')
     group.add_option('--draw_mondrian', dest='draw_mondrian', default=0, type='int',
-            help='do you want to draw mondrians? (0=False, 1=True) [default: %default] ')
+                     help='do you want to draw mondrians? (0=False, 1=True) [default: %default] ')
     group.add_option('--smooth_hierarchically', dest='smooth_hierarchically', default=1, type='int',
-            help='do you want to smooth hierarchically? (0=False, 1=True)')
+                     help='do you want to smooth hierarchically? (0=False, 1=True)')
     group.add_option('--store_every', dest='store_every', default=0, type='int',
-            help='do you want to store mondrians at every iteration? (0=False, 1=True)')
+                     help='do you want to store mondrians at every iteration? (0=False, 1=True)')
     group.add_option('--bagging', dest='bagging', default=0, type='int',
-            help='do you want to use bagging? (0=False) [default: %default] ')
+                     help='do you want to use bagging? (0=False) [default: %default] ')
     group.add_option('--min_samples_split', dest='min_samples_split', default=2, type='int',
-            help='the minimum number of samples required to split an internal node ' \
-                    '(used only for optype=real) [default: %default]')
+                     help='the minimum number of samples required to split an internal node ' \
+                          '(used only for optype=real) [default: %default]')
     parser.add_option_group(group)
     return parser
 
 
 def parser_check_common_options(parser, settings):
-    fail(parser, not(settings.save==0 or settings.save==1), 'save needs to be 0/1')
-    fail(parser, not(settings.smooth_hierarchically==0 or settings.smooth_hierarchically==1), \
-            'smooth_hierarchically needs to be 0/1')
-    fail(parser, not(settings.normalize_features==0 or settings.normalize_features==1), 'normalize_features needs to be 0/1')
-    fail(parser, not(settings.optype=='real' or settings.optype=='class'), 'optype needs to be real/class')
+    fail(parser, not (settings.save == 0 or settings.save == 1), 'save needs to be 0/1')
+    fail(parser, not (settings.smooth_hierarchically == 0 or settings.smooth_hierarchically == 1), \
+         'smooth_hierarchically needs to be 0/1')
+    fail(parser, not (settings.normalize_features == 0 or settings.normalize_features == 1),
+         'normalize_features needs to be 0/1')
+    fail(parser, not (settings.optype == 'real' or settings.optype == 'class'), 'optype needs to be real/class')
 
 
 def parser_check_mf_options(parser, settings):
     fail(parser, settings.n_mondrians < 1, 'number of mondrians needs to be >= 1')
     fail(parser, settings.discount_factor <= 0, 'discount_factor needs to be > 0')
-    fail(parser, not(settings.budget == -1), 'budget needs to be -1 (treated as INF); control complexity through min_samples_split if reqd')
+    fail(parser, not (settings.budget == -1),
+         'budget needs to be -1 (treated as INF); control complexity through min_samples_split if reqd')
     fail(parser, settings.n_minibatches < 1, 'number of minibatches needs to be >= 1')
-    fail(parser, not(settings.draw_mondrian==0 or settings.draw_mondrian==1), 'draw_mondrian needs to be 0/1')
-    fail(parser, not(settings.store_every==0 or settings.store_every==1), 'store_every needs to be 0/1')
-    fail(parser, not(settings.bagging==0), 'bagging=1 not supported; please set bagging=0')
+    fail(parser, not (settings.draw_mondrian == 0 or settings.draw_mondrian == 1), 'draw_mondrian needs to be 0/1')
+    fail(parser, not (settings.store_every == 0 or settings.store_every == 1), 'store_every needs to be 0/1')
+    fail(parser, not (settings.bagging == 0), 'bagging=1 not supported; please set bagging=0')
     fail(parser, settings.min_samples_split < 1, 'min_samples_split needs to be > 1')
     # added additional checks for MF
     if settings.normalize_features != 1:
@@ -221,21 +226,21 @@ def check_dataset(settings):
     classification_datasets = set(['satimage', 'usps', 'dna', 'dna-61-120', 'letter', 'mnist'])
     regression_datasets = set(['housing', 'kin40k'])
     special_cases = settings.dataset[:3] == 'toy' or settings.dataset[:4] == 'rsyn' \
-            or settings.dataset[:8] == 'ctslices' or settings.dataset[:3] == 'msd' \
-            or settings.dataset[:6] == 'houses' or settings.dataset[:9] == 'halfmoons' \
-            or settings.dataset[:3] == 'sim' or settings.dataset == 'navada' \
-            or settings.dataset[:3] == 'msg' or settings.dataset[:14] == 'airline-delays' \
-            or settings.dataset == 'branin'
+                    or settings.dataset[:8] == 'ctslices' or settings.dataset[:3] == 'msd' \
+                    or settings.dataset[:6] == 'houses' or settings.dataset[:9] == 'halfmoons' \
+                    or settings.dataset[:3] == 'sim' or settings.dataset == 'navada' \
+                    or settings.dataset[:3] == 'msg' or settings.dataset[:14] == 'airline-delays' \
+                    or settings.dataset == 'branin'
     if not special_cases:
         try:
             if settings.optype == 'class':
-                assert(settings.dataset in classification_datasets)
+                assert (settings.dataset in classification_datasets)
             else:
-                assert(settings.dataset in regression_datasets)
+                assert (settings.dataset in regression_datasets)
         except AssertionError:
             print('Unrecognized dataset for optype; dataset = %s, optype = %s' % \
-                    (settings.dataset, settings.optype))
-            #raise AssertionError
+                  (settings.dataset, settings.optype))
+            # raise AssertionError
     return special_cases
 
 
@@ -244,7 +249,7 @@ def load_data(settings):
     special_cases = check_dataset(settings)
     if not special_cases:
         data = pickle.load(open(settings.data_path + settings.dataset + '/' + \
-                settings.dataset + '.p', "rb"))
+                                settings.dataset + '.p', "rb"))
     elif settings.dataset == 'toy-mf':
         data = load_toy_mf_data()
     elif settings.dataset == 'msg-4dim':
@@ -263,15 +268,15 @@ def load_data(settings):
     else:
         print('Unknown dataset: ' + settings.dataset)
         raise Exception
-    assert(not data['is_sparse'])
+    assert (not data['is_sparse'])
     try:
         if settings.normalize_features == 1:
             min_d = np.minimum(np.min(data['x_train'], 0), np.min(data['x_test'], 0))
             max_d = np.maximum(np.max(data['x_train'], 0), np.max(data['x_test'], 0))
             range_d = max_d - min_d
-            idx_range_d_small = range_d <= 0.   # find columns where all features are identical
+            idx_range_d_small = range_d <= 0.  # find columns where all features are identical
             if data['n_dim'] > 1:
-                range_d[idx_range_d_small] = 1e-3   # non-zero value just to prevent division by 0
+                range_d[idx_range_d_small] = 1e-3  # non-zero value just to prevent division by 0
             elif idx_range_d_small:
                 range_d = 1e-3
             data['x_train'] -= min_d + 0.
@@ -286,7 +291,7 @@ def load_data(settings):
             scores, _ = feature_selection.f_regression(data['x_train'], data['y_train'])
         else:
             raise Exception('select_features currently supported only for regression')
-        scores[np.isnan(scores)] = 0.   # FIXME: setting nan scores to 0. Better alternative?
+        scores[np.isnan(scores)] = 0.  # FIXME: setting nan scores to 0. Better alternative?
         scores_sorted, idx_sorted = np.sort(scores), np.argsort(scores)
         flag_relevant = scores_sorted > (scores_sorted[-1] * 0.05)  # FIXME: better way to set threshold? 
         idx_feat_selected = idx_sorted[flag_relevant]
@@ -300,7 +305,7 @@ def load_data(settings):
             data['x_train'] = data['x_train'][:, idx_feat_selected]
             data['x_test'] = data['x_test'][:, idx_feat_selected]
         else:
-            data['x_train'] = np.dot(data['x_train'], np.diag(scores)) 
+            data['x_train'] = np.dot(data['x_train'], np.diag(scores))
             data['x_test'] = np.dot(data['x_test'], np.diag(scores))
         data['n_dim'] = data['x_train'].shape[1]
     # ------ beginning of hack ----------
@@ -366,20 +371,20 @@ def gen_hypercube_data(n_points, n_dim, class_output, f_values=None):
     # x-values of data points are close to vertices of a hypercube
     # y-value of data point is different
     y_sd = 0.
-    x_sd = 0.1 
+    x_sd = 0.1
     mag = 3
     x = x_sd * np.random.randn(n_points, n_dim)
     n_vertices = 2 ** n_dim
-    #i = np.random.randint(0, n_vertices, n_points)
-    i = np.arange(n_vertices).repeat(n_points / n_vertices)     # equal distribution
+    # i = np.random.randint(0, n_vertices, n_points)
+    i = np.arange(n_vertices).repeat(n_points / n_vertices)  # equal distribution
     offsets = np.zeros((n_vertices, n_dim))
     for d in range(n_dim):
-        tmp = np.ones(2**(n_dim-d))
-        tmp[:2**(n_dim-d-1)] = -1
-        offsets[:, d] = np.tile(tmp, (1, 2**d))[0]
+        tmp = np.ones(2 ** (n_dim - d))
+        tmp[:2 ** (n_dim - d - 1)] = -1
+        offsets[:, d] = np.tile(tmp, (1, 2 ** d))[0]
     x += offsets[i, :]
     y = np.zeros(n_points)
-    #f = np.zeros(n_points)
+    # f = np.zeros(n_points)
     if class_output:
         y = f = i
     else:
@@ -419,7 +424,7 @@ def add_stuff_2_settings(settings):
 
 def get_name_metric(settings):
     name_metric = settings.perf_metrics_keys[1]
-    assert(name_metric == 'mse' or name_metric == 'acc')
+    assert (name_metric == 'mse' or name_metric == 'acc')
     return name_metric
 
 
@@ -430,9 +435,9 @@ def load_toy_data():
     n_train = n_train_pc * n_class
     n_test = n_train
     y_train = np.r_[np.ones(n_train_pc, dtype='int'), \
-            np.zeros(n_train_pc, dtype='int')]
+                    np.zeros(n_train_pc, dtype='int')]
     y_test = np.r_[np.ones(n_train_pc, dtype='int'), \
-            np.zeros(n_train_pc, dtype='int')]
+                   np.zeros(n_train_pc, dtype='int')]
     x_train = np.random.randn(n_train, n_dim)
     x_test = np.random.randn(n_train, n_dim)
     mag = 5
@@ -440,25 +445,25 @@ def load_toy_data():
         if y_ == 0:
             x_train[i, :] += np.sign(np.random.rand() - 0.5) * mag
         else:
-            tmp = np.sign(np.random.rand() - 0.5) 
+            tmp = np.sign(np.random.rand() - 0.5)
             x_train[i, :] += np.array([tmp, -tmp]) * mag
     for i, y_ in enumerate(y_test):
         if y_ == 0:
             x_test[i, :] += np.sign(np.random.rand() - 0.5) * mag
         else:
-            tmp = np.sign(np.random.rand() - 0.5) 
+            tmp = np.sign(np.random.rand() - 0.5)
             x_test[i, :] += np.array([tmp, -tmp]) * mag
     data = {'x_train': x_train, 'y_train': y_train, 'n_class': n_class, \
             'n_dim': n_dim, 'n_train': n_train, 'x_test': x_test, \
             'y_test': y_test, 'n_test': n_test, 'is_sparse': False}
     print(data)
     return data
- 
+
 
 def load_toy_mf_data():
     n_dim = 2
     n_class = 3
-    x_train = np.array([-0.5,-1, -2,-2, 1,0.5, 2,2, -1,1, -1.5, 1.5]) + 0.
+    x_train = np.array([-0.5, -1, -2, -2, 1, 0.5, 2, 2, -1, 1, -1.5, 1.5]) + 0.
     y_train = np.array([0, 0, 1, 1, 2, 2], dtype='int')
     x_train.shape = (6, 2)
     if False:
@@ -467,7 +472,7 @@ def load_toy_mf_data():
         plt.scatter(x_train[:2, 0], x_train[:2, 1], color='b')
         plt.scatter(x_train[2:4, 0], x_train[2:4, 1], color='r')
         plt.scatter(x_train[4:, 0], x_train[4:, 1], color='k')
-        plt.savefig('toy-mf_dataset.pdf', type='pdf') 
+        plt.savefig('toy-mf_dataset.pdf', type='pdf')
     x_test = x_train
     n_train = x_train.shape[0]
     n_test = x_test.shape[0]
@@ -482,7 +487,9 @@ def load_halfmoons(dataset):
     n_dim = 2
     n_class = 2
     if dataset == 'halfmoons':
-        x_train = np.array([-3,0, -2,1, -1,2, 0,3, 1,2, 2,1, 3,0, -1.5,1.5, -0.5,0.5, 0.5,-0.5, 1.5,-1.5, 2.5,-0.5, 3.5,0.5, 4.5,1.5]) + 0.
+        x_train = np.array(
+            [-3, 0, -2, 1, -1, 2, 0, 3, 1, 2, 2, 1, 3, 0, -1.5, 1.5, -0.5, 0.5, 0.5, -0.5, 1.5, -1.5, 2.5, -0.5, 3.5,
+             0.5, 4.5, 1.5]) + 0.
         y_train = np.array([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], dtype='int')
         x_train.shape = (14, 2)
         x_train[7:, 0] += 1.5
@@ -509,7 +516,7 @@ def load_halfmoons(dataset):
         plt.scatter(x_train[i1, 0], x_train[i1, 1], color='b')
         plt.scatter(x_train[i2, 0], x_train[i2, 1], color='r')
         name = '%s_dataset.pdf' % dataset
-        plt.savefig(name, type='pdf') 
+        plt.savefig(name, type='pdf')
     x_test, y_test = x_train.copy(), y_train.copy()
     n_train = x_train.shape[0]
     n_test = x_test.shape[0]
@@ -518,7 +525,7 @@ def load_halfmoons(dataset):
             'y_test': y_test, 'n_test': n_test, 'is_sparse': False}
     return data
 
- 
+
 def load_rgf_datasets(settings):
     filename_train = settings.data_path + 'exp-data' + '/' + settings.dataset
     filename_test = filename_train[:-3]
@@ -567,7 +574,7 @@ def get_tree_limits(p, data):
         d_extent[left] = left_extent
         d_extent[right] = right_extent
     return (hlines_list, vlines_list)
-            
+
 
 def bootstrap(train_ids, settings=None):
     """ online bagging: each point is included Poisson(1) times """
@@ -590,9 +597,9 @@ def get_filename_mf(settings):
     else:
         param_str = ''
     split_str = 'mf-budg-%s_nmon-%s_mini-%s_discount-%s' % (settings.budget, settings.n_mondrians, \
-                                        settings.n_minibatches, settings.discount_factor)
+                                                            settings.n_minibatches, settings.discount_factor)
     filename = settings.op_dir + '/' + '%s-%s-param-%s-init_id-%s-bag-%s-tag-%s.p' % \
-            (settings.dataset, split_str, param_str, settings.init_id, \
+               (settings.dataset, split_str, param_str, settings.init_id, \
                 settings.bagging, settings.tag)
     return filename
 
@@ -623,13 +630,13 @@ def compute_metrics_classification(y_test, pred_prob, do_not_compute_log_prob=Fa
     acc, log_prob = 0.0, 0.0
     for n, y in enumerate(y_test):
         tmp = pred_prob[n, :]
-        #pred = np.argmax(tmp)
-        pred = random.choice(np.argwhere(tmp == np.amax(tmp)).flatten())    # randomly break ties
+        # pred = np.argmax(tmp)
+        pred = random.choice(np.argwhere(tmp == np.amax(tmp)).flatten())  # randomly break ties
         acc += (pred == y)
         if not do_not_compute_log_prob:
-            log_tmp_pred = math.log(tmp[y]) 
+            log_tmp_pred = math.log(tmp[y])
             try:
-                assert(not np.isinf(abs(log_tmp_pred)))
+                assert (not np.isinf(abs(log_tmp_pred)))
             except AssertionError:
                 'print abs(log_tmp_pred) = inf in compute_metrics_classification; tmp = '
                 print(tmp)
@@ -651,7 +658,7 @@ def test_compute_metrics_classification():
     y = np.ones(n)
     metrics = compute_metrics_classification(y, pred_prob)
     print('chk if same: %s, %s' % (metrics['log_prob'], np.mean(np.log(pred_prob[:, 1]))))
-    assert(np.abs(metrics['log_prob']  - np.mean(np.log(pred_prob[:, 1]))) < 1e-10)
+    assert (np.abs(metrics['log_prob'] - np.mean(np.log(pred_prob[:, 1]))) < 1e-10)
     pred_prob[:, 1] = 1e5
     metrics = compute_metrics_classification(y, pred_prob)
     assert np.abs(metrics['acc'] - 1) < 1e-3
@@ -679,8 +686,8 @@ def test_compute_metrics_regression():
 
 def is_split_valid(split_chosen, x_min, x_max):
     try:
-        assert(split_chosen > x_min)
-        assert(split_chosen < x_max)
+        assert (split_chosen > x_min)
+        assert (split_chosen < x_max)
     except AssertionError:
         print('split_chosen <= x_min or >= x_max')
         raise AssertionError
@@ -711,16 +718,16 @@ def compute_dirichlet_normalizer(cnt, alpha=0.0, prior_term=None):
         => alpha/K is the mass for each component of a K-dimensional Dirichlet
     """
     try:
-        assert(len(cnt.shape) == 1)
+        assert (len(cnt.shape) == 1)
     except AssertionError:
         print('cnt should be a 1-dimensional np array')
         raise AssertionError
     n_class = float(len(cnt))
     if prior_term is None:
-        #print 'recomputing prior_term'
+        # print 'recomputing prior_term'
         prior_term = gammaln(alpha) - n_class * gammaln(alpha / n_class)
     op = np.sum(gammaln(cnt + alpha / n_class)) - gammaln(np.sum(cnt) + alpha) \
-            + prior_term
+         + prior_term
     return op
 
 
@@ -729,7 +736,7 @@ def compute_dirichlet_normalizer_fast(cnt, cache):
         => alpha/K is the mass for each component of a K-dimensional Dirichlet
     """
     op = compute_gammaln_1(cnt, cache) - compute_gammaln_2(cnt.sum(), cache) \
-            + cache['alpha_prior_term']
+         + cache['alpha_prior_term']
     return op
 
 
@@ -740,11 +747,11 @@ def evaluate_predictions(p, x, y, data, param):
 
 
 def init_left_right_statistics():
-    return(None, None, {}, -np.inf, -np.inf)
+    return (None, None, {}, -np.inf, -np.inf)
 
 
 def compute_left_right_statistics(data, param, cache, train_ids, feat_id_chosen, \
-        split_chosen, settings):
+                                  split_chosen, settings):
     cond = data['x_train'][train_ids, feat_id_chosen] <= split_chosen
     train_ids_left = train_ids[cond]
     train_ids_right = train_ids[~cond]
@@ -765,8 +772,8 @@ def compute_left_right_statistics(data, param, cache, train_ids, feat_id_chosen,
     if settings.verbose >= 2:
         print('feat_id_chosen = %s, split_chosen = %s' % (feat_id_chosen, split_chosen))
         print('y (left) = %s\ny (right) = %s' % (data['y_train'][train_ids_left], \
-                                                    data['y_train'][train_ids_right]))
-    return(train_ids_left, train_ids_right, cache_tmp)
+                                                 data['y_train'][train_ids_right]))
+    return (train_ids_left, train_ids_right, cache_tmp)
 
 
 def get_reg_stats(y):
@@ -811,19 +818,19 @@ def precompute_minimal(data, settings):
         param.prior_variance = np.var(data['y_train'])
         param.prior_precision = 1.0 / param.prior_variance
         if not settings.smooth_hierarchically:
-            param.noise_variance = 0.01     # FIXME: hacky
+            param.noise_variance = 0.01  # FIXME: hacky
         else:
-            K = min(1000, data['n_train'])     # FIXME: measurement noise set to fraction of unconditional variance
+            K = min(1000, data['n_train'])  # FIXME: measurement noise set to fraction of unconditional variance
             param.noise_variance = param.prior_variance / (1. + K)  # assume noise variance = prior_variance / (2K)
             # NOTE: max_split_cost scales inversely with the number of dimensions
         param.variance_coef = 2.0 * param.prior_variance
-        param.sigmoid_coef = data['n_dim']  / (2.0 * np.log2(data['n_train']))
+        param.sigmoid_coef = data['n_dim'] / (2.0 * np.log2(data['n_train']))
         param.noise_precision = 1.0 / param.noise_variance
     return (param, cache)
 
 
 def init_update_posterior_node_incremental(tree, data, param, settings, cache, node_id, train_ids_new, \
-         init_node_id=None):
+                                           init_node_id=None):
     # init with sufficient statistics of init_node_id and add contributions of train_ids_new
     if settings.optype == 'class':
         if init_node_id is None:
@@ -836,7 +843,7 @@ def init_update_posterior_node_incremental(tree, data, param, settings, cache, n
             tree.sum_y2[node_id] = 0
             tree.n_points[node_id] = 0
         else:
-            tree.sum_y[node_id] = tree.sum_y[init_node_id] + 0 
+            tree.sum_y[node_id] = tree.sum_y[init_node_id] + 0
             tree.sum_y2[node_id] = tree.sum_y2[init_node_id] + 0
             tree.n_points[node_id] = tree.n_points[init_node_id] + 0
     update_posterior_node_incremental(tree, data, param, settings, cache, node_id, train_ids_new)

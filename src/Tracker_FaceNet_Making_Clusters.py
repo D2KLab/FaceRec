@@ -132,7 +132,7 @@ def main():
                 print('Number of images: {}'.format(len(paths)))
                 print('Loading feature extraction model')
                 embedding_model_dir = args.model_path
-                classifier_filename = args.classifer_path
+                classifier_filename = args.classifier_path
                 classifier_filename_exp = os.path.expanduser(classifier_filename)
                 with open(classifier_filename_exp, 'rb') as infile:
                     (classifier, class_names) = pickle.load(infile)
@@ -330,7 +330,7 @@ def parse_args():
     parser.add_argument('--output_path', type=str,
                         help='Path to the cluster folder',
                         default='data/cluster')
-    parser.add_argument('--classifer_path', type=str,
+    parser.add_argument('--classifier_path', type=str,
                         help='Path to KNN classifier',
                         default="classifier/classifier_1NN_grayscale46891.pkl")
     parser.add_argument('--model_path', type=str,

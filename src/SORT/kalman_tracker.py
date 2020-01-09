@@ -42,7 +42,7 @@ class KalmanBoxTracker(object):
         self.age = 0
 
         # addtional fields
-        self.face_addtional_attribute = []
+        self.face_additional_attribute = []
 
     def update(self, bbox, img=None):
         """
@@ -52,18 +52,18 @@ class KalmanBoxTracker(object):
         self.history = []
         self.hits += 1
         self.hit_streak += 1
-        if bbox != []:
+        if len(bbox) > 0:
             self.kf.update(convert_bbox_to_z(bbox))
 
     def predict(self, img=None):
         """
         Advances the state vector and returns the predicted bounding box estimate.
         """
-        if ((self.kf.x[6] + self.kf.x[2]) <= 0):
+        if (self.kf.x[6] + self.kf.x[2]) <= 0:
             self.kf.x[6] *= 0.0
         self.kf.predict()
         self.age += 1
-        if (self.time_since_update > 0):
+        if self.time_since_update > 0:
             self.hit_streak = 0
         self.time_since_update += 1
         self.history.append(convert_x_to_bbox(self.kf.x))
@@ -98,7 +98,7 @@ def convert_x_to_bbox(x, score=None):
     """
     w = np.sqrt(x[2] * x[3])
     h = x[2] / w
-    if (score == None):
+    if score is None:
         return np.array([x[0] - w / 2., x[1] - h / 2., x[0] + w / 2., x[1] + h / 2.]).reshape((1, 4))
     else:
         return np.array([x[0] - w / 2., x[1] - h / 2., x[0] + w / 2., x[1] + h / 2., score]).reshape((1, 5))
