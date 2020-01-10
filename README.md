@@ -16,7 +16,7 @@ python -m src.FaceDetector  data/training_img/ data/training_img_aligned --image
 ### 3. Train a classifier on own images
 We perform training a classifier using the following command:
 ```sh
-python -m src.classifier TRAIN --classifier SVM data/training_img_aligned model/20180402-114759.pb classifier/classifier.pkl --batch_size 200
+python -m src.classifier TRAIN --classifier SVM data/training_img_aligned  --model-path model/20180402-114759.pb --classifier_path classifier/classifier.pkl --batch_size 200
 ```
 ### 4. Perform face recognition on Video
 The below command helps us to recognize people from video using the trained classifier from the previous step:
@@ -64,9 +64,10 @@ We track the face from the first frame in which it is detected, and we assign to
 
 Execute the following command:
 ```sh
-python -m src.Tracker_FaceNet_export_mappingfile --video video/xxx.mp4 --output_path data/cluster/ --all_trackers_saved data/all_trackers_saved.txt --obid_mapping_classnames  data/obid_mapping_classnames.txt --classifier_path classifier/classifier.pkl --model_path model/20180402-114759.pb --export_frames
+python -m src.Tracker_FaceNet_export_mappingfile --video video/xxx.mp4 --face_fragment_path data/cluster/ --trackers_csv data/trackers.csv --predictions_csv data/predictions.csv --classifier_path classifier/classifier.pkl --model_path model/20180402-114759.pb --export_frames --frames_path data/frames --trackout_csv data/trackout.csv
 ```
 
+         
 ### 7. Combine Tracker + FaceNet + Cosine Similarity to perform face recognition on Video
 We apply **SORT** Tracker to track every face and put them into clusters. Clusters will be generated and stored in `data/cluster/{video_name}/clusterid`. After that, the system will try to guess the label for each cluster using **majority rule**. A cosine similarity computed between each vector of features in our face training dataset and the ones from each face in our cluster labeled from the previous step is the third step. A cluster is considered to be recognized as a known person if the mean of the three maximum cosine similarities between each face in the cluster and each face in that person training dataset is higher than 0.66 (this value depends on your own dataset, you should do some statistic to pick the fitted one).
 

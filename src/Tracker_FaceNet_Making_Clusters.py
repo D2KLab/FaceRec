@@ -4,8 +4,7 @@ import math
 import os
 import pickle
 import shutil
-from statistics import mean
-from statistics import mode
+from statistics import mean, mode
 
 import cv2
 import numpy as np

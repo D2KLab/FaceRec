@@ -43,7 +43,7 @@ from .utils import facenet
 
 
 def main(mode, classifier='KNN', data_dir='data/training_img_aligned', model_path='model/20180402-114759.pb',
-         classifier_filename='classifier/classifier.pkl', use_split_dataset=False,
+         classifier_path='classifier/classifier.pkl', use_split_dataset=False,
          test_data_dir=None, batch_size=90, image_size=160, seed=666, min_nrof_images_per_class=20,
          nrof_train_images_per_class=10):
     with tf.Graph().as_default():
@@ -105,7 +105,7 @@ def main(mode, classifier='KNN', data_dir='data/training_img_aligned', model_pat
                 writer = csv.writer(f)
                 writer.writerows(zip(labels, paths))
 
-            classifier_filename_exp = os.path.expanduser(classifier_filename)
+            classifier_filename_exp = os.path.expanduser(classifier_path)
             os.makedirs(os.path.dirname(classifier_filename_exp), exist_ok=True)
 
             if mode == 'TRAIN':
@@ -171,14 +171,12 @@ def parse_arguments(argv):
                               help='The type of classifier to use.',
                               default='KNN')
     subparsers.add_parser('CLASSIFY', help='Predict whose image from trained classifier.')
-    parser.add_argument('data_dir', type=str,
+    parser.add_argument('--data_dir', type=str, default='data/training_img_aligned',
                         help='Path to the data directory containing aligned LFW face patches.')
-    parser.add_argument('model', type=str,
-                        help='Could be either a directory containing the meta_file and ckpt_file '
-                             'or a model protobuf (.pb) file')
-    parser.add_argument('classifier_filename',
-                        help='Classifier model file name as a pickle (.pkl) file. ' +
-                             'For training this is the output and for classification this is an input.')
+    parser.add_argument('--classifier_path', type=str, default='classifier/classifier.pkl',
+                        help='Path to the KNN classifier')
+    parser.add_argument('--model_path', type=str, default='model/20180402-114759.pb',
+                        help='Path to the facenet embedding model')
     parser.add_argument('--use_split_dataset',
                         help='Indicates that the dataset specified by data_dir should be split '
                              'into a training and test set.' +
@@ -203,6 +201,6 @@ def parse_arguments(argv):
 
 if __name__ == '__main__':
     args = parse_arguments(sys.argv[1:])
-    main(args.mode, args.classifier, args.data_dir, args.model, args.classifier_filename, args.use_split_dataset,
+    main(args.mode, args.classifier, args.data_dir, args.model_path, args.classifier_path, args.use_split_dataset,
          args.test_data_dir, args.batch_size, args.image_size, args.seed, args.min_nrof_images_per_class,
          args.nrof_train_images_per_class)

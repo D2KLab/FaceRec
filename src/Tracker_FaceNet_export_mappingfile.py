@@ -1,7 +1,7 @@
 import argparse
 import os
 import pickle
-
+import csv
 import cv2
 import numpy as np
 import tensorflow.compat.v1 as tf
@@ -15,32 +15,46 @@ ALIGN_MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ali
 
 colours = np.random.rand(32, 3)
 
+file_to_be_close = []
 
-def export_frame(input_frame, d, dict_obid_classname, total_frames_passed, folder_containing_frame, output):
+
+def export_frame(input_frame, d, classname, frame_num, frames_path, writer):
     frame = input_frame.copy()
     cv2.rectangle(frame, (d[0], d[1]), (d[2], d[3]), colours[d[4] % 32, :] * 255, 3)
-    cv2.putText(frame, 'a' + dict_obid_classname, (d[0] - 10, d[1] - 10),
+    cv2.putText(frame, 'a' + classname, (d[0] - 10, d[1] - 10),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.75,
                 colours[d[4] % 32, :] * 255, 2)
 
-    with open(output, 'a+') as f:
-        f.write(" ".join(map(str, d)) + '.' + dict_obid_classname + '.' + str(
-            total_frames_passed) + "\n")
-    frame_number = 'frame' + str(total_frames_passed) + '.jpg'
-    name = os.path.join(folder_containing_frame, frame_number)
-    print(name)
-    cv2.imwrite(name, frame)
+    print([str(i) for i in d] + [classname, str(frame_num)])
+    writer.writerow([str(i) for i in d] + [classname, str(frame_num)])
+
+    filename = 'frame' + str(frame_num) + '.jpg'
+    cv2.imwrite(os.path.join(frames_path, filename), frame)
 
 
-def main(video_path, output_path, all_trackers_saved='data/all_trackers_saved.txt',
-         obid_mapping_classnames='data/obid_mapping_classnames.txt',
+def init_csv(path, fieldnames):
+    file = open(path, 'w')
+    writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(fieldnames)
+    file_to_be_close.append(file)
+    return writer
+
+
+def main(video_path, face_fragment_path, frames_path,
+         trackers_csv='data/trackers.csv',
+         predictions_csv='data/predictions.csv',
+         trackout_csv='data/trackout.csv',
          classifier_path='classifier/classifier.pkl',
          facenet_model_path='model/20180402-114759.pb', video_speedup=1, export_frames=False):
     video_capture = utils.get_capture(video_path)
 
-    if output_path is None:
-        output_path = utils.generate_output_path('./data/cluster', video_path)
+    if face_fragment_path is None:
+        face_fragment_path = utils.generate_output_path('./data/cluster', video_path)
+
+    if export_frames:
+        if frames_path is None:
+            frames_path = utils.generate_output_path('./data/frames', video_path)
 
     minsize = 50  # minimum size of face for mtcnn to detect
     threshold = [0.6, 0.7, 0.7]  # three steps's threshold
@@ -51,11 +65,19 @@ def main(video_path, output_path, all_trackers_saved='data/all_trackers_saved.tx
     # Load classifier
     classifier_filename = os.path.expanduser(classifier_path)
     with open(classifier_filename, 'rb') as f:
-        (model, class_names) = pickle.load(f)
+        (classifier, class_names) = pickle.load(f)
         print("Loaded classifier file: %s" % classifier_filename)
+
+    # Get the path of the facenet model and load it
+    facenet.load_model(facenet_model_path)
 
     # init tracker
     tracker = Sort()  # create instance of the SORT tracker
+
+    # init csv outputs
+    trackers_writer = init_csv(trackers_csv, ['x1', 'y1', 'x2', 'y2', 'track_id', 'frame'])
+    predictions_writer = init_csv(predictions_csv, ['name', 'track_id'])
+    trackout_writer = init_csv(trackout_csv, ['x1', 'y1', 'x2', 'y2', 'track_id', 'name', 'frame'])
 
     with tf.Graph().as_default():
         gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
@@ -85,7 +107,7 @@ def main(video_path, output_path, all_trackers_saved='data/all_trackers_saved.tx
                 ret, frame = video_capture.retrieve()
 
                 face_list = []
-                additional_attribute_list = []
+                attribute_list = []
                 frame = cv2.resize(frame, (0, 0), fx=scale_rate, fy=scale_rate)
                 frame_height, frame_width, _ = frame.shape
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -114,10 +136,10 @@ def main(video_path, output_path, all_trackers_saved='data/all_trackers_saved.tx
 
                     # face additional attribute
                     # (index 0:face score; index 1:0 represents front face and 1 for side face )
-                    additional_attribute_list.append([cropped, item[4], dist_rate, high_ratio_variance, width_rate])
+                    attribute_list.append([cropped, item[4], dist_rate, high_ratio_variance, width_rate])
 
                 final_faces = np.array(face_list)
-                trackers = tracker.update(final_faces, img_size, output_path, additional_attribute_list, rgb_frame)
+                trackers = tracker.update(final_faces, img_size, face_fragment_path, attribute_list, rgb_frame)
 
                 for d in trackers:
                     d = d.astype(np.int32)
@@ -129,12 +151,9 @@ def main(video_path, output_path, all_trackers_saved='data/all_trackers_saved.tx
                             or d[1] >= frame_height or d[3] >= frame_height:
                         print('Error tracker: ')
                         print(d)
-                        with open(obid_mapping_classnames, 'a+') as f:
-                            f.write('error tracker.%d\n' % total_frames_passed)
                         continue
 
-                    with open(all_trackers_saved, 'a+') as f:
-                        f.write(" ".join(map(str, d)) + '.%d\n' % total_frames_passed)
+                    trackers_writer.writerow([str(i) for i in d] + [str(total_frames_passed)])
 
                     # cutting the img on the face
                     trackers_cropped = frame[d[1]:d[3], d[0]:d[2], :]
@@ -146,15 +165,14 @@ def main(video_path, output_path, all_trackers_saved='data/all_trackers_saved.tx
                     # convert to array and predict among the known ones
                     feed_dict = {images_placeholder: scaled_reshape, phase_train_placeholder: False}
                     emb_array = sess.run(embeddings, feed_dict=feed_dict)
-                    predictions = model.predict_proba(emb_array)
+                    predictions = classifier.predict_proba(emb_array)
                     best_class_indices = np.argmax(predictions, axis=1)
                     best_class_probabilities = predictions[
                         np.arange(len(best_class_indices)), best_class_indices]
                     best_name = class_names[best_class_indices[0]]
 
                     if best_class_probabilities > 0.09:  # TODO too low ?
-                        with open(obid_mapping_classnames, 'a+') as f:
-                            f.write(best_name + '.' + str(d[4]) + "\n")
+                        predictions_writer.writerow([best_name, str(d[4])])
                         matches.append({
                             'name': best_name,
                             'track_id': d[4],
@@ -166,36 +184,51 @@ def main(video_path, output_path, all_trackers_saved='data/all_trackers_saved.tx
                         })
 
                         if export_frames:
-                            os.makedirs('data/frames', exist_ok=True)
-                            export_frame(frame, d, str(d[4]), total_frames_passed,
-                                         'data/frames', 'data/track_out.txt')
+                            export_frame(frame, d, best_name, total_frames_passed, frames_path, trackout_writer)
 
-            return matches
+    for f in file_to_be_close:
+        f.close()
+    return matches
 
 
 def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser()
+
+    # files required in input
     parser.add_argument('-v', '--video', type=str, required=True,
                         help='Path or URI of the video to be analysed.')
-    parser.add_argument('--output_path', type=str,
-                        help='Path to the cluster folder')
-    parser.add_argument('--all_trackers_saved', type=str, default='data/all_trackers_saved.txt',
-                        help='Path to the txt file for all trackers saved')
-    parser.add_argument('--obid_mapping_classnames', type=str, default='data/obid_mapping_classnames.txt',
-                        help='Path to the txt output file for mapping file')
     parser.add_argument('--classifier_path', type=str, default='classifier/classifier.pkl',
-                        help='Path to KNN classifier')
+                        help='Path to the KNN classifier')
     parser.add_argument('--model_path', type=str, default='model/20180402-114759.pb',
-                        help='Path to embedding model')
-    parser.add_argument('--video_speedup', type=int,
-                        help='Speed up for the video', default=50)
-    parser.add_argument('--export_frames', default=False, action='store_true')
+                        help='Path to the facenet embedding model')
+
+    # paths for the output
+    parser.add_argument('--face_fragment_path', type=str,
+                        help='Path for saving the fragment of image containing the detected face.\n'
+                             'By default is in `data\\cluster\\<video_name>`')
+    parser.add_argument('--frames_path', type=str,
+                        help='If `--export_frames` is set, path for saving the annotated frames.\n'
+                             'By default is in `data\\frames\\<video_name>`')
+    parser.add_argument('--trackers_csv', type=str, default='data/trackers.csv',
+                        help='Path to the csv file for writing the computed trackers')
+    parser.add_argument('--predictions_csv', type=str, default='data/predictions.csv',
+                        help='Path to the csv output of the frame-based predictions')
+    parser.add_argument('--trackout_csv', type=str, default='data/trackout.csv',
+                        help='Path to the csv output of the frame-based predictions')
+
+    # parameters
+    parser.add_argument('--video_speedup', type=int, default=50,
+                        help='Speed up for the video')
+    parser.add_argument('--export_frames', default=False, action='store_true',
+                        help='If specified, export the annotated frames')
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = parse_args()
 
-    main(args.video, args.output_path, args.all_trackers_saved,
-         args.obid_mapping_classnames, args.classifier_path, args.model_path, args.video_speedup, args.export_frames)
+    main(args.video, args.face_fragment_path, args.frames_path,
+         args.trackers_csv, args.predictions_csv, args.trackout_csv,
+         args.classifier_path, args.model_path,
+         args.video_speedup, args.export_frames)
