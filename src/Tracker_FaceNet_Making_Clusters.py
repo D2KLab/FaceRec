@@ -23,7 +23,7 @@ ALIGN_MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ali
 def main(video_path, output_path, classifier_path='classifier/classifier.pkl',
          facenet_model_path='model/20180402-114759.pb', video_speedup=1, prob_threshold=0.7,
          dominant_ratio=0.5, merge_cluster=False):
-    video_capture = utils.get_capture(video_path)
+    video_capture = utils.normalize_video(video_path)
 
     if output_path is None:
         output_path = utils.generate_output_path('./data/cluster', video_path)

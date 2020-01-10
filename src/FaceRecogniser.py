@@ -15,7 +15,7 @@ ALIGN_MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ali
 def main(video_path, output_path='data/cluster.txt', facenet_model_path='model/20180402-114759.pb',
          classifier_path='classifier/classifier.pkl', video_speedup=50, folder_containing_frame=None,
          confidence_threshold=0.6):
-    video_capture = utils.get_capture(video_path)
+    video_capture = cv2.VideoCapture(video_path)
 
     if folder_containing_frame is None:
         folder_containing_frame = utils.generate_output_path('./data/frames', video_path)
@@ -49,6 +49,7 @@ def main(video_path, output_path='data/cluster.txt', facenet_model_path='model/2
             matches = []
 
             # start reading frame by frame
+            # TODO https://stackoverflow.com/questions/33650974/opencv-python-read-specific-frame-using-videocapture
             while video_capture.grab():  # move pointer to next frame
                 total_frames_passed += 1
                 # Skip frames if video is to be speed up
@@ -142,5 +143,6 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    main(args.video, args.output_path, args.model_path, args.classifier_path,
+    video = utils.normalize_video(args.video)
+    main(video, args.output_path, args.model_path, args.classifier_path,
          args.video_speedup, args.folder_containing_frame, args.confidence_threshold)

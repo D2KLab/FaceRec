@@ -28,10 +28,12 @@ def init_graph():
 def semantify(res):
     data = res['results']
     video_id = res['video']
-
     timestamp = res['time']
     g = init_graph()
 
+    print(res['info'])
+    # {'media': {'type': 'uri', 'value': 'http://data.memad.eu/media/8a3a9588e0f58e1e40bfd30198274cb0ce27984e'}, 'programme': {'type': 'uri', 'value': 'http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e'}, 'locator': {'type': 'uri', 'value': 'https://platform.limecraft.com/api/production/2336/mo/1263475/moa'}}
+    # TODO integrate info
     video = URIRef('http://data.memad.eu/media/9d002c31a1cb79b1fb75778eed9f20e9a3d562e8')
 
     for d in data:

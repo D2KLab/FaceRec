@@ -7,6 +7,7 @@ from flask_cors import CORS
 
 import semantifier
 from src import *
+from src.utils import utils
 
 VIDEO_DIR = os.path.join(os.getcwd(), 'video')
 
@@ -56,6 +57,7 @@ def train():
 # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
 # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/eurovaalit-2019-kuka-johtaa-eurooppaa/0460c1b7d735e3fc796aa2829811aa1ae5dc9fa8
 # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/eurovaalit-2019-kuka-johtaa-eurooppaa/d9d05488b35db559cdef35bac95f518ee0dda76a
+# http://127.0.0.1:5000/recognise?speedup=50&format=ttl&no_cache&video=http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
 @app.route('/recognise')
 def recognise():
     start_time = time.time()
@@ -65,22 +67,32 @@ def recognise():
     no_cache = 'no_cache' in request.args.to_dict()
 
     results = None
+    info = None
     if not no_cache:
         results = db.search(Query().video == video)
         if results and len(results) > 0:
             results = results[0]
 
     if not results:
-        r = FaceRecogniser.main(video, video_speedup=speedup, confidence_threshold=0.7)
+        video_path = video
+        if video.startswith('http'):  # it is a uri!
+            video_path, info = utils.uri2video(video)
+        elif not os.path.isfile(video):
+            raise FileNotFoundError('video not found: %s' % video)
+
+        r = FaceRecogniser.main(video_path, video_speedup=speedup, confidence_threshold=0.2)
         results = {
             'task': 'recognise',
             'status': 'ok',
             'execution_time': (time.time() - start_time),
             'time': now(),
             'video': video,
+            'info': info,
             'results': r
         }
 
+        # TODO insert aliases in the cache
+        # TODO when insert, delete previous results
         db.insert(results)
 
     # with open('recognise.json', 'w') as outfile:

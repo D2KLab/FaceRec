@@ -5,6 +5,8 @@ import math
 import cv2
 import os
 import re
+from src.connectors import memad_connector as memad
+from src.connectors import limecraft_connector as limecraft
 
 
 def rect2xywh(x, y, x2, y2):
@@ -18,18 +20,22 @@ def frame2npt(frame, fps):
     return frame / fps
 
 
-def get_capture(video_path):
-    if video_path.startswith('http'):  # it is a uri!
-        pass
-    else:
-        # TODO remove me when connected to KG
-        video_name = os.path.join('video', video_path.replace('/', '_') + '.mp4')
-        if not os.path.isfile(video_name):
-            video_name = video_path
-        if not os.path.isfile(video_name):  # still
-            raise FileNotFoundError('video not found: %s' % video_name)
+def uri2video(uri):
+    if uri.endswith('.avi') or uri.endswith('.mp4'):
+        return uri  # it is already a location
+    if uri.startswith('http://data.memad.eu'):
+        data = memad.get_locator_for(uri)
+        return limecraft.locator2video(data['locator']['value']), data
 
-    return cv2.VideoCapture(video_path)
+
+def normalize_video(video_path):
+    if video_path.startswith('http'):  # it is a uri!
+        video_path, _ = uri2video(video_path)
+    elif not os.path.isfile(video_path):
+        raise FileNotFoundError('video not found: %s' % video_path)
+
+    print("--> %s" % video_path)
+    return video_path
 
 
 def generate_output_path(base, video_path):

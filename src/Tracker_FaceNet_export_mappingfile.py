@@ -47,7 +47,7 @@ def main(video_path, face_fragment_path, frames_path,
          trackout_csv='data/trackout.csv',
          classifier_path='classifier/classifier.pkl',
          facenet_model_path='model/20180402-114759.pb', video_speedup=1, export_frames=False):
-    video_capture = utils.get_capture(video_path)
+    video_capture = cv2.VideoCapture(video_path)
 
     if face_fragment_path is None:
         face_fragment_path = utils.generate_output_path('./data/cluster', video_path)
@@ -97,6 +97,7 @@ def main(video_path, face_fragment_path, frames_path,
             matches = []
 
             # start reading frame by frame
+            # TODO https://stackoverflow.com/questions/33650974/opencv-python-read-specific-frame-using-videocapture
             while video_capture.grab():  # move pointer to next frame
                 total_frames_passed += 1
                 # Skip frames if video is to be speed up
@@ -227,8 +228,9 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
+    video = utils.normalize_video(args.video)
 
-    main(args.video, args.face_fragment_path, args.frames_path,
+    main(video, args.face_fragment_path, args.frames_path,
          args.trackers_csv, args.predictions_csv, args.trackout_csv,
          args.classifier_path, args.model_path,
          args.video_speedup, args.export_frames)
