@@ -45,19 +45,16 @@ def main(video_path, output_path='data/cluster.txt', facenet_model_path='model/2
 
             # frames per second
             fps = video_capture.get(cv2.CAP_PROP_FPS)
-            total_frames_passed = -1
+            video_length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+
             matches = []
 
-            # start reading frame by frame
-            # TODO https://stackoverflow.com/questions/33650974/opencv-python-read-specific-frame-using-videocapture
-            while video_capture.grab():  # move pointer to next frame
-                total_frames_passed += 1
-                # Skip frames if video is to be speed up
-                if video_speedup > 1:
-                    if total_frames_passed % video_speedup != 0:
-                        continue
+            # iterate over the frames
+            for frame_no in np.arange(0, video_length, video_speedup):
+                print(frame_no)
+                video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
 
-                # Otherwise read the frame
+                # read the frame
                 ret, frame = video_capture.retrieve()
 
                 bounding_boxes, _ = detect_face.detect_face(frame, minsize, pnet, rnet, onet, threshold, factor)
@@ -102,14 +99,14 @@ def main(video_path, output_path='data/cluster.txt', facenet_model_path='model/2
                             'name': best_name,
                             'confidence': best_class_probabilities,
                             'video': video_path,
-                            'frame': total_frames_passed,
-                            'npt': utils.frame2npt(total_frames_passed, fps),
+                            'frame': frame_no,
+                            'npt': utils.frame2npt(frame_no, fps),
                             'bounding': utils.rect2xywh(bb[0], bb[1], bb[2], bb[3])
                         })
 
                         with open(output_path, 'a+') as f:
-                            f.write(str(total_frames_passed) + ',' + class_names[best_class_indices[0]] + "\n")
-                        frame_number = 'frame' + str(total_frames_passed) + '.jpg'
+                            f.write(str(frame_no) + ',' + class_names[best_class_indices[0]] + "\n")
+                        frame_number = 'frame' + str(frame_no) + '.jpg'
                         filename = os.path.join(folder_containing_frame, frame_number)
                         cv2.imwrite(filename, frame)
 

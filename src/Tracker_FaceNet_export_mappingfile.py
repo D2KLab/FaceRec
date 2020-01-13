@@ -93,18 +93,16 @@ def main(video_path, face_fragment_path, frames_path,
 
             # frames per second
             fps = video_capture.get(cv2.CAP_PROP_FPS)
-            total_frames_passed = -1
+            video_length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+
             matches = []
 
-            # start reading frame by frame
-            # TODO https://stackoverflow.com/questions/33650974/opencv-python-read-specific-frame-using-videocapture
-            while video_capture.grab():  # move pointer to next frame
-                total_frames_passed += 1
-                # Skip frames if video is to be speed up
-                if video_speedup > 1 and total_frames_passed % video_speedup != 0:
-                    continue
+            # iterate over the frames
+            for frame_no in np.arange(0, video_length, video_speedup):
+                print(frame_no)
+                video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
 
-                # Otherwise read the frame
+                # read the frame
                 ret, frame = video_capture.retrieve()
 
                 face_list = []
@@ -145,7 +143,7 @@ def main(video_path, face_fragment_path, frames_path,
                 for d in trackers:
                     d = d.astype(np.int32)
                     # print(d)
-                    print(total_frames_passed)
+                    print(frame_no)
                     # FIXME how this is possible?
                     if any(i < 0 for i in d) \
                             or d[0] >= frame_width or d[2] >= frame_width \
@@ -154,7 +152,7 @@ def main(video_path, face_fragment_path, frames_path,
                         print(d)
                         continue
 
-                    trackers_writer.writerow([str(i) for i in d] + [str(total_frames_passed)])
+                    trackers_writer.writerow([str(i) for i in d] + [str(frame_no)])
 
                     # cutting the img on the face
                     trackers_cropped = frame[d[1]:d[3], d[0]:d[2], :]
@@ -178,14 +176,14 @@ def main(video_path, face_fragment_path, frames_path,
                             'name': best_name,
                             'track_id': d[4],
                             'video': video_path,
-                            'frame': total_frames_passed,
+                            'frame': frame_no,
                             'confidence': best_class_probabilities,
-                            'npt': utils.frame2npt(total_frames_passed, fps),
+                            'npt': utils.frame2npt(frame_no, fps),
                             'bounding': utils.rect2xywh(d[0], d[1], d[2], d[3])
                         })
 
                         if export_frames:
-                            export_frame(frame, d, best_name, total_frames_passed, frames_path, trackout_writer)
+                            export_frame(frame, d, best_name, frame_no, frames_path, trackout_writer)
 
     for f in file_to_be_close:
         f.close()
