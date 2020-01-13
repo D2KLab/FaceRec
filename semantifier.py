@@ -31,10 +31,14 @@ def semantify(res):
     timestamp = res['time']
     g = init_graph()
 
-    print(res['info'])
-    # {'media': {'type': 'uri', 'value': 'http://data.memad.eu/media/8a3a9588e0f58e1e40bfd30198274cb0ce27984e'}, 'programme': {'type': 'uri', 'value': 'http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e'}, 'locator': {'type': 'uri', 'value': 'https://platform.limecraft.com/api/production/2336/mo/1263475/moa'}}
-    # TODO integrate info
-    video = URIRef('http://data.memad.eu/media/9d002c31a1cb79b1fb75778eed9f20e9a3d562e8')
+    if 'info' in res:
+        info = res['info']
+        video = URIRef(info['media']['value'])
+        programme = URIRef(info['programme']['value'])
+
+        g.add((programme, EBUCORE['isInstantiatedBy'], video))
+    else:
+        video = URIRef(video_id)
 
     for d in data:
         npt = d['npt']
