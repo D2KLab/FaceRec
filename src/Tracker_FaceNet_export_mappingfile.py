@@ -83,7 +83,6 @@ def main(video_path, face_fragment_path, frames_path,
         gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
         sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, log_device_placement=False))
         with sess.as_default():
-            # Bounding box
             pnet, rnet, onet = detect_face.create_mtcnn(sess, ALIGN_MODEL_PATH)
             # Get the path of the facenet model and load it
             facenet.load_model(facenet_model_path)
@@ -143,12 +142,11 @@ def main(video_path, face_fragment_path, frames_path,
                 for d in trackers:
                     d = d.astype(np.int32)
                     # print(d)
-                    print(frame_no)
                     # FIXME how this is possible?
                     if any(i < 0 for i in d) \
                             or d[0] >= frame_width or d[2] >= frame_width \
                             or d[1] >= frame_height or d[3] >= frame_height:
-                        print('Error tracker: ')
+                        print('Error tracker at frame %d:' % frame_no)
                         print(d)
                         continue
 

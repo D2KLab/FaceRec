@@ -82,6 +82,7 @@ class Sort:
                     utils.save_to_file(root_dic, trk)
                     # time_dict.update({trk.id : self.frame_count})
                     # TODO make this path a parameter
+                    # TODO make this a csv
                     with open('data/tracker_saved_greater_5.txt', 'a+') as f:
                         f.write(str(trk.id) + '.' + str(self.frame_count) + "\n")
 

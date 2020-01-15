@@ -73,7 +73,7 @@ We apply **SORT** Tracker to track every face and put them into clusters. Cluste
 
 Execute the following command:
 ```sh
-python -m src.Tracker_FaceNet_Making_Clusters --video_dir video/ --frame_interval 1 --threshold 0.7 --output_path data/cluster/ --classifier_path classifier/classifier.pkl --model_path model/20180402-114759.pb --dominant_ratio 0.8 --merge_cluster 1
+python -m src.Tracker_FaceNet_Making_Clusters --video video/xxx.mp4 --frame_interval 1 --threshold 0.7 --output_path data/cluster/ --classifier_path classifier/classifier.pkl --model_path model/20180402-114759.pb --dominant_ratio 0.8 --merge_cluster
 ```
 ### Special Thanks to:
 *  [**Face-Recognition-using-Tensorflow**](https://github.com/davidsandberg/facenet)
