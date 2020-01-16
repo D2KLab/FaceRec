@@ -50,7 +50,7 @@ def main(video_path, face_fragment_path, classifier_path='classifier/classifier.
             dataset = facenet.get_dataset(face_fragment_path)
             paths, cur_labels = facenet.get_image_paths_and_labels(dataset)
             label_name = [cls.name.replace('_', ' ') for cls in dataset]
-            cur_labels = np.array([label_name[i] for i in cur_labels])
+            cur_labels = np.array([int(label_name[i]) for i in cur_labels])
 
             print('Number of cluster: {}'.format(len(dataset)))
             print('Number of images: {}'.format(len(paths)))
@@ -121,7 +121,7 @@ def main(video_path, face_fragment_path, classifier_path='classifier/classifier.
                 person_clusters = [i for i, j in interest_cluster.items() if j == person_id]
 
                 if merge_cluster:
-                    person_clusters = merge_consecutive_cluster(person_clusters, face_fragment_path)
+                    person_clusters = merge_consecutive_clusters(person_clusters, face_fragment_path)
 
                 print("{}: {}".format(person, person_clusters))
                 if person_clusters:
@@ -139,10 +139,6 @@ def main(video_path, face_fragment_path, classifier_path='classifier/classifier.
                         print("-> appears at frame %s" % time_dict[int(cluster_id)])
 
 
-def check_consecutive(l):
-    return sorted(l) == list(range(min(l), max(l) + 1))
-
-
 def merge_folders(root_src_dir, root_dst_dir):
     for src_dir, dirs, files in os.walk(root_src_dir):
         dst_dir = src_dir.replace(root_src_dir, root_dst_dir, 1)
@@ -157,45 +153,24 @@ def merge_folders(root_src_dir, root_dst_dir):
         shutil.rmtree(root_src_dir)
 
 
-def merge_consecutive_cluster(humanname, directoryname):
-    humanname = list(map(int, humanname))
-    for i in humanname:
-        for j in humanname:
+def merge_consecutive_clusters(clusters, face_fragment_path):
+    clusters.sort()
+
+    for i in clusters:
+        for j in clusters:
             if i < j:
-                if check_consecutive([i, j]):
-                    src_dir = os.path.join(directoryname, str(j))
-                    dst_dir = os.path.join(directoryname, str(i))
+                if i == j + 1:
+                    src_dir = os.path.join(face_fragment_path, j)
+                    dst_dir = os.path.join(face_fragment_path, i)
                     merge_folders(src_dir, dst_dir)
-                    humanname.remove(j)
+                    clusters.remove(j)
                     break
-    humanname = list(map(str, humanname))
-    return humanname
+    return clusters
 
 
-def count_frames(path):
-    frames = 0
-    for _, _, filenames in os.walk(path):
-        frames += len(filenames)
-        print(frames)
-
-
-def count_frames_for_cluster(humanname, directoryname):
-    if humanname:
-        for i in humanname:
-            print("The number of frames in cluster {}: ".format(i), end=" ")
-            count_frames(os.path.join(directoryname, i))
-
-
-def compare(humanname, mean_dict):
-    if humanname:
-        for i in range(len(humanname)):
-            for j in range(len(humanname)):
-                print("Cosine similarity {} - {}: {}".format(humanname[i], humanname[j],
-                                                             distance.cosine(mean_dict[float(humanname[i])],
-                                                                             mean_dict[float(humanname[j])])))
-                print("Euclidean distance {} - {}: {}".format(humanname[i], humanname[j],
-                                                              distance.euclidean(mean_dict[float(humanname[i])],
-                                                                                 mean_dict[float(humanname[j])])))
+def count_frames_for_cluster(person_clusters, directory):
+    for i in person_clusters:
+        return len(os.listdir(os.path.join(directory, str(i))))
 
 
 def cluster_distance(a, b):
