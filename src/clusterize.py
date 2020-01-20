@@ -1,5 +1,6 @@
 import argparse
 import os
+import json
 import shutil
 from statistics import mode, StatisticsError
 
@@ -14,23 +15,13 @@ ALIGN_MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ali
 
 # IMPORTANT: this has to be run AFTER the tracker
 
-def main(video_path, tracker_path, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluster=False):
-    if tracker_path is None:
-        tracker_path = utils.generate_output_path('./data/out', video_path)
-
-    # setup all paths
-    # cluster_path = os.path.join(tracker_path, 'cluster')
-    predictions_csv = os.path.join(tracker_path, 'predictions.csv')
-
-    predictions_load = pd.read_csv(predictions_csv,
-                                   dtype={'x1': np.int, 'y1': np.int, 'x2': np.int, 'y2': np.int,
-                                          'track_id': np.int, 'frame': np.int, 'tracker_sample': np.int})
-    # print(predictions_load.head())
-
+# predictions is a pandas dataframe
+def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluster=False):
+    predictions = predictions.sort_values(by=['track_id', 'tracker_sample'])
     # START ALGORITHM
     interest_cluster = {}
-    for track in predictions_load.track_id.unique():
-        involved = predictions_load[predictions_load.track_id == track]
+    for track in predictions.track_id.unique():
+        involved = predictions[predictions.track_id == track]
         involved = involved[involved.confidence >= confidence_threshold]
         predicted = involved.name.values.tolist()
         name = ""
@@ -44,45 +35,84 @@ def main(video_path, tracker_path, confidence_threshold=0.7, dominant_ratio=0.5,
         interest_cluster.update({track: name})
 
     known_persons = list(set([j for i, j in interest_cluster.items() if j]))
-
+    final_clusters = []
     for person in known_persons:
         person_clusters = [i for i, j in interest_cluster.items() if j == person]
-        print("* {}: {}".format(person, person_clusters))
 
         if merge_cluster:
-            involved = predictions_load[predictions_load.track_id.isin(person_clusters)]
+            involved = predictions[predictions.track_id.isin(person_clusters)]
 
-            # select the max and min sample (for the merging)
             person_clusters = []
-            for inv in involved.track_id.unique():
-                x = involved[involved.track_id == inv]
+            previous_cluster = None
+            for id in involved.track_id.unique():
+                x = involved[involved.track_id == id]
+                # select the max and min sample (for the merging)
                 max = x.tracker_sample.max()
                 min = x.tracker_sample.min()
 
-                person_clusters.append({'id': inv, 'max': max, 'min': min})
+                if previous_cluster is not None and previous_cluster['end_sample'] - min == 1:
+                    # merge here
+                    previous_cluster['end_sample'] = max
+                    previous_cluster['end_frame'] = x.frame.max()
+                    previous_cluster['end_npt'] = x.npt.max()
+                    continue
+                    # in case, merge the folders
+                elif previous_cluster is not None:
+                    final_clusters.append(previous_cluster)
+                    person_clusters.append(previous_cluster['track_id'])
 
-            person_clusters = merge_consecutive_clusters(person_clusters, tracker_path)
-            print("---> {}: {}".format(person, [c['id'] for c in person_clusters]))
+                previous_cluster = x.to_dict('records')[0]
+                previous_cluster['end_sample'] = max
+                previous_cluster['start_sample'] = min
+                previous_cluster['end_frame'] = x.frame.max()
+                previous_cluster['start_frame'] = x.frame.min()
+                previous_cluster['end_npt'] = x.npt.max()
+                previous_cluster['start_npt'] = x.npt.min()
+                previous_cluster['confidence'] = x.confidence.mean()  # FIXME give a more smart confidence
+                previous_cluster['name'] = person
 
-        # COSINE SIMILARITY
-        # I don't see any utility now, but maybe in the future
+                del previous_cluster['npt']
+                del previous_cluster['frame']
+                del previous_cluster['tracker_sample']
 
-        # train_embs contains the embeddings of the faces used for training
-        # train_embs = pd.read_csv('data/embedding/embedding.csv', header=None)
-        # train_embs = np.array(train_embs.values)
-        # train_labels = pd.read_csv('data/embedding/label.csv', header=None, names=["label", "path"])
-        # train_labels = np.array(train_labels['label'].values)
+            if previous_cluster is not None:
+                person_clusters.append(previous_cluster['track_id'])
+                final_clusters.append(previous_cluster)
 
-        # for cluster_id in person_clusters:
-        #     # get the training faces of the current person
-        #     emb_array_training = train_embs[np.nonzero(train_labels == person_id)]
-        #     # get the video faces of the current cluster
-        #     emb_array_testing = cur_embs[np.nonzero(cur_labels == cluster_id)]
-        #
-        #     distances = cluster_distance(emb_array_testing, emb_array_training)
-        #     distances.sort(reverse=True)
-        #     mean_of_best_3 = mean(distances[0:3])  # TODO why?
-        #     print("Cluster %s - %s - Cosine distance Mean: %f" % (cluster_id, person, mean_of_best_3))
+        print("* {}: {}".format(person, person_clusters))
+
+    return sanitize(final_clusters)
+
+
+def convert(o):
+    if isinstance(o, np.int64):
+        return int(o)
+    raise TypeError
+
+
+def sanitize(input):
+    j = json.dumps(input, default=convert)
+    return json.loads(j)
+
+    # COSINE SIMILARITY
+    # I don't see any utility now, but maybe in the future
+
+    # train_embs contains the embeddings of the faces used for training
+    # train_embs = pd.read_csv('data/embedding/embedding.csv', header=None)
+    # train_embs = np.array(train_embs.values)
+    # train_labels = pd.read_csv('data/embedding/label.csv', header=None, names=["label", "path"])
+    # train_labels = np.array(train_labels['label'].values)
+
+    # for cluster_id in person_clusters:
+    #     # get the training faces of the current person
+    #     emb_array_training = train_embs[np.nonzero(train_labels == person_id)]
+    #     # get the video faces of the current cluster
+    #     emb_array_testing = cur_embs[np.nonzero(cur_labels == cluster_id)]
+    #
+    #     distances = cluster_distance(emb_array_testing, emb_array_training)
+    #     distances.sort(reverse=True)
+    #     mean_of_best_3 = mean(distances[0:3])  # TODO why?
+    #     print("Cluster %s - %s - Cosine distance Mean: %f" % (cluster_id, person, mean_of_best_3))
 
 
 def merge_folders(root_src_dir, root_dst_dir):
@@ -135,7 +165,24 @@ def parse_args():
     return parser.parse_args()
 
 
+def from_dict(input):
+    return pd.DataFrame(input)
+
+
 if __name__ == '__main__':
     args = parse_args()
-    main(args.video, args.tracker_path, args.confidence_threshold,
-         args.dominant_ratio, args.merge_cluster)
+
+    if args.tracker_path is None:
+        tracker_path = utils.generate_output_path('./data/out', args.video_path)
+    else:
+        tracker_path = args.tracker_path
+
+    # setup all paths
+    # cluster_path = os.path.join(tracker_path, 'cluster')
+    predictions_csv = os.path.join(tracker_path, 'predictions.csv')
+
+    predictions_load = pd.read_csv(predictions_csv,
+                                   dtype={'x1': int, 'y1': int, 'x2': int, 'y2': int,
+                                          'track_id': int, 'frame': int, 'tracker_sample': int})
+
+    main(predictions_load, args.confidence_threshold, args.dominant_ratio, args.merge_cluster)

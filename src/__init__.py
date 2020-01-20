@@ -1,3 +1,3 @@
 __all__ = [
-        'crawler', 'FaceDetector', 'classifier', 'FaceRecogniser'
+        'crawler', 'FaceDetector', 'classifier', 'FaceRecogniser', 'tracker', 'clusterize'
         ]

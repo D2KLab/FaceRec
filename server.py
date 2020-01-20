@@ -16,7 +16,8 @@ os.makedirs('database', exist_ok=True)
 
 app = Flask(__name__)
 CORS(app)
-db = TinyDB('database/db.json')
+db_detection = TinyDB('database/detection.json')
+db_tracking = TinyDB('database/tracking.json')
 
 
 def now():
@@ -54,6 +55,53 @@ def train():
     })
 
 
+# http://127.0.0.1:5000/track?speedup=25&video=video/yle_a-studio_8a3a9588e0f58e1e40bfd30198274cb0ce27984e.mp4
+@app.route('/track')
+def track():
+    start_time = time.time()
+
+    video = request.args.get('video')
+    speedup = request.args.get('speedup', type=int, default=25)
+    no_cache = 'no_cache' in request.args.to_dict()
+
+    results = None
+    info = None
+    if not no_cache:
+        results = db_tracking.search(Query().video == video)
+        if results and len(results) > 0:
+            results = results[0]
+
+    if not results:
+        video_path = video
+        if video.startswith('http'):  # it is a uri!
+            video_path, info = utils.uri2video(video)
+        elif not os.path.isfile(video):
+            raise FileNotFoundError('video not found: %s' % video)
+
+        r = tracker.main(video_path, video_speedup=speedup)
+        results = {
+            'task': 'recognise',
+            'status': 'ok',
+            'execution_time': (time.time() - start_time),
+            'time': now(),
+            'video': video,
+            'info': info,
+            'results': r
+        }
+
+        # TODO insert aliases in the cache
+        # TODO when insert, delete previous results
+        db_tracking.insert(results)
+
+    clusters = clusterize.main(clusterize.from_dict(results['results']), confidence_threshold=0.5, merge_cluster=True)
+    print(clusters)
+    # fmt = request.args.get('format')
+    # if fmt == 'ttl':
+    #     return Response(semantifier.semantify(results), mimetype='text/turtle')
+
+    return jsonify(clusters)
+
+
 # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
 # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/eurovaalit-2019-kuka-johtaa-eurooppaa/0460c1b7d735e3fc796aa2829811aa1ae5dc9fa8
 # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/eurovaalit-2019-kuka-johtaa-eurooppaa/d9d05488b35db559cdef35bac95f518ee0dda76a
@@ -63,13 +111,13 @@ def recognise():
     start_time = time.time()
 
     video = request.args.get('video')
-    speedup = request.args.get('speedup', type=int, default=1)
+    speedup = request.args.get('speedup', type=int, default=25)
     no_cache = 'no_cache' in request.args.to_dict()
 
     results = None
     info = None
     if not no_cache:
-        results = db.search(Query().video == video)
+        results = db_detection.search(Query().video == video)
         if results and len(results) > 0:
             results = results[0]
 
@@ -93,7 +141,7 @@ def recognise():
 
         # TODO insert aliases in the cache
         # TODO when insert, delete previous results
-        db.insert(results)
+        db_detection.insert(results)
 
     # with open('recognise.json', 'w') as outfile:
     #     json.dump(r, outfile)

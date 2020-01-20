@@ -48,7 +48,7 @@ def select_best(predictions, class_names):
     return best_name, best_prob
 
 
-def main(video_path, output_path,
+def main(video_path, output_path=None,
          classifier_path='classifier/classifier.pkl', facenet_model_path='model/20180402-114759.pb',
          video_speedup=25, export_frames=False):
     video_capture = cv2.VideoCapture(video_path)
@@ -64,8 +64,8 @@ def main(video_path, output_path,
 
     # init csv outputs
     trackers_writer = init_csv(trackers_csv, ['x1', 'y1', 'x2', 'y2', 'track_id', 'frame'])
-    predictions_writer = init_csv(predictions_csv,
-                                  ['x1', 'y1', 'x2', 'y2', 'track_id', 'name', 'confidence', 'frame', 'tracker_sample'])
+    predictions_writer = init_csv(predictions_csv, ['x1', 'y1', 'x2', 'y2',
+                                                    'track_id', 'name', 'confidence', 'frame', 'tracker_sample', 'npt'])
 
     minsize = 50  # minimum size of face for mtcnn to detect
     threshold = [0.6, 0.7, 0.7]  # three steps's threshold
@@ -104,7 +104,7 @@ def main(video_path, output_path,
 
             # iterate over the frames
             for frame_no in np.arange(0, video_length, video_speedup):
-                print(frame_no)
+                print('frame %d/%d' % (frame_no, video_length))
                 video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
 
                 # read the frame
@@ -148,7 +148,7 @@ def main(video_path, output_path,
                 # this is a counter of the frame analysed by the tracker (so normalised respect to the video_speedup)
 
                 for d in trackers:
-                    d = d.astype(np.int32)
+                    d = d.astype(int)
                     # print(d)
                     # FIXME how this is possible?
                     if any(i < 0 for i in d) \
@@ -173,16 +173,18 @@ def main(video_path, output_path,
                     predictions = classifier.predict_proba(emb_array).flatten()
                     best_name, best_prob = select_best(predictions, class_names)
 
+                    npt = utils.frame2npt(frame_no, fps)
                     predictions_writer.writerow(
-                        [str(i) for i in d] + [best_name, best_prob, str(frame_no), tracker_sample])
+                        [str(i) for i in d] + [best_name, best_prob, str(frame_no), tracker_sample, npt])
 
                     matches.append({
                         'name': best_name,
-                        'track_id': d[4],
+                        'track_id': int(d[4]),
                         'video': video_path,
-                        'frame': frame_no,
+                        'frame': int(frame_no),
                         'confidence': best_prob,
-                        'npt': utils.frame2npt(frame_no, fps),
+                        'tracker_sample': tracker_sample,
+                        'npt': npt,
                         'bounding': utils.rect2xywh(d[0], d[1], d[2], d[3])
                     })
 
