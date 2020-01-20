@@ -31,7 +31,7 @@ class Sort:
         Requires: this method must be called once for each frame even with empty detections.
         Returns the a similar array, where the last column is the object ID.
 
-        NOTE:as in practical realtime MOT, the detector doesn't run on every single frame
+        NOTE: as in practical realtime MOT, the detector doesn't run on every single frame
         """
         self.frame_count += 1
         # time_dict = dict()
@@ -76,15 +76,9 @@ class Sort:
                 ret.append(np.concatenate((d, [trk.id + 1])).reshape(1, -1))  # +1 as MOT benchmark requires positive
             i -= 1
             # remove dead tracklet
-            if trk.time_since_update >= self.max_age or d[2] < 0 or d[3] < 0 or d[0] > img_size[1] or d[1] > img_size[
-                0]:
-                if len(trk.face_additional_attribute) >= 5:
-                    utils.save_to_file(root_dic, trk)
-                    # time_dict.update({trk.id : self.frame_count})
-                    # TODO make this path a parameter
-                    # TODO make this a csv
-                    with open('data/tracker_saved_greater_5.txt', 'a+') as f:
-                        f.write(str(trk.id) + '.' + str(self.frame_count) + "\n")
+            if trk.time_since_update >= self.max_age or \
+                    d[2] < 0 or d[3] < 0 or d[0] > img_size[1] or d[1] > img_size[0]:
+                utils.save_to_file(root_dic, trk)
 
                 self.trackers.pop(i)
         if len(ret) > 0:

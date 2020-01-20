@@ -13,7 +13,7 @@ ALIGN_MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ali
 
 
 def main(video_path, output_path='data/cluster.txt', facenet_model_path='model/20180402-114759.pb',
-         classifier_path='classifier/classifier.pkl', video_speedup=50, folder_containing_frame=None,
+         classifier_path='classifier/classifier.pkl', video_speedup=25, folder_containing_frame=None,
          confidence_threshold=0.6):
     video_capture = cv2.VideoCapture(video_path)
 
@@ -128,7 +128,7 @@ def parse_args():
                         help='Path to KNN classifier',
                         default="classifier/classifier.pkl")
     parser.add_argument('--video_speedup', type=int,
-                        help='Speed up for the video', default=50)
+                        help='Speed up for the video', default=25)
     parser.add_argument("--folder_containing_frame", type=str,
                         help='Path to the out data directory containing frames.',
                         default=None)

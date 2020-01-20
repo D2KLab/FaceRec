@@ -18,7 +18,7 @@ colours = np.random.rand(32, 3)
 file_to_be_close = []
 
 
-def export_frame(input_frame, d, classname, frame_num, frames_path, writer):
+def export_frame(input_frame, d, classname, frame_num, frames_path):
     frame = input_frame.copy()
     cv2.rectangle(frame, (d[0], d[1]), (d[2], d[3]), colours[d[4] % 32, :] * 255, 3)
     cv2.putText(frame, 'a' + classname, (d[0] - 10, d[1] - 10),
@@ -27,7 +27,6 @@ def export_frame(input_frame, d, classname, frame_num, frames_path, writer):
                 colours[d[4] % 32, :] * 255, 2)
 
     print([str(i) for i in d] + [classname, str(frame_num)])
-    writer.writerow([str(i) for i in d] + [classname, str(frame_num)])
 
     filename = 'frame' + str(frame_num) + '.jpg'
     cv2.imwrite(os.path.join(frames_path, filename), frame)
@@ -41,20 +40,32 @@ def init_csv(path, fieldnames):
     return writer
 
 
-def main(video_path, face_fragment_path, frames_path,
-         trackers_csv='data/trackers.csv',
-         predictions_csv='data/predictions.csv',
-         trackout_csv='data/trackout.csv',
-         classifier_path='classifier/classifier.pkl',
-         facenet_model_path='model/20180402-114759.pb', video_speedup=1, export_frames=False):
+def select_best(predictions, class_names):
+    best_index = np.argmax(predictions)
+    best_prob = predictions[best_index]
+    best_name = class_names[best_index]
+
+    return best_name, best_prob
+
+
+def main(video_path, output_path,
+         classifier_path='classifier/classifier.pkl', facenet_model_path='model/20180402-114759.pb',
+         video_speedup=25, export_frames=False):
     video_capture = cv2.VideoCapture(video_path)
 
-    if face_fragment_path is None:
-        face_fragment_path = utils.generate_output_path('./data/cluster', video_path)
+    if output_path is None:
+        output_path = utils.generate_output_path('./data/out', video_path)
 
-    if export_frames:
-        if frames_path is None:
-            frames_path = utils.generate_output_path('./data/frames', video_path)
+    # setup all paths
+    cluster_path = os.path.join(output_path, 'cluster')
+    frames_path = os.path.join(output_path, 'frames')
+    trackers_csv = os.path.join(output_path, 'trackers.csv')
+    predictions_csv = os.path.join(output_path, 'predictions.csv')
+
+    # init csv outputs
+    trackers_writer = init_csv(trackers_csv, ['x1', 'y1', 'x2', 'y2', 'track_id', 'frame'])
+    predictions_writer = init_csv(predictions_csv,
+                                  ['x1', 'y1', 'x2', 'y2', 'track_id', 'name', 'confidence', 'frame', 'tracker_sample'])
 
     minsize = 50  # minimum size of face for mtcnn to detect
     threshold = [0.6, 0.7, 0.7]  # three steps's threshold
@@ -73,11 +84,6 @@ def main(video_path, face_fragment_path, frames_path,
 
     # init tracker
     tracker = Sort()  # create instance of the SORT tracker
-
-    # init csv outputs
-    trackers_writer = init_csv(trackers_csv, ['x1', 'y1', 'x2', 'y2', 'track_id', 'frame'])
-    predictions_writer = init_csv(predictions_csv, ['name', 'track_id'])
-    trackout_writer = init_csv(trackout_csv, ['x1', 'y1', 'x2', 'y2', 'track_id', 'name', 'frame'])
 
     with tf.Graph().as_default():
         gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
@@ -136,8 +142,10 @@ def main(video_path, face_fragment_path, frames_path,
                     # (index 0:face score; index 1:0 represents front face and 1 for side face )
                     attribute_list.append([cropped, item[4], dist_rate, high_ratio_variance, width_rate])
 
-                final_faces = np.array(face_list)
-                trackers = tracker.update(final_faces, img_size, face_fragment_path, attribute_list, rgb_frame)
+                trackers = tracker.update(np.array(face_list), img_size, cluster_path, attribute_list, rgb_frame)
+
+                tracker_sample = tracker.frame_count
+                # this is a counter of the frame analysed by the tracker (so normalised respect to the video_speedup)
 
                 for d in trackers:
                     d = d.astype(np.int32)
@@ -162,26 +170,24 @@ def main(video_path, face_fragment_path, frames_path,
                     # convert to array and predict among the known ones
                     feed_dict = {images_placeholder: scaled_reshape, phase_train_placeholder: False}
                     emb_array = sess.run(embeddings, feed_dict=feed_dict)
-                    predictions = classifier.predict_proba(emb_array)
-                    best_class_indices = np.argmax(predictions, axis=1)
-                    best_class_probabilities = predictions[
-                        np.arange(len(best_class_indices)), best_class_indices]
-                    best_name = class_names[best_class_indices[0]]
+                    predictions = classifier.predict_proba(emb_array).flatten()
+                    best_name, best_prob = select_best(predictions, class_names)
 
-                    if best_class_probabilities > 0.09:  # TODO too low ?
-                        predictions_writer.writerow([best_name, str(d[4])])
-                        matches.append({
-                            'name': best_name,
-                            'track_id': d[4],
-                            'video': video_path,
-                            'frame': frame_no,
-                            'confidence': best_class_probabilities,
-                            'npt': utils.frame2npt(frame_no, fps),
-                            'bounding': utils.rect2xywh(d[0], d[1], d[2], d[3])
-                        })
+                    predictions_writer.writerow(
+                        [str(i) for i in d] + [best_name, best_prob, str(frame_no), tracker_sample])
 
-                        if export_frames:
-                            export_frame(frame, d, best_name, frame_no, frames_path, trackout_writer)
+                    matches.append({
+                        'name': best_name,
+                        'track_id': d[4],
+                        'video': video_path,
+                        'frame': frame_no,
+                        'confidence': best_prob,
+                        'npt': utils.frame2npt(frame_no, fps),
+                        'bounding': utils.rect2xywh(d[0], d[1], d[2], d[3])
+                    })
+
+                    if export_frames:
+                        export_frame(frame, d, best_name, frame_no, frames_path)
 
     for f in file_to_be_close:
         f.close()
@@ -201,21 +207,12 @@ def parse_args():
                         help='Path to the facenet embedding model')
 
     # paths for the output
-    parser.add_argument('--face_fragment_path', type=str,
-                        help='Path for saving the fragment of image containing the detected face.\n'
-                             'By default is in `data\\cluster\\<video_name>`')
-    parser.add_argument('--frames_path', type=str,
-                        help='If `--export_frames` is set, path for saving the annotated frames.\n'
-                             'By default is in `data\\frames\\<video_name>`')
-    parser.add_argument('--trackers_csv', type=str, default='data/trackers.csv',
-                        help='Path to the csv file for writing the computed trackers')
-    parser.add_argument('--predictions_csv', type=str, default='data/predictions.csv',
-                        help='Path to the csv output of the frame-based predictions')
-    parser.add_argument('--trackout_csv', type=str, default='data/trackout.csv',
-                        help='Path to the csv output of the frame-based predictions')
+    parser.add_argument('--output', type=str,
+                        help='Path for saving all the ouput of the script.\n'
+                             'By default is in `data\\out\\<video_name>`')
 
     # parameters
-    parser.add_argument('--video_speedup', type=int, default=50,
+    parser.add_argument('--video_speedup', type=int, default=25,
                         help='Speed up for the video')
     parser.add_argument('--export_frames', default=False, action='store_true',
                         help='If specified, export the annotated frames')
@@ -226,7 +223,6 @@ if __name__ == '__main__':
     args = parse_args()
     video = utils.normalize_video(args.video)
 
-    main(video, args.face_fragment_path, args.frames_path,
-         args.trackers_csv, args.predictions_csv, args.trackout_csv,
+    main(video, args.output,
          args.classifier_path, args.model_path,
          args.video_speedup, args.export_frames)

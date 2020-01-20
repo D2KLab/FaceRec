@@ -64,16 +64,16 @@ We track the face from the first frame in which it is detected, and we assign to
 
 Execute the following command:
 ```sh
-python -m src.Tracker_FaceNet_export_mappingfile --video video/xxx.mp4 --face_fragment_path data/cluster/ --trackers_csv data/trackers.csv --predictions_csv data/predictions.csv --classifier_path classifier/classifier.pkl --model_path model/20180402-114759.pb --export_frames --frames_path data/frames --trackout_csv data/trackout.csv
+python -m src.tracker --video video/xxx.mp4 --output data/out/
 ```
 
          
 ### 7. Combine Tracker + FaceNet + Cosine Similarity to perform face recognition on Video
-We apply **SORT** Tracker to track every face and put them into clusters. Clusters will be generated and stored in `data/cluster/{video_name}/clusterid`. After that, the system will try to guess the label for each cluster using **majority rule**. A cosine similarity computed between each vector of features in our face training dataset and the ones from each face in our cluster labeled from the previous step is the third step. A cluster is considered to be recognized as a known person if the mean of the three maximum cosine similarities between each face in the cluster and each face in that person training dataset is higher than 0.66 (this value depends on your own dataset, you should do some statistic to pick the fitted one).
+We apply **SORT** Tracker to track every face and put them into clusters. Clusters will be generated and stored in `data/out/{video_name}/cluster/{clusterid}`. After that, the system will try to guess the label for each cluster using **majority rule**. A cosine similarity computed between each vector of features in our face training dataset and the ones from each face in our cluster labeled from the previous step is the third step. A cluster is considered to be recognized as a known person if the mean of the three maximum cosine similarities between each face in the cluster and each face in that person training dataset is higher than 0.66 (this value depends on your own dataset, you should do some statistic to pick the fitted one).
 
-Execute the following command:
+Execute the following command (after src.tracker):
 ```sh
-python -m src.Tracker_FaceNet_Making_Clusters --video video/xxx.mp4 --frame_interval 1 --threshold 0.7 --output_path data/cluster/ --classifier_path classifier/classifier.pkl --model_path model/20180402-114759.pb --dominant_ratio 0.8 --merge_cluster
+python -m src.clusterize --video video/xxx.mp4 --confidence_threshold 0.7 --dominant_ratio 0.8 --merge_cluster
 ```
 ### Special Thanks to:
 *  [**Face-Recognition-using-Tensorflow**](https://github.com/davidsandberg/facenet)
