@@ -185,7 +185,8 @@ def main(video_path, output_path=None,
                         'confidence': best_prob,
                         'tracker_sample': tracker_sample,
                         'npt': npt,
-                        'bounding': utils.rect2xywh(d[0], d[1], d[2], d[3])
+                        'bounding': utils.rect2xywh(d[0], d[1], d[2], d[3]),
+                        'rect': [int(bb[0]), int(bb[1]), int(bb[2]), int(bb[3])]
                     })
 
                     if export_frames:

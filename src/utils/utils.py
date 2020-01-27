@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 
-import numpy as np
 import math
-import cv2
 import os
 import re
-from src.connectors import memad_connector as memad
+
+import numpy as np
+
 from src.connectors import limecraft_connector as limecraft
+from src.connectors import memad_connector as memad
 
 
 def rect2xywh(x, y, x2, y2):
     w = x2 - x  # width
     h = y2 - y  # height
 
-    return {'x': int(x), 'y': int(y), 'w': int(w), 'h': int(h)}
+    return {'x': int(x), 'y': int(y), 'w': int(w), 'h': int(h), 'xywh': '%d,%d,%d,%d' % (x, y, w, h)}
 
 
 def frame2npt(frame, fps):

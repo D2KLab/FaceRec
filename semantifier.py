@@ -29,29 +29,32 @@ def semantify(res):
     data = res['results']
     video_id = res['video']
     timestamp = res['time']
+    info = res['info']
+
     g = init_graph()
 
-    if 'info' in res:
-        info = res['info']
+    if info is not None:
         video = URIRef(info['media']['value'])
+        video_id = video_id.split('/', 4)[-1]
+        print(video_id)
         programme = URIRef(info['programme']['value'])
 
         g.add((programme, EBUCORE['isInstantiatedBy'], video))
     else:
-        video = URIRef(video_id)
+        video = URIRef('http://example.org/' + video_id)
 
     for d in data:
-        npt = d['npt']
-        x = d['bounding']['x']
-        y = d['bounding']['y']
-        w = d['bounding']['w']
-        h = d['bounding']['h']
+        print(d)
+        npt = '%.2f' % d['start_npt']
+        if 'end_npt' in d:
+            npt += ',%.2f' % d['end_npt']
+        xywh = d['bounding']['xywh']
 
         # uuid = UUID('%s%f%d%d%d%d' % (video_id, npt, x, y, w, h))
-        frag_uri = video + '#t=npt:%f&xywh=%d,%d,%d,%d' % (npt, x, y, w, h)
+        frag_uri = video + '#t=npt:%s&xywh=%s' % (npt, xywh)
         frag = URIRef(frag_uri)
         uuid = UUID(NAMESPACE_DNS, frag_uri)
-        body = URIRef('http://data.memad.eu/identification/%s/person-identification/%s' % (video_id, uuid))
+        body = URIRef('http://data.memad.eu/person-identification/%s' % uuid)
 
         g.add((frag, a, EBUCORE['MediaFragment']))
         g.add((frag, EBUCORE['isMediaFragmentOf'], video))

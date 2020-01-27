@@ -63,7 +63,7 @@ def main(video_path, output_path='data/cluster.txt', facenet_model_path='model/2
                 if faces_found == 0:
                     continue
 
-                det = np.array(bounding_boxes[:, 0:4], dtype=np.int32)
+                det = np.array(bounding_boxes[:, 0:4], dtype=int)
                 for bb in det:
 
                     # inner exception
@@ -82,8 +82,7 @@ def main(video_path, output_path='data/cluster.txt', facenet_model_path='model/2
                     emb_array = sess.run(embeddings, feed_dict=feed_dict)
                     predictions = model.predict_proba(emb_array)
                     best_class_indices = np.argmax(predictions, axis=1)
-                    best_class_probabilities = predictions[np.arange(len(best_class_indices)), best_class_indices][
-                        0]
+                    best_class_probabilities = predictions[np.arange(len(best_class_indices)), best_class_indices][0]
                     best_name = class_names[best_class_indices[0]]
                     print("Name: {}, Confidence: {}".format(best_name, best_class_probabilities))
                     if best_class_probabilities > confidence_threshold:
@@ -99,9 +98,10 @@ def main(video_path, output_path='data/cluster.txt', facenet_model_path='model/2
                             'name': best_name,
                             'confidence': best_class_probabilities,
                             'video': video_path,
-                            'frame': frame_no,
-                            'npt': utils.frame2npt(frame_no, fps),
-                            'bounding': utils.rect2xywh(bb[0], bb[1], bb[2], bb[3])
+                            'start_frame': frame_no,
+                            'start_npt': utils.frame2npt(frame_no, fps),
+                            'bounding': utils.rect2xywh(bb[0], bb[1], bb[2], bb[3]),
+                            'rect': [bb[0], bb[1], bb[2], bb[3]]
                         })
 
                         with open(output_path, 'a+') as f:

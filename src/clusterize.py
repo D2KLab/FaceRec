@@ -16,6 +16,15 @@ ALIGN_MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ali
 # IMPORTANT: this has to be run AFTER the tracker
 
 # predictions is a pandas dataframe
+def get_avg_rect(rects):
+    rects = np.array(rects.values.tolist())
+    x1 = min(rects[:, 0])
+    y1 = min(rects[:, 1])
+    x2 = max(rects[:, 2])
+    y2 = max(rects[:, 3])
+    return [x1, y1, x2, y2]
+
+
 def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluster=False):
     predictions = predictions.sort_values(by=['track_id', 'tracker_sample'])
     # START ALGORITHM
@@ -70,6 +79,10 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluste
                 previous_cluster['start_npt'] = x.npt.min()
                 previous_cluster['confidence'] = x.confidence.mean()  # FIXME give a more smart confidence
                 previous_cluster['name'] = person
+
+                avg_rect = get_avg_rect(x.rect)
+                previous_cluster['rect'] = avg_rect
+                previous_cluster['bounding'] = utils.rect2xywh(*avg_rect)
 
                 del previous_cluster['npt']
                 del previous_cluster['frame']

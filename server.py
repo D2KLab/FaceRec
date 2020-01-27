@@ -1,7 +1,7 @@
 import os
 import time
 import datetime
-from tinydb import TinyDB, Query
+from tinydb import TinyDB, Query, where
 from flask import Flask, request, jsonify, Response, send_from_directory
 from flask_cors import CORS
 
@@ -56,6 +56,7 @@ def train():
 
 
 # http://127.0.0.1:5000/track?speedup=25&video=video/yle_a-studio_8a3a9588e0f58e1e40bfd30198274cb0ce27984e.mp4
+# http://127.0.0.1:5000/track?format=ttl&video=http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
 @app.route('/track')
 def track():
     start_time = time.time()
@@ -80,7 +81,7 @@ def track():
 
         r = tracker.main(video_path, video_speedup=speedup)
         results = {
-            'task': 'recognise',
+            'task': 'tracking',
             'status': 'ok',
             'execution_time': (time.time() - start_time),
             'time': now(),
@@ -90,16 +91,26 @@ def track():
         }
 
         # TODO insert aliases in the cache
-        # TODO when insert, delete previous results
+        # delete previous results
+        db_tracking.remove(where('video') == video)
         db_tracking.insert(results)
 
     clusters = clusterize.main(clusterize.from_dict(results['results']), confidence_threshold=0.5, merge_cluster=True)
-    print(clusters)
-    # fmt = request.args.get('format')
-    # if fmt == 'ttl':
-    #     return Response(semantifier.semantify(results), mimetype='text/turtle')
+    results = {
+        'task': 'recognise',
+        'status': 'ok',
+        'execution_time': (time.time() - start_time),
+        'time': now(),
+        'video': video,
+        'info': info,
+        'results': clusters
+    }
 
-    return jsonify(clusters)
+    fmt = request.args.get('format')
+    if fmt == 'ttl':
+        return Response(semantifier.semantify(results), mimetype='text/turtle')
+
+    return jsonify(results)
 
 
 # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
@@ -140,7 +151,8 @@ def recognise():
         }
 
         # TODO insert aliases in the cache
-        # TODO when insert, delete previous results
+        # delete previous results
+        db_detection.remove(where('video') == video)
         db_detection.insert(results)
 
     # with open('recognise.json', 'w') as outfile:
