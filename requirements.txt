@@ -12,6 +12,7 @@ Pillow
 filterpy
 flask
 flask-cors
+flask_restplus
 tinydb
 rdflib
 uuid
