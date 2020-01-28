@@ -6,6 +6,8 @@
 /classifier/
 /config
 
+/visualizer/node_modules
+
 .idea
 
 # Byte-compiled / optimized / DLL files
