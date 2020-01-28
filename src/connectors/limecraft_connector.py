@@ -2,7 +2,7 @@ import yaml
 import requests
 from datetime import datetime, timedelta
 
-with open("config.yaml", 'r') as ymlfile:
+with open("config/config.yaml", 'r') as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.BaseLoader)['limecraft']
 
 # api documentation : https://platform.limecraft.com/api/documentation/#flatdoc/readme/cases/upload-transcribe.md

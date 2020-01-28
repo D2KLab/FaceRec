@@ -75,6 +75,17 @@ Execute the following command (after src.tracker):
 ```sh
 python -m src.clusterize --video video/xxx.mp4 --confidence_threshold 0.7 --dominant_ratio 0.8 --merge_cluster
 ```
+
+## FaceRec as a service
+
+A service is available as Docker image.
+
+```sh
+docker build -t facerec .
+docker run -d -p 5050:5000 --restart=unless-stopped  -v /home/semantic/Repositories/Face-Celebrity-Recognition/database:/app/database -v /home/semantic/Repositories/Face-Celebrity-Recognition/video:/app/video -v /home/semantic/Repositories/Face-Celebrity-Recognition/data:/app/data -v /home/semantic/Repositories/Face-Celebrity-Recognition/config:/app/config --name facerec1 facerec
+```
+
 ### Special Thanks to:
 *  [**Face-Recognition-using-Tensorflow**](https://github.com/davidsandberg/facenet)
 *  [**Face-Track-Detect-Extract**](https://github.com/Linzaer/Face-Track-Detect-Extract)
+
