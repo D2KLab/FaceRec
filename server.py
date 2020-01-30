@@ -21,8 +21,6 @@ db_tracking = TinyDB('database/tracking.json')
 flask_app = Flask(__name__)
 api = Api(app=flask_app,
           version="0.1.0",
-          prefix='/facerec',
-          doc='/facerec',
           title="Face Recognition Api",
           description="Recognise celebrities on videos.", )
 CORS(flask_app)

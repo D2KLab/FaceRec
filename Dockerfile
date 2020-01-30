@@ -1,4 +1,4 @@
-FROM python:3.7.1
+FROM python:3.7-slim-stretch
 
 LABEL Author="Pasquale Lisena"
 LABEL E-mail="pasquale.lisena@eurecom.fr"
@@ -8,6 +8,10 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV FLASK_APP "server.py"
 ENV FLASK_ENV "production"
 ENV FLASK_DEBUG True
+
+RUN apt-get -y update
+RUN apt-get install -y --fix-missing build-essential cmake  && apt-get clean && rm -rf /tmp/* /var/tmp/*
+
 
 RUN pip install --upgrade pip
 COPY requirements.txt /app/
