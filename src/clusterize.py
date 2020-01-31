@@ -27,6 +27,11 @@ def get_avg_rect(rects):
 
 def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluster=False):
     predictions = predictions.sort_values(by=['track_id', 'tracker_sample'])
+    # filter out tracks with less than 3 records
+    stat = predictions.groupby('track_id').size().to_frame('size')
+    good_ids = [i for i, s in stat.iterrows() if s['size'] >= 3]
+    predictions = predictions[predictions['track_id'].isin(good_ids)]
+
     # START ALGORITHM
     interest_cluster = {}
     for track in predictions.track_id.unique():
@@ -48,49 +53,50 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluste
     for person in known_persons:
         person_clusters = [i for i, j in interest_cluster.items() if j == person]
 
-        if merge_cluster:
-            involved = predictions[predictions.track_id.isin(person_clusters)]
+        involved = predictions[predictions.track_id.isin(person_clusters)]
+        person_clusters = []
+        previous_cluster = None
 
-            person_clusters = []
-            previous_cluster = None
-            for id in involved.track_id.unique():
-                x = involved[involved.track_id == id]
-                # select the max and min sample (for the merging)
-                max = x.tracker_sample.max()
-                min = x.tracker_sample.min()
+        for id in involved.track_id.unique():
+            x = involved[involved.track_id == id]
+            # select the max and min sample (for the merging)
+            max = x.tracker_sample.max()
+            min = x.tracker_sample.min()
 
-                if previous_cluster is not None and previous_cluster['end_sample'] - min == 1:
-                    # merge here
-                    previous_cluster['end_sample'] = max
-                    previous_cluster['end_frame'] = x.frame.max()
-                    previous_cluster['end_npt'] = x.npt.max()
-                    continue
-                    # in case, merge the folders
-                elif previous_cluster is not None:
-                    final_clusters.append(previous_cluster)
-                    person_clusters.append(previous_cluster['track_id'])
-
-                previous_cluster = x.to_dict('records')[0]
+            if merge_cluster and previous_cluster is not None and previous_cluster['end_sample'] - min == 1:
+                # merge here
                 previous_cluster['end_sample'] = max
-                previous_cluster['start_sample'] = min
                 previous_cluster['end_frame'] = x.frame.max()
-                previous_cluster['start_frame'] = x.frame.min()
                 previous_cluster['end_npt'] = x.npt.max()
-                previous_cluster['start_npt'] = x.npt.min()
-                previous_cluster['confidence'] = x.confidence.mean()  # FIXME give a more smart confidence
-                previous_cluster['name'] = person
-
-                avg_rect = get_avg_rect(x.rect)
-                previous_cluster['rect'] = avg_rect
-                previous_cluster['bounding'] = utils.rect2xywh(*avg_rect)
-
-                del previous_cluster['npt']
-                del previous_cluster['frame']
-                del previous_cluster['tracker_sample']
-
-            if previous_cluster is not None:
-                person_clusters.append(previous_cluster['track_id'])
+                continue
+                # in case, merge the folders
+            elif previous_cluster is not None:
                 final_clusters.append(previous_cluster)
+                person_clusters.append(previous_cluster['track_id'])
+
+            print(person)
+            print(x.tracker_sample)
+            previous_cluster = x.to_dict('records')[0]
+            previous_cluster['end_sample'] = max
+            previous_cluster['start_sample'] = min
+            previous_cluster['end_frame'] = x.frame.max()
+            previous_cluster['start_frame'] = x.frame.min()
+            previous_cluster['end_npt'] = x.npt.max()
+            previous_cluster['start_npt'] = x.npt.min()
+            previous_cluster['confidence'] = x.confidence.mean()  # FIXME give a smarter confidence
+            previous_cluster['name'] = person
+
+            avg_rect = get_avg_rect(x.rect)
+            previous_cluster['rect'] = avg_rect
+            previous_cluster['bounding'] = utils.rect2xywh(*avg_rect)
+
+            del previous_cluster['npt']
+            del previous_cluster['frame']
+            del previous_cluster['tracker_sample']
+
+        if previous_cluster is not None:
+            person_clusters.append(previous_cluster['track_id'])
+            final_clusters.append(previous_cluster)
 
         print("* {}: {}".format(person, person_clusters))
 

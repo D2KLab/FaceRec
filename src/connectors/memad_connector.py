@@ -7,12 +7,12 @@ def get_media(media):
     sparql.setQuery("""
         SELECT DISTINCT *
     WHERE {
-    VALUES ?media { <http://data.memad.eu/media/8a3a9588e0f58e1e40bfd30198274cb0ce27984e> } 
+    VALUES ?media { <%s> } 
     ?programme ebucore:isInstantiatedBy ?media .
     ?media a ebucore:MediaResource;
       ebucore:locator ?locator .
     }
-    """)
+    """ % media)
     sparql.setReturnFormat(JSON)
     return sparql.query().convert()["results"]["bindings"]
 
@@ -21,12 +21,12 @@ def get_programme(media):
     sparql.setQuery("""
         SELECT DISTINCT *
     WHERE {
-    VALUES ?programme { <http://data.memad.eu/media/8a3a9588e0f58e1e40bfd30198274cb0ce27984e> } 
+    VALUES ?programme { <%s> } 
     ?programme ebucore:isInstantiatedBy ?media .
     ?media a ebucore:MediaResource;
       ebucore:locator ?locator .
     }
-    """)
+    """ % media)
     sparql.setReturnFormat(JSON)
     return sparql.query().convert()["results"]["bindings"]
 
@@ -43,4 +43,3 @@ def get_locator_for(uri):
         return results[0]
 
     return None
-

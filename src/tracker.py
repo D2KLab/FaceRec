@@ -26,7 +26,7 @@ def export_frame(input_frame, d, classname, frame_num, frames_path):
                 0.75,
                 colours[d[4] % 32, :] * 255, 2)
 
-    print([str(i) for i in d] + [classname, str(frame_num)])
+    # print([str(i) for i in d] + [classname, str(frame_num)])
 
     filename = 'frame' + str(frame_num) + '.jpg'
     cv2.imwrite(os.path.join(frames_path, filename), frame)
@@ -59,6 +59,8 @@ def main(video_path, output_path=None,
     # setup all paths
     cluster_path = os.path.join(output_path, 'cluster')
     frames_path = os.path.join(output_path, 'frames')
+    if export_frames:
+        os.makedirs(frames_path, exist_ok=True)
     trackers_csv = os.path.join(output_path, 'trackers.csv')
     predictions_csv = os.path.join(output_path, 'predictions.csv')
 
@@ -83,7 +85,7 @@ def main(video_path, output_path=None,
     facenet.load_model(facenet_model_path)
 
     # init tracker
-    tracker = Sort()  # create instance of the SORT tracker
+    tracker = Sort(min_hits=1)
 
     with tf.Graph().as_default():
         gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
@@ -103,7 +105,7 @@ def main(video_path, output_path=None,
             matches = []
 
             # iterate over the frames
-            for frame_no in np.arange(0, video_length, video_speedup):
+            for frame_no in np.arange(0, 2000, video_speedup):
                 print('frame %d/%d' % (frame_no, video_length))
                 video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
 
@@ -149,12 +151,12 @@ def main(video_path, output_path=None,
 
                 for d in trackers:
                     d = d.astype(int)
-                    # print(d)
+                    print(d)
                     # FIXME how this is possible?
                     if any(i < 0 for i in d) \
                             or d[0] >= frame_width or d[2] >= frame_width \
                             or d[1] >= frame_height or d[3] >= frame_height:
-                        print('Error tracker at frame %d:' % frame_no)
+                        print('Error tracker %d at frame %d:' % (d[4], frame_no))
                         print(d)
                         continue
 
@@ -171,8 +173,8 @@ def main(video_path, output_path=None,
                     feed_dict = {images_placeholder: scaled_reshape, phase_train_placeholder: False}
                     emb_array = sess.run(embeddings, feed_dict=feed_dict)
                     predictions = classifier.predict_proba(emb_array).flatten()
-                    best_name, best_prob = select_best(predictions, class_names)
 
+                    best_name, best_prob = select_best(predictions, class_names)
                     npt = utils.frame2npt(frame_no, fps)
                     predictions_writer.writerow(
                         [str(i) for i in d] + [best_name, best_prob, str(frame_no), tracker_sample, npt])
@@ -191,6 +193,8 @@ def main(video_path, output_path=None,
 
                     if export_frames:
                         export_frame(frame, d, best_name, frame_no, frames_path)
+
+    # TODO final track
 
     for f in file_to_be_close:
         f.close()

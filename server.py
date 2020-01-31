@@ -105,7 +105,7 @@ class Track(Resource):
             elif not os.path.isfile(video):
                 raise FileNotFoundError('video not found: %s' % video)
 
-            r = tracker.main(video_path, video_speedup=speedup)
+            r = tracker.main(video_path, video_speedup=speedup, export_frames=True)
             results = {
                 'task': 'tracking',
                 'status': 'ok',
@@ -121,8 +121,8 @@ class Track(Resource):
             db_tracking.remove(where('video') == video)
             db_tracking.insert(results)
 
-        clusters = clusterize.main(clusterize.from_dict(results['results']), confidence_threshold=0.5,
-                                   merge_cluster=True)
+        clusters = clusterize.main(clusterize.from_dict(results['results']), confidence_threshold=0,
+                                   merge_cluster=False)
         results = {
             'task': 'tracking',
             'status': 'ok',

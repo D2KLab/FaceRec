@@ -73,13 +73,12 @@ class Sort:
                 trk.update([], img)
             d = trk.get_state()
             if (trk.time_since_update < 1) and (trk.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
-                ret.append(np.concatenate((d, [trk.id + 1])).reshape(1, -1))  # +1 as MOT benchmark requires positive
+                ret.append(np.concatenate((d, [trk.id])).reshape(1, -1))
             i -= 1
             # remove dead tracklet
             if trk.time_since_update >= self.max_age or \
                     d[2] < 0 or d[3] < 0 or d[0] > img_size[1] or d[1] > img_size[0]:
-                utils.save_to_file(root_dic, trk)
-
+                utils.save_to_file(root_dic, trk, self.frame_count)
                 self.trackers.pop(i)
         if len(ret) > 0:
             return np.concatenate(ret)

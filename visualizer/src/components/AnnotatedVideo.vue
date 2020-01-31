@@ -90,18 +90,16 @@ export default {
     },
     saveDimensions() {
       this.$video = this.$refs.video;
-      const { videoWidth, videoHeight } = this.$video;
+      // const { videoWidth, videoHeight } = this.$video;
 
       // looks like that the video dimensions are fixed in the software
-      this.$videoWidth = videoWidth; // 1728; // videoWidth;
-      this.$videoHeight = videoHeight; // 972; // videoHeight;
+      this.$videoWidth = 864; // videoWidth;
+      this.$videoHeight = 486; // videoHeight;
     },
     updateAnnotations() {
       const { offsetWidth, offsetHeight } = this.$video;
-      console.log(this.$video.currentTime);
       const frags = this.data
         .filter((d) => between(this.$video.currentTime, d.start_npt, d.end_npt));
-      console.log(frags);
       this.boxes.forEach((b) => { b.style.display = 'none'; });
       frags.forEach((frag) => {
         const dim = adaptDimension(frag.bounding, this.$videoWidth, this.$videoHeight,
