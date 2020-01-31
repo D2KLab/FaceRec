@@ -29,7 +29,7 @@ CORS(flask_app)
 def now():
     return datetime.datetime.now().isoformat()
 
-
+# http://127.0.0.1:5000/crawler?q=Annastiina Heikkilä;Frans Timmermans;Manfred Weber;Markus Preiss;Ska Keller;Emilie Tran Nguyen;Jan Zahradil;Margrethe Vestager;Nico Cué
 @api.route('/crawler')
 @api.doc(
     description="Search faces of people in the web to be added to the dataset.",

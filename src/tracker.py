@@ -105,7 +105,7 @@ def main(video_path, output_path=None,
             matches = []
 
             # iterate over the frames
-            for frame_no in np.arange(0, 2000, video_speedup):
+            for frame_no in np.arange(0, video_length, video_speedup):
                 print('frame %d/%d' % (frame_no, video_length))
                 video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
 
