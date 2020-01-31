@@ -21,8 +21,6 @@ db_tracking = TinyDB('database/tracking.json')
 flask_app = Flask(__name__)
 api = Api(app=flask_app,
           version="0.1.0",
-          doc='/api',
-          prefix='/api',
           title="Face Recognition Api",
           description="Recognise celebrities on videos.", )
 CORS(flask_app)
@@ -98,6 +96,7 @@ class Track(Resource):
             results = db_tracking.search(Query().video == video)
             if results and len(results) > 0:
                 results = results[0]
+                info = results['info']
 
         if not results:
             video_path = video
@@ -125,7 +124,7 @@ class Track(Resource):
         clusters = clusterize.main(clusterize.from_dict(results['results']), confidence_threshold=0.5,
                                    merge_cluster=True)
         results = {
-            'task': 'recognise',
+            'task': 'tracking',
             'status': 'ok',
             'execution_time': (time.time() - start_time),
             'time': now(),
@@ -202,9 +201,15 @@ class Recognise(Resource):
         return jsonify(results)
 
 
-@flask_app.route('/video/<path:path>')
-def send_video(path):
-    return send_from_directory(VIDEO_DIR, path, as_attachment=True)
+@flask_app.route('/get_locator')
+def send_video():
+    path = request.args.get('video')
+
+    if path.startswith('http'):
+        video_path, info = utils.uri2video(path)
+        return video_path
+    else:
+        return send_from_directory(VIDEO_DIR, path, as_attachment=True)
 
 
 @api.errorhandler(ValueError)

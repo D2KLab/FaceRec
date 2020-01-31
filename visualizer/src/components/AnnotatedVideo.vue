@@ -1,21 +1,35 @@
 <template>
   <div>
-    <div class="container" ref="container">
+    <div class="video-container" ref="container">
       <video ref="video"
-      v-bind:src="getVideoLocator()"
+      v-bind:src="locator"
       v-on:loadedmetadata="saveDimensions()"
       v-on:timeupdate="updateAnnotations()"
       controls autoplay></video>
     </div>
-    <p>
-      In this video:
-      <ul id="legenda">
-        <li v-for="item in classes" v-bind:key="item.label">
-          <span class="square" v-bind:style = "{borderColor: item.colour}"></span>
-          {{ item.label }}
-        </li>
-      </ul>
-    </p>
+    <div class="container">
+
+    <div class="columns is-mobile">
+      <div class="column legenda">
+        <p>In this video:</p>
+        <ul id="legenda">
+          <li v-for="item in classes" v-bind:key="item.label">
+            <span class="square" v-bind:style = "{borderColor: item.colour}"></span>
+            {{ item.label }}
+          </li>
+        </ul>
+      </div>
+      <div class="column is-two-thirds">
+        <ul class="listing">
+          <li v-for="d in data" v-bind:key="d.start_npt + d.name">
+            <a v-on:click="goToSecond(d.start_npt)">
+              <strong>{{d.start_npt}} - {{d.end_npt}}</strong></a>
+            {{d.name}} <small>Confidence: {{d.confidence | formatNumber}}</small>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
 
   </div>
 </template>
@@ -24,7 +38,7 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 
 import palette from 'google-palette';
-import { recognise } from '@/face-recognition-service';
+import { recognise, getLocator } from '@/face-recognition-service';
 
 function adaptDimension(bounding, origW, origH, destW, destH) {
   const rW = destW / origW;
@@ -37,13 +51,15 @@ function adaptDimension(bounding, origW, origH, destW, destH) {
   };
 }
 
+function between(x, min, max) {
+  return x >= min && x <= max;
+}
+
 export default {
   name: 'AnnotatedVideo',
-  props: {
-    msg: String,
-  },
   data() {
     return {
+      locator: null,
       rectStyle: {
         top: 0,
         left: 0,
@@ -55,10 +71,12 @@ export default {
     };
   },
   mounted() {
-    recognise(this.$route.params.id)
+    getLocator(this.$route.query.v)
+      .then((d) => { this.locator = d; });
+    recognise(this.$route.query.v)
       .then((data) => {
         this.data = data.results;
-
+        this.data = this.data.sort((a, b) => ((a.start_npt > b.start_npt) ? 1 : -1));
         const classes = [...new Set(this.data.map((c) => c.name))];
 
         const colours = palette('mpn65', classes.length);
@@ -67,6 +85,9 @@ export default {
       });
   },
   methods: {
+    goToSecond(second) {
+      this.$refs.video.currentTime = second;
+    },
     saveDimensions() {
       this.$video = this.$refs.video;
       const { videoWidth, videoHeight } = this.$video;
@@ -75,14 +96,12 @@ export default {
       this.$videoWidth = videoWidth; // 1728; // videoWidth;
       this.$videoHeight = videoHeight; // 972; // videoHeight;
     },
-    getVideoLocator() {
-      return `http://127.0.0.1:5000/video/${this.$route.params.id.replace(/\//g, '_')}.mp4#t=380`;
-    },
     updateAnnotations() {
       const { offsetWidth, offsetHeight } = this.$video;
       console.log(this.$video.currentTime);
       const frags = this.data
-        .filter((d) => Math.abs(d.npt - this.$video.currentTime) < 1);
+        .filter((d) => between(this.$video.currentTime, d.start_npt, d.end_npt));
+      console.log(frags);
       this.boxes.forEach((b) => { b.style.display = 'none'; });
       frags.forEach((frag) => {
         const dim = adaptDimension(frag.bounding, this.$videoWidth, this.$videoHeight,
@@ -113,9 +132,12 @@ export default {
 video {
   max-width: 100vw;
   max-height: 100vh;
+  margin: auto;
 }
-.container {
+.video-container {
   position: relative;
+  text-align: center;
+  margin-bottom: 6px;
 }
 .square {
   display: inline-block;
@@ -124,16 +146,17 @@ video {
   border: 2px solid yellow;
   vertical-align: sub;
 }
-ul {
-  list-style: none;
-  text-align: left;
-  display: inline;
-  padding-inline-start: 0;
+.legenda {
+  background-color: #eee;
+  padding: 1.5em;
 }
-
-li {
-  display: inline-block;
-  margin: 2px 0.7em;
+small {
+  color: #ccc;
+  font-size: 0.7em;
+}
+.listing {
+  max-height: 20em;
+  overflow: scroll;
 }
 </style>
 
