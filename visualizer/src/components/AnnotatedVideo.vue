@@ -128,8 +128,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 video {
-  max-width: 100vw;
-  max-height: 100vh;
+  width: 100%;
   margin: auto;
 }
 .video-container {
