@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const FR_SERVER = 'http://127.0.0.1:5000/';
+const FR_SERVER = '/';
 
 export async function recognise(video) {
   const data = await axios.get(`${FR_SERVER}track`, {

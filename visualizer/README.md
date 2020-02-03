@@ -20,5 +20,16 @@ npm run build
 npm run lint
 ```
 
+## Docker
+```
+docker build -t facerec/visualizer .
+docker run -p 8080:8080 --name facerec-visualizer -it facerec/visualizer
+
+# uninstall
+docker stop facerec-visualizer
+docker rm facerec-visualizer
+docker rmi facerec/visualizer
+```
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
