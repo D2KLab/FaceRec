@@ -1,6 +1,18 @@
 Face-Celebrity-Recognition
 ==========================
 
+## Install
+
+Install dependencies
+
+    pip install -r requirements.txt
+    
+If you have errors like `'thread._local' object has no attribute 'value'`, run
+
+    `sh mtcnn_patch.sh`
+    
+If you want to use also the server capabilities, you need to install [MongoDB](mongodb.com) and run it on default port.
+
 ### 1. Building a Training Dataset
 Create a directory for raw images utilized for training. In order to download automatically images of celebrity to build the training dataset we need to call the following command:
 ```sh
@@ -8,20 +20,23 @@ python -m src.crawler --keyword "Churchill Winston" --max_num 20 --image_dir dat
 python -m src.crawler --keyword "Roosevelt Franklin" --max_num 20 --image_dir data/training_img/RooseveltFranklin
 python -m src.crawler --keyword "De Gasperi Alcide" --max_num 20 --image_dir data/training_img/DeGasperiAlcide
 ```
+
+> NOTE: The crawler is temporarly out of service because of https://github.com/hellock/icrawler/issues/65
+ 
 ### 2. Preprocess the raw images (Face detection)
 Face alignment using MTCNN
 ```sh
-python -m src.FaceDetector  data/training_img/ data/training_img_aligned --image_size 182 --margin 44
+python -m src.FaceDetector  data/training_img/ data/training_img_aligned --image_size 160 --margin 44
 ```
 ### 3. Train a classifier on own images
 We perform training a classifier using the following command:
 ```sh
-python -m src.classifier TRAIN --classifier SVM data/training_img_aligned  --model-path model/20180402-114759.pb --classifier_path classifier/classifier.pkl --batch_size 200
+python -m src.classifier --data_dir data/training_img_aligned --classifier_path classifier/classifier.pkl --classifier SVM
 ```
 ### 4. Perform face recognition on Video
 The below command helps us to recognize people from video using the trained classifier from the previous step:
 ```sh
-python -m src.FaceRecogniser --video video/xxx.mp4 --output_path data/output.txt --model_path model/20180402-114759.pb --classifier_path classifier/classifier.pkl --video_speedup 1 --folder_containing_frame data/output
+python -m src.FaceRecogniser --video video/xxx.mp4 --output_path data/output.txt --classifier_path classifier/classifier.pkl --video_speedup 1 --folder_containing_frame data/output
 ```
 ### 5. Adding new persons (or images of existing persons) into a system
 First, creating a directory for raw images of new persons as follow. 
@@ -48,10 +63,8 @@ Please note that for every new person added, you should add as many images of th
 python -m src.crawler --keyword "Bardot Brigitte" --max_num 20 --image_dir data/new_person/BardotBrigitte
 ```
 
-Then, the following command should be executed:
-```sh
-python -m src.add_new_person  --input_dir data/new_person --align_dir data/new_person_aligned/ --model_path model/20180402-114759.pb --classifier SVM classifier/classifier_2.pkl
-```
+Then, retrain the model.
+
 > Note: Please empty the data/new_person directory before adding other persons.
 
 ### 6. Combine FaceNet + Tracker to perform face recognition on Video
@@ -83,6 +96,12 @@ A service is available as Docker image.
 ```sh
 docker build -t facerec .
 docker run -d -p 5050:5000 --restart=unless-stopped  -v /home/semantic/Repositories/Face-Celebrity-Recognition/database:/app/database -v /home/semantic/Repositories/Face-Celebrity-Recognition/video:/app/video -v /home/semantic/Repositories/Face-Celebrity-Recognition/data:/app/data -v /home/semantic/Repositories/Face-Celebrity-Recognition/config:/app/config --name facerec1 facerec
+```
+
+or 
+
+```
+docker-compose up
 ```
 
 ### Special Thanks to:

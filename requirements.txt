@@ -1,11 +1,9 @@
-six
-imageio
 pandas
 scikit-learn
 numpy
 scipy
 icrawler
-tensorflow==1.15.2
+tensorflow==2.1.0
 opencv-python
 face_recognition
 Pillow
@@ -13,9 +11,9 @@ filterpy
 flask
 flask-cors
 flask_restplus
-tinydb
 rdflib
 uuid
 SPARQLWrapper
 requests
 pyyaml
+pymongo

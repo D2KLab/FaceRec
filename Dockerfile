@@ -17,6 +17,9 @@ RUN pip install --upgrade pip
 COPY requirements.txt /app/
 RUN pip install -r /app/requirements.txt
 
+COPY mtcnn_patch.sh /app/
+RUN mtcnn_patch.sh
+
 COPY . /app
 
 EXPOSE 5000

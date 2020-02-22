@@ -10,8 +10,6 @@ from scipy.spatial import distance
 
 from .utils import utils
 
-ALIGN_MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "align")
-
 
 # IMPORTANT: this has to be run AFTER the tracker
 
@@ -74,8 +72,6 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluste
                 final_clusters.append(previous_cluster)
                 person_clusters.append(previous_cluster['track_id'])
 
-            print(person)
-            print(x.tracker_sample)
             previous_cluster = x.to_dict('records')[0]
             previous_cluster['end_sample'] = max
             previous_cluster['start_sample'] = min
@@ -93,12 +89,13 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluste
             del previous_cluster['npt']
             del previous_cluster['frame']
             del previous_cluster['tracker_sample']
+            del previous_cluster['_id']
 
         if previous_cluster is not None:
             person_clusters.append(previous_cluster['track_id'])
             final_clusters.append(previous_cluster)
 
-        print("* {}: {}".format(person, person_clusters))
+        # print("* {}: {}".format(person, person_clusters))
 
     return sanitize(final_clusters)
 

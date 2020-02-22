@@ -41,7 +41,6 @@ class Sort:
         ret = []
         for t, trk in enumerate(trks):
             pos = self.trackers[t].predict(img)  # for kal!
-            # print(pos)
             trk[:] = [pos[0], pos[1], pos[2], pos[3], 0]
             if np.any(np.isnan(pos)):
                 to_del.append(t)
@@ -65,6 +64,7 @@ class Sort:
                     trk.face_additional_attribute.append(additional_attribute_list[i])
                 else:
                     trk = CorrelationTracker(dets[i, :], img)
+
                 self.trackers.append(trk)
 
         i = len(self.trackers)

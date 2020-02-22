@@ -23,7 +23,7 @@ npm run lint
 ## Docker
 ```
 docker build -t facerec/visualizer .
-docker run -p 8080:8080 --name facerec-visualizer -it facerec/visualizer
+docker run -p 8080:8080 --name facerec-visualizer --restart unless-stopped -d facerec/visualizer
 
 # uninstall
 docker stop facerec-visualizer

@@ -1,12 +1,11 @@
 import os
 import time
 import datetime
-from tinydb import TinyDB, Query, where
 from flask import Flask, request, jsonify, Response, send_from_directory
 from flask_cors import CORS
 from flask_restplus import Api, Resource
+from threading import Thread
 
-import semantifier
 from src import *
 from src.utils import utils
 
@@ -15,8 +14,7 @@ VIDEO_DIR = os.path.join(os.getcwd(), 'video')
 TRAINING_IMG = 'data/training_img'
 os.makedirs('database', exist_ok=True)
 
-db_detection = TinyDB('database/detection.json')
-db_tracking = TinyDB('database/tracking.json')
+database.init()
 
 flask_app = Flask(__name__)
 api = Api(app=flask_app,
@@ -29,7 +27,8 @@ CORS(flask_app)
 def now():
     return datetime.datetime.now().isoformat()
 
-# http://127.0.0.1:5000/crawler?q=Annastiina Heikkilä;Frans Timmermans;Manfred Weber;Markus Preiss;Ska Keller;Emilie Tran Nguyen;Jan Zahradil;Margrethe Vestager;Nico Cué
+
+# http://127.0.0.1:5000/crawler?q=Annastiina Heikkilä;Frans Timmermans;Manfred Weber;Markus Preiss;Ska Keller;Emilie Tran Nguyen;Jan Zahradil;Margrethe Vestager;Nico Cué;Laura Huhtasaari;Asseri Kinnunen
 @api.route('/crawler')
 @api.doc(
     description="Search faces of people in the web to be added to the dataset.",
@@ -61,7 +60,7 @@ class Training(Resource):
         start_time = time.time()
 
         FaceDetector.main()
-        classifier.main('TRAIN', classifier='SVM', batch_size=200)
+        classifier.main(classifier='SVM')
         return jsonify({
             'task': 'train',
             'time': now(),
@@ -84,76 +83,67 @@ class Training(Resource):
          })
 class Track(Resource):
     def get(self):
-        start_time = time.time()
-
         video = request.args.get('video')
         speedup = request.args.get('speedup', type=int, default=25)
         no_cache = 'no_cache' in request.args.to_dict() and request.args.get('no_cache') != 'false'
 
-        results = None
-        info = None
+        v = None
+        video_path = video
         if not no_cache:
-            results = db_tracking.search(Query().video == video)
-            if results and len(results) > 0:
-                results = results[0]
-                info = results['info']
+            v = database.get_all_about(video)
+            if v:
+                video_path = v['locator']
 
-        if not results:
-            video_path = video
+        need_run = not v or 'tracks' not in v and v.get('status') != 'RUNNING'
+        if not v or need_run:
             if video.startswith('http'):  # it is a uri!
-                video_path, info = utils.uri2video(video)
+                video_path, v = utils.uri2video(video)
+                video = utils.clean_locator(v['locator'])
             elif not os.path.isfile(video):
                 raise FileNotFoundError('video not found: %s' % video)
+            else:
+                v = {'locator': video}
+            database.save_metadata(v)
 
-            r = tracker.main(video_path, video_speedup=speedup, export_frames=True)
-            results = {
-                'task': 'tracking',
-                'status': 'ok',
-                'execution_time': (time.time() - start_time),
-                'time': now(),
-                'video': video,
-                'info': info,
-                'results': r
-            }
+        if need_run:
+            database.save_status(video, 'RUNNING')
+            database.clean_analysis(video)
+            v['status'] = 'RUNNING'
+            Thread(target=run_tracker, args=(video_path, speedup, video)).start()
+        elif 'tracks' in v and len(v['tracks']) > 0:
+            v['tracks'] = clusterize.main(clusterize.from_dict(v['tracks']),
+                                          confidence_threshold=0, merge_cluster=False)
 
-            # TODO insert aliases in the cache
-            # delete previous results
-            db_tracking.remove(where('video') == video)
-            db_tracking.insert(results)
-
-        clusters = clusterize.main(clusterize.from_dict(results['results']), confidence_threshold=0,
-                                   merge_cluster=False)
-        results = {
-            'task': 'tracking',
-            'status': 'ok',
-            'execution_time': (time.time() - start_time),
-            'time': now(),
-            'video': video,
-            'info': info,
-            'results': clusters
-        }
+        if '_id' in v:
+            del v['_id']  # the database id should not appear on the output
 
         fmt = request.args.get('format')
         if fmt == 'ttl':
-            return Response(semantifier.semantify(results), mimetype='text/turtle')
+            return Response(semantifier.semantify(v), mimetype='text/turtle')
+        return jsonify(v)
 
-        return jsonify(results)
+
+def run_tracker(video_path, speedup, video):
+    try:
+        return tracker.main(video_path, video_speedup=speedup, export_frames=True)
+    except RuntimeError:
+        database.save_status(video, 'ERROR')
 
 
 # # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
 # # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/eurovaalit-2019-kuka-johtaa-eurooppaa/0460c1b7d735e3fc796aa2829811aa1ae5dc9fa8
 # # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/eurovaalit-2019-kuka-johtaa-eurooppaa/d9d05488b35db559cdef35bac95f518ee0dda76a
 # # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&no_cache&video=http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
-@api.route('/recognise')
-@api.doc(description="Extract from each frame of the video the positions of the people in the dataset",
-         params={
-             'video': {'required': True, 'description': 'URI of the video to be analysed'},
-             'speedup': {'default': 25, 'type': int,
-                         'description': 'Number of frame to wait between two iterations of the algorithm'},
-             'no_cache': {'type': bool, 'default': False,
-                          'description': 'Set it if you want to recompute the annotations'},
-             'format': {'default': 'json', 'enum': ['json', 'ttl'], 'description': 'Set the output format'}
-         })
+# @api.route('/recognise')
+# @api.doc(description="Extract from each frame of the video the positions of the people in the dataset",
+#          params={
+#              'video': {'required': True, 'description': 'URI of the video to be analysed'},
+#              'speedup': {'default': 25, 'type': int,
+#                          'description': 'Number of frame to wait between two iterations of the algorithm'},
+#              'no_cache': {'type': bool, 'default': False,
+#                           'description': 'Set it if you want to recompute the annotations'},
+#              'format': {'default': 'json', 'enum': ['json', 'ttl'], 'description': 'Set the output format'}
+#          })
 class Recognise(Resource):
     def get(self):
         start_time = time.time()

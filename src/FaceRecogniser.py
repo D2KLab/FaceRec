@@ -4,15 +4,50 @@ import pickle
 
 import cv2
 import numpy as np
-import tensorflow.compat.v1 as tf
+from mtcnn import MTCNN
+from tensorflow.keras.models import load_model
 
-from .utils import facenet, utils
-from .align import detect_face
-
-ALIGN_MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "align")
+from .utils import utils
 
 
-def main(video_path, output_path='data/cluster.txt', facenet_model_path='model/20180402-114759.pb',
+def select_best(predictions, class_names):
+    best_index = np.argmax(predictions)
+    best_prob = predictions[best_index]
+    best_name = class_names[best_index]
+    return best_name, best_prob
+
+
+class Classifier:
+    def __init__(self, classifier_path, facenet_model='./model/facenet_keras.h5',
+                 facenet_weights='./model/facenet_keras_weights.h5'):
+        self.image_size = 160
+
+        self.facenet = load_model(facenet_model, compile=False)
+        self.facenet.load_weights(facenet_weights)
+
+        # Load classifier
+        classifier_filename = os.path.expanduser(classifier_path)
+        with open(classifier_filename, 'rb') as f:
+            (classifier, class_names) = pickle.load(f)
+            print("Loaded classifier file: %s" % classifier_filename)
+            self.classifier = classifier
+            self.class_names = class_names
+
+    def predict(self, img):
+        scaled = cv2.resize(img, (self.image_size, self.image_size), interpolation=cv2.INTER_CUBIC)
+        scaled = scaled.reshape(-1, self.image_size, self.image_size, 3)
+
+        # convert to array and predict among the known ones
+        emb_array = [utils.get_embedding(self.facenet, face_pixels) for face_pixels in scaled]
+        emb_array = np.asarray(emb_array)
+        return self.classifier.predict_proba(emb_array).flatten()
+
+    def predict_best(self, img):
+        predictions = self.predict(img)
+        return select_best(predictions, self.class_names)
+
+
+def main(video_path, output_path='data/cluster.txt',
          classifier_path='classifier/classifier.pkl', video_speedup=25, folder_containing_frame=None,
          confidence_threshold=0.6):
     video_capture = cv2.VideoCapture(video_path)
@@ -20,95 +55,59 @@ def main(video_path, output_path='data/cluster.txt', facenet_model_path='model/2
     if folder_containing_frame is None:
         folder_containing_frame = utils.generate_output_path('./data/frames', video_path)
 
-    minsize = 20  # minimum size of face for mtcnn to detect
-    threshold = [0.6, 0.7, 0.7]  # three steps's threshold
-    factor = 0.709  # scale factor
-    input_image_size = 160
+    detector = MTCNN()
 
     # Load classifier
-    classifier_filename = os.path.expanduser(classifier_path)
-    with open(classifier_filename, 'rb') as f:
-        (model, class_names) = pickle.load(f)
-        print("Loaded classifier file: %s" % classifier_filename)
+    classifier = Classifier(classifier_path)
 
-    with tf.Graph().as_default():
-        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
-        sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, log_device_placement=False))
-        with sess.as_default():
-            # Bounding box
-            pnet, rnet, onet = detect_face.create_mtcnn(sess, ALIGN_MODEL_PATH)
-            # Get the path of the facenet model and load it
-            facenet.load_model(facenet_model_path)
-            images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
-            embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
-            phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
+    # frames per second
+    fps = video_capture.get(cv2.CAP_PROP_FPS)
+    video_length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
-            # frames per second
-            fps = video_capture.get(cv2.CAP_PROP_FPS)
-            video_length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    matches = []
 
-            matches = []
+    # iterate over the frames
+    for frame_no in np.arange(0, video_length, video_speedup):
+        print('frame %d/%d' % (frame_no, video_length))
+        video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
 
-            # iterate over the frames
-            for frame_no in np.arange(0, video_length, video_speedup):
-                print(frame_no)
-                video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
+        # read the frame
+        ret, frame = video_capture.retrieve()
 
-                # read the frame
-                ret, frame = video_capture.retrieve()
+        bounding_boxes = detector.detect_faces(frame)
+        if len(bounding_boxes) == 0:
+            continue
 
-                bounding_boxes, _ = detect_face.detect_face(frame, minsize, pnet, rnet, onet, threshold, factor)
+        for item in bounding_boxes:
+            bb = utils.xywh2rect(*utils.fix_box(item['box']))
 
-                faces_found = bounding_boxes.shape[0]
-                if faces_found == 0:
-                    continue
+            cropped = frame[bb[1]:bb[3], bb[0]:bb[2], :]
+            best_name, best_prob = classifier.predict_best(cropped)
 
-                det = np.array(bounding_boxes[:, 0:4], dtype=int)
-                for bb in det:
+            if best_prob > confidence_threshold:
+                # boxing face
+                cv2.rectangle(frame, (bb[0], bb[1]), (bb[2], bb[3]), (0, 255, 0), 2)
+                text_x = bb[0]
+                text_y = bb[3] + 20
+                cv2.putText(frame, best_name, (text_x, text_y),
+                            cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                            1, (0, 0, 255), thickness=1, lineType=2)
 
-                    # inner exception
-                    if bb[0] <= 0 or bb[1] <= 0 or bb[2] >= len(frame[0]) or bb[3] >= len(frame):
-                        print('face is inner of range!')
-                        continue
+                matches.append({
+                    'name': best_name,
+                    'confidence': best_prob,
+                    'video': video_path,
+                    'start_frame': frame_no,
+                    'start_npt': utils.frame2npt(frame_no, fps),
+                    'bounding': utils.rect2xywh(*bb),
+                    'rect': bb
+                })
 
-                    cropped = frame[bb[1]:bb[3], bb[0]:bb[2], :]
-                    scaled = cv2.resize(cropped, (input_image_size, input_image_size),
-                                        interpolation=cv2.INTER_CUBIC)
-
-                    scaled = facenet.prewhiten(scaled)
-                    scaled_reshape = scaled.reshape(-1, input_image_size, input_image_size, 3)
-                    # convert to array and predict among the known ones
-                    feed_dict = {images_placeholder: scaled_reshape, phase_train_placeholder: False}
-                    emb_array = sess.run(embeddings, feed_dict=feed_dict)
-                    predictions = model.predict_proba(emb_array)
-                    best_class_indices = np.argmax(predictions, axis=1)
-                    best_class_probabilities = predictions[np.arange(len(best_class_indices)), best_class_indices][0]
-                    best_name = class_names[best_class_indices[0]]
-                    print("Name: {}, Confidence: {}".format(best_name, best_class_probabilities))
-                    if best_class_probabilities > confidence_threshold:
-                        # boxing face
-                        cv2.rectangle(frame, (bb[0], bb[1]), (bb[2], bb[3]), (0, 255, 0), 2)
-                        text_x = bb[0]
-                        text_y = bb[3] + 20
-                        cv2.putText(frame, class_names[best_class_indices[0]], (text_x, text_y),
-                                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                                    1, (0, 0, 255), thickness=1, lineType=2)
-
-                        matches.append({
-                            'name': best_name,
-                            'confidence': best_class_probabilities,
-                            'video': video_path,
-                            'start_frame': frame_no,
-                            'start_npt': utils.frame2npt(frame_no, fps),
-                            'bounding': utils.rect2xywh(bb[0], bb[1], bb[2], bb[3]),
-                            'rect': [bb[0], bb[1], bb[2], bb[3]]
-                        })
-
-                        with open(output_path, 'a+') as f:
-                            f.write(str(frame_no) + ',' + class_names[best_class_indices[0]] + "\n")
-                        frame_number = 'frame' + str(frame_no) + '.jpg'
-                        filename = os.path.join(folder_containing_frame, frame_number)
-                        cv2.imwrite(filename, frame)
+                with open(output_path, 'a+') as f:
+                    f.write(str(frame_no) + ',' + best_name + "\n")
+                frame_number = 'frame' + str(frame_no) + '.jpg'
+                filename = os.path.join(folder_containing_frame, frame_number)
+                cv2.imwrite(filename, frame)
 
     return matches
 
@@ -121,9 +120,6 @@ def parse_args():
     parser.add_argument('--output_path', type=str,
                         help='Path to the txt output file',
                         default='data/cluster.txt')
-    parser.add_argument('--model_path', type=str,
-                        help='Path to embedding model',
-                        default="model/20180402-114759.pb")
     parser.add_argument('--classifier_path', type=str,
                         help='Path to KNN classifier',
                         default="classifier/classifier.pkl")
@@ -141,5 +137,5 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     video = utils.normalize_video(args.video)
-    main(video, args.output_path, args.model_path, args.classifier_path,
+    main(video, args.output_path, args.classifier_path,
          args.video_speedup, args.folder_containing_frame, args.confidence_threshold)

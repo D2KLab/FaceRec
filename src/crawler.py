@@ -15,8 +15,8 @@ def main(keyword, max_num=20, image_dir=None):
 
     keyword = keyword.strip()
 
-    logger.info('Crawler run for: %s' % keyword);
-    print('Crawler run for: %s' % keyword);
+    logger.info('Crawler run for: %s' % keyword)
+    print('Crawler run for: %s' % keyword)
 
     if image_dir is None:
         image_dir = 'data/training_img/%s' % keyword.replace(" ", "_")
@@ -26,9 +26,9 @@ def main(keyword, max_num=20, image_dir=None):
 
     google_crawler = GoogleImageCrawler(feeder_threads=10, parser_threads=10, log_level=logging.DEBUG,
                                         downloader_threads=25, storage={'root_dir': image_dir})
-    filters = dict(type='photo') # I find photo more accurate than 'face'
+    # filters = dict(type='photo')  # I find photo more accurate than 'face'
     start = time.time()
-    google_crawler.crawl(keyword=keyword, filters=filters, offset=0, max_num=max_num,
+    google_crawler.crawl(keyword=keyword, offset=0, max_num=max_num,
                          min_size=(200, 200), max_size=None, file_idx_offset=0)
 
     for (rootDir, dirNames, filenames) in os.walk(image_dir):

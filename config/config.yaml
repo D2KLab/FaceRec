@@ -1,3 +1,6 @@
 limecraft:
-    username: xx
-    password: xx
+    username: xxx
+    password: xxx
+mongo:
+    server: mongo
+    port: 27017
