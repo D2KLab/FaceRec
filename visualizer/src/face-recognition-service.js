@@ -1,9 +1,10 @@
 import axios from 'axios';
+import config from '../app.config';
 
-const FR_SERVER = 'http://127.0.0.1:5000/';
+export const SERVER = config.api;
 
 export async function recognise(video) {
-  const data = await axios.get(`${FR_SERVER}track`, {
+  const data = await axios.get(`${SERVER}track`, {
     params: {
       video,
       speedup: 25,
@@ -14,13 +15,28 @@ export async function recognise(video) {
 
 export async function getLocator(video) {
   if (!video) return '';
-  const data = await axios.get(`${FR_SERVER}get_locator`, {
+  const data = await axios.get(`${SERVER}get_locator`, {
     params: { video },
   });
   return data.data;
 }
 
-export default {
-  recognise,
-  getLocator,
-};
+export async function getTrainingSet() {
+  const data = await axios.get(`${SERVER}training-set`);
+  return data.data;
+}
+
+export async function setDisabled(list) {
+  const data = await axios.post(`${SERVER}disabled`, list);
+  return data.data;
+}
+
+export async function getDisabled() {
+  const data = await axios.get(`${SERVER}disabled`);
+  return data.data;
+}
+
+export async function crawl(q) {
+  const data = await axios.get(`${SERVER}crawler`, { params: { q } });
+  return data.data;
+}

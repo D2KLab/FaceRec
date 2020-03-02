@@ -1,52 +1,14 @@
-<template>
-  <div>
-    <div class="video-container" ref="container">
-      <video ref="video"
-      v-bind:src="locator"
-      v-on:loadedmetadata="saveDimensions()"
-      v-on:timeupdate="updateAnnotations()"
-      controls autoplay></video>
-    </div>
-    <div class="container">
+<template src="./AnnotatedVideo.html" ></template>
 
-    <div class="columns is-mobile">
-      <div class="column legenda">
-        <p>In this video:</p>
-        <ul id="legenda">
-          <li v-for="item in classes" v-bind:key="item.label">
-            <label>
-              <input type="checkbox" :id="item.label"  :name="item.label"
-              @input="onPersonToggle($event, item.label)" />
-              <span class="square"
-              :style = "{borderColor: item.colour,
-                 background: item.selected ? item.colour : 'transparent'}">
-               </span>
-              {{ item.label }}
-            </label>
-          </li>
-        </ul>
-      </div>
-      <div class="column is-two-thirds">
-        <label>
-          Min confidence:
-          <input type="range" min="0.0" max="1.0" value="0.7" step="0.05"
-          v-model="confidence" name="confidence"/>
-          <span>{{confidence}}</span>
-        </label>
-        <ul class="listing">
-          <li v-for="d in data.filter(d=>!deselected.includes(d.name))"
-            v-bind:key="d.start_npt + d.name + d.track_id">
-            <a v-on:click="goToSecond(d.start_npt)">
-              <strong>{{d.start_npt}} - {{d.end_npt}}</strong></a>
-            {{d.name}} <small>Confidence: {{d.confidence | formatNumber}}</small>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+<style scoped lang="stylus" src='./AnnotatedVideo.styl'></style>
 
-  </div>
-</template>
+<style>
+.rect {
+  position: absolute;
+  border: 2px solid yellow;
+  transition: all 100ms linear;
+}
+</style>
 
 <script>
 /* eslint no-param-reassign: ["error", { "props": false }] */
@@ -161,47 +123,3 @@ export default {
   },
 };
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-video {
-  width: 100%;
-  margin: auto;
-}
-.video-container {
-  position: relative;
-  text-align: center;
-  margin-bottom: 6px;
-}
-.square {
-  display: inline-block;
-  height: 1em;
-  width: 1em;
-  border: 2px solid yellow;
-  vertical-align: sub;
-}
-.legenda {
-  background-color: #eee;
-  padding: 1.5em;
-}
-.legenda input[type=checkbox] {
-  visibility: hidden;
-  position:absolute;
-}
-small {
-  color: #ccc;
-  font-size: 0.7em;
-}
-.listing {
-  max-height: 20em;
-  overflow: scroll;
-}
-</style>
-
-<style>
-.rect {
-  position: absolute;
-  border: 2px solid yellow;
-  transition: all 100ms linear;
-}
-</style>

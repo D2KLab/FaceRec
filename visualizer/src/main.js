@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 import Buefy from 'buefy';
 import numeral from 'numeral';
 import App from './App.vue';
-import AnnotatedVideo from './components/AnnotatedVideo.vue';
+import routes from './routes';
 import 'buefy/dist/buefy.css';
 
 Vue.config.productionTip = false;
@@ -13,14 +13,6 @@ Vue.use(Buefy);
 
 Vue.filter('formatNumber', (value) => numeral(value).format('0.00'));
 
-
-const routes = [
-  {
-    path: '/',
-    name: 'Home',
-  },
-  { path: '/video', component: AnnotatedVideo },
-];
 
 const router = new VueRouter({
   mode: 'history',

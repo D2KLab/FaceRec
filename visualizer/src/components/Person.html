@@ -1,0 +1,26 @@
+<div class="container section">
+
+  <h1 class="title">{{person}}</h1>
+
+  <div v-if="!paths.length">
+    <p>There is no image for this person</p>
+
+    <div class="buttons">
+      <button class="button is-success" :class="{'is-loading': crawling}" @click="runCrawler()">Search on web</button>
+    </div>
+  </div>
+
+  <div v-if="paths.length">
+    <p>Click on any image for enabling/disabling it in the training</p>
+    <div class="buttons">
+      <button class="button is-success" :disabled="!hasChanged()" @click="saveChange()">Save changes</button>
+      <button class="button" @click="reset()">Reset</button>
+    </div>
+
+    <ul>
+      <li v-for="p in paths" @click="togglePath($event, p)" :class="{disabled: disabled.includes(p)}">
+        <img :src='p' />
+      </li>
+    </ul>
+  </div>
+</div>

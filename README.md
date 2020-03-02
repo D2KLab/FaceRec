@@ -31,12 +31,12 @@ python -m src.FaceDetector  data/training_img/ data/training_img_aligned --image
 ### 3. Train a classifier on own images
 We perform training a classifier using the following command:
 ```sh
-python -m src.classifier --data_dir data/training_img_aligned --classifier_path classifier/classifier.pkl --classifier SVM
+python -m src.classifier --data_dir data/training_img_aligned --classifier_path data/classifier/classifier.pkl --classifier SVM
 ```
 ### 4. Perform face recognition on Video
 The below command helps us to recognize people from video using the trained classifier from the previous step:
 ```sh
-python -m src.FaceRecogniser --video video/xxx.mp4 --output_path data/output.txt --classifier_path classifier/classifier.pkl --video_speedup 1 --folder_containing_frame data/output
+python -m src.FaceRecogniser --video video/xxx.mp4 --output_path data/output.txt --classifier_path data/classifier/classifier.pkl --video_speedup 1 --folder_containing_frame data/output
 ```
 ### 5. Adding new persons (or images of existing persons) into a system
 First, creating a directory for raw images of new persons as follow. 
@@ -95,7 +95,7 @@ A service is available as Docker image.
 
 ```sh
 docker build -t facerec .
-docker run -d -p 5050:5000 --restart=unless-stopped  -v /home/semantic/Repositories/Face-Celebrity-Recognition/database:/app/database -v /home/semantic/Repositories/Face-Celebrity-Recognition/video:/app/video -v /home/semantic/Repositories/Face-Celebrity-Recognition/data:/app/data -v /home/semantic/Repositories/Face-Celebrity-Recognition/config:/app/config --name facerec1 facerec
+docker run -d -p 5050:5000 --restart=unless-stopped  -v /home/semantic/Repositories/Face-Celebrity-Recognition/video:/app/video -v /home/semantic/Repositories/Face-Celebrity-Recognition/data:/app/data -v /home/semantic/Repositories/Face-Celebrity-Recognition/config:/app/config --name facerec1 facerec
 ```
 
 or 

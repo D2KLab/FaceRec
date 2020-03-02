@@ -2,7 +2,7 @@
 /data/
 /video/
 /database/
-/classifier/
+/data/classifier/
 
 .idea
 

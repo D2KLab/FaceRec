@@ -40,7 +40,7 @@ def init_csv(path, fieldnames):
 
 
 def main(video_path, output_path=None,
-         classifier_path='classifier/classifier.pkl',
+         classifier_path='data/classifier/classifier.pkl',
          video_speedup=25, export_frames=False):
     print(video_path)
 

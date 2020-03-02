@@ -18,7 +18,7 @@ def select_best(predictions, class_names):
 
 
 class Classifier:
-    def __init__(self, classifier_path, facenet_model='./model/facenet_keras.h5',
+    def __init__(self, classifier_path='data/classifier/classifier.pkl', facenet_model='./model/facenet_keras.h5',
                  facenet_weights='./model/facenet_keras_weights.h5'):
         self.image_size = 160
 

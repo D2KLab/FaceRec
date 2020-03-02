@@ -6,7 +6,6 @@ services:
       - "5000:5000"
     volumes:
       - ./video/:/app/video
-      - ./database/:/app/database
       - ./data/:/app/data
       - ./config/:/app/config
     links:

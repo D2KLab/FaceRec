@@ -2,7 +2,7 @@
   <div id="app">
     <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <a class="navbar-item" href="/"><b>FaceRec Visualizer</b></a>
+        <a class="navbar-item" href="/visualizer"><b>FaceRec Visualizer</b></a>
 
         <a class="navbar-item">
           <form class="field has-addons" action="video">

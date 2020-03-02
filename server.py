@@ -9,9 +9,16 @@ from threading import Thread
 from src import *
 from src.utils import utils
 
-VIDEO_DIR = os.path.join(os.getcwd(), 'video')
+TRAINING_IMG = 'data/training_img/'
 
-TRAINING_IMG = 'data/training_img'
+IMG_DIR = os.path.join(os.getcwd(), TRAINING_IMG)
+VIDEO_DIR = os.path.join(os.getcwd(), 'video')
+DISABLED_FILE = TRAINING_IMG + 'disabled.txt'
+
+if not os.path.isfile(DISABLED_FILE):
+    f = open(DISABLED_FILE, "w")
+    f.close()
+
 os.makedirs('database', exist_ok=True)
 
 database.init()
@@ -26,6 +33,24 @@ CORS(flask_app)
 
 def now():
     return datetime.datetime.now().isoformat()
+
+
+@api.route('/training-set')
+@api.doc(description="Get list of training images with classes.")
+class TrainingSet(Resource):
+    def get(self):
+        labels, paths = utils.fetch_dataset(TRAINING_IMG)
+        results = {}
+        for path, c in zip(paths, labels):
+            path = path.replace(TRAINING_IMG, 'training-img/')
+            if c not in results:
+                results[c] = {
+                    'class': c,
+                    'path': [path]
+                }
+            else:
+                results[c]['path'].append(path)
+        return jsonify(list(results.values()))
 
 
 # http://127.0.0.1:5000/crawler?q=Annastiina Heikkilä;Frans Timmermans;Manfred Weber;Markus Preiss;Ska Keller;Emilie Tran Nguyen;Jan Zahradil;Margrethe Vestager;Nico Cué;Laura Huhtasaari;Asseri Kinnunen
@@ -144,51 +169,51 @@ def run_tracker(video_path, speedup, video):
 #                           'description': 'Set it if you want to recompute the annotations'},
 #              'format': {'default': 'json', 'enum': ['json', 'ttl'], 'description': 'Set the output format'}
 #          })
-class Recognise(Resource):
-    def get(self):
-        start_time = time.time()
-
-        video = request.args.get('video')
-        speedup = request.args.get('speedup', type=int, default=25)
-        no_cache = 'no_cache' in request.args.to_dict()
-
-        results = None
-        info = None
-        if not no_cache:
-            results = db_detection.search(Query().video == video)
-            if results and len(results) > 0:
-                results = results[0]
-
-        if not results:
-            video_path = video
-            if video.startswith('http'):  # it is a uri!
-                video_path, info = utils.uri2video(video)
-            elif not os.path.isfile(video):
-                raise FileNotFoundError('video not found: %s' % video)
-
-            r = FaceRecogniser.main(video_path, video_speedup=speedup, confidence_threshold=0.2)
-            results = {
-                'task': 'recognise',
-                'status': 'ok',
-                'execution_time': (time.time() - start_time),
-                'time': now(),
-                'video': video,
-                'info': info,
-                'results': r
-            }
-
-            # TODO insert aliases in the cache
-            # delete previous results
-            db_detection.remove(where('video') == video)
-            db_detection.insert(results)
-
-        # with open('recognise.json', 'w') as outfile:
-        #     json.dump(r, outfile)
-        fmt = request.args.get('format')
-        if fmt == 'ttl':
-            return Response(semantifier.semantify(results), mimetype='text/turtle')
-
-        return jsonify(results)
+# class Recognise(Resource):
+#     def get(self):
+#         start_time = time.time()
+#
+#         video = request.args.get('video')
+#         speedup = request.args.get('speedup', type=int, default=25)
+#         no_cache = 'no_cache' in request.args.to_dict()
+#
+#         results = None
+#         info = None
+#         if not no_cache:
+#             results = db_detection.search(Query().video == video)
+#             if results and len(results) > 0:
+#                 results = results[0]
+#
+#         if not results:
+#             video_path = video
+#             if video.startswith('http'):  # it is a uri!
+#                 video_path, info = utils.uri2video(video)
+#             elif not os.path.isfile(video):
+#                 raise FileNotFoundError('video not found: %s' % video)
+#
+#             r = FaceRecogniser.main(video_path, video_speedup=speedup, confidence_threshold=0.2)
+#             results = {
+#                 'task': 'recognise',
+#                 'status': 'ok',
+#                 'execution_time': (time.time() - start_time),
+#                 'time': now(),
+#                 'video': video,
+#                 'info': info,
+#                 'results': r
+#             }
+#
+#             # TODO insert aliases in the cache
+#             # delete previous results
+#             db_detection.remove(where('video') == video)
+#             db_detection.insert(results)
+#
+#         # with open('recognise.json', 'w') as outfile:
+#         #     json.dump(r, outfile)
+#         fmt = request.args.get('format')
+#         if fmt == 'ttl':
+#             return Response(semantifier.semantify(results), mimetype='text/turtle')
+#
+#         return jsonify(results)
 
 
 @flask_app.route('/get_locator')
@@ -200,6 +225,30 @@ def send_video():
         return video_path
     else:
         return send_from_directory(VIDEO_DIR, path, as_attachment=True)
+
+
+@flask_app.route('/training-img/<folder>/<filename>')
+def send_img(folder=None, filename=None):
+    return send_from_directory(IMG_DIR + folder, filename, as_attachment=True)
+
+
+@api.route('/disabled')
+class Disabled(Resource):
+    def get(self):
+        with open(DISABLED_FILE) as f:
+            dis = f.read().split('\n')
+            return jsonify(dis)
+
+    def post(self):
+        data = request.json
+
+        with open(DISABLED_FILE, 'w') as f:
+            for x in data:
+                f.write(x)
+                f.write('\n')
+            f.close()
+
+        return 'ok'
 
 
 @api.errorhandler(ValueError)

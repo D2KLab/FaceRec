@@ -109,6 +109,26 @@ def load_dataset(directory, keep_original_size=False):
     return np.asarray(X), np.asarray(y), paths, class_names
 
 
+def fetch_dataset(directory):
+    y, paths = list(), list()
+    # enumerate folders, on per class
+    for subdir in sorted(os.listdir(directory)):
+        # path
+        path = os.path.join(directory, subdir)
+        # skip any files that might be in the dir
+        if not os.path.isdir(path):
+            continue
+        # load all faces in the subdirectory
+        files = [os.path.join(path, p) for p in os.listdir(path) if p != '.DS_Store']
+        paths.extend(files)
+
+        # create labels
+        labels = [subdir.replace('_', ' ') for _ in range(len(files))]
+        y.extend(labels)
+
+    return np.asarray(y), paths,
+
+
 def fix_box(box):
     return [max(0, i) for i in box]  # workaround for https://github.com/ipazc/mtcnn/issues/11
 

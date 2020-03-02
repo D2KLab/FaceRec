@@ -14,7 +14,7 @@ from tensorflow.keras.models import load_model
 from .utils import utils
 
 
-def main(classifier='SVM', data_dir='data/training_img_aligned', classifier_path='classifier/classifier.pkl'):
+def main(classifier='SVM', data_dir='data/training_img_aligned', classifier_path='data/classifier/classifier.pkl'):
     embedding_dir = "data/embedding/"
 
     # load train dataset
@@ -61,7 +61,7 @@ def parse_arguments(argv):
                         default='SVM')
     parser.add_argument('--data_dir', type=str, default='data/training_img_aligned',
                         help='Path to the data directory containing aligned LFW face patches.')
-    parser.add_argument('--classifier_path', type=str, default='classifier/classifier.pkl',
+    parser.add_argument('--classifier_path', type=str, default='data/classifier/classifier.pkl',
                         help='Path to the KNN classifier')
 
     return parser.parse_args(argv)

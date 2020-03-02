@@ -1,0 +1,46 @@
+<div class="container">
+  <div class="video-container" ref="container">
+    <video ref="video"
+    v-bind:src="locator"
+    v-on:loadedmetadata="saveDimensions()"
+    v-on:timeupdate="updateAnnotations()"
+    controls autoplay></video>
+  </div>
+
+
+    <div class="columns is-mobile">
+      <div class="column legenda">
+        <p>In this video:</p>
+        <ul id="legenda">
+          <li v-for="item in classes" v-bind:key="item.label">
+            <label>
+              <input type="checkbox" :id="item.label"  :name="item.label"
+              @input="onPersonToggle($event, item.label)" />
+              <span class="square"
+              :style = "{borderColor: item.colour,
+                background: item.selected ? item.colour : 'transparent'}">
+              </span>
+              {{ item.label }}
+            </label>
+          </li>
+        </ul>
+      </div>
+      <div class="column is-two-thirds">
+        <label>
+          Min confidence:
+          <input type="range" min="0.0" max="1.0" value="0.7" step="0.05"
+          v-model="confidence" name="confidence"/>
+          <span>{{confidence}}</span>
+        </label>
+        <ul class="listing">
+          <li v-for="d in data.filter(d=>!deselected.includes(d.name))"
+            v-bind:key="d.start_npt + d.name + d.track_id">
+            <a v-on:click="goToSecond(d.start_npt)">
+              <strong>{{d.start_npt}} - {{d.end_npt}}</strong></a>
+              {{d.name}} <small>Confidence: {{d.confidence | formatNumber}}</small>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+  </div>
