@@ -15,6 +15,8 @@
 
 import palette from 'google-palette';
 import { recognise, getLocator } from '@/face-recognition-service';
+// import memad from '@/connectors/memad';
+import { hhmmss } from '@/utils';
 
 function adaptDimension(bounding, origW, origH, destW, destH) {
   const rW = destW / origW;
@@ -60,10 +62,16 @@ export default {
     },
   },
   mounted() {
-    getLocator(this.$route.query.v)
+    const url = this.$route.query.v;
+    getLocator(url)
       .then((d) => { this.locator = d; });
 
     this.trigService();
+
+    // if (url.startsWith('http://data.memad.eu')) {
+    //   memad.get('http://data.memad.eu')
+    //     .then((d) => { console.log(d); });
+    // }
   },
   methods: {
     onPersonToggle($event, person) {
@@ -121,5 +129,12 @@ export default {
       });
     },
   },
+  filters: {
+    hhmmss(value) {
+      if (!value) return '';
+      return hhmmss(value);
+    },
+  },
+
 };
 </script>
