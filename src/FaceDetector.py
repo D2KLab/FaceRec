@@ -10,7 +10,7 @@ from .utils import utils
 
 
 def main(input_dir='data/training_img', output_dir='data/training_img_aligned', image_size=160, margin=44,
-         detect_multiple_faces=False):
+         detect_multiple_faces=False, discard_disabled=True):
     output_dir = os.path.expanduser(output_dir)
     os.makedirs(output_dir, exist_ok=True)
 
@@ -20,7 +20,14 @@ def main(input_dir='data/training_img', output_dir='data/training_img_aligned', 
 
     nrof_successfully_aligned = 0
 
+    disabled = []
+    if discard_disabled:
+        with open(os.path.join(input_dir, 'disabled.txt')) as f:
+            disabled = f.read().splitlines()
+
     for img, label, path in zip(data, labels, paths):
+        if path in disabled:
+            pass
         print(path)
         output_class_dir = os.path.join(output_dir, label.replace(' ', '_'))
         os.makedirs(output_class_dir, exist_ok=True)
@@ -88,6 +95,8 @@ def parse_arguments(argv):
                         help='Margin for the crop around the bounding box (height, width) in pixels')
     parser.add_argument('--detect_multiple_faces', type=bool, default=False,
                         help='Detect and align multiple faces per image')
+    parser.add_argument('--discard_disabled', type=bool, default=False,
+                        help='If true, skip the images in the file "disabled.txt"')
     return parser.parse_args(argv)
 
 
