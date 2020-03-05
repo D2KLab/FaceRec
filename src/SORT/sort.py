@@ -49,7 +49,6 @@ class Sort:
             self.trackers.pop(t)
         if len(dets) > 0:
             matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(dets, trks)
-
             # update matched trackers with assigned detections
             for t, trk in enumerate(self.trackers):
                 if t not in unmatched_trks:
@@ -69,9 +68,8 @@ class Sort:
 
         i = len(self.trackers)
         for trk in reversed(self.trackers):
-            if len(dets) == 0:
-                trk.update([], img)
             d = trk.get_state()
+
             if (trk.time_since_update < 1) and (trk.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
                 ret.append(np.concatenate((d, [trk.id])).reshape(1, -1))
             i -= 1

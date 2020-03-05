@@ -28,7 +28,7 @@ def main(input_dir='data/training_img', output_dir='data/training_img_aligned', 
     for img, label, path in zip(data, labels, paths):
         if path in disabled:
             pass
-        print(path)
+
         output_class_dir = os.path.join(output_dir, label.replace(' ', '_'))
         os.makedirs(output_class_dir, exist_ok=True)
 

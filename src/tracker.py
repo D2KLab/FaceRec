@@ -118,14 +118,12 @@ def main(video_path, output_path=None,
             attribute_list.append([cropped, item['confidence'], dist_rate, high_ratio_variance, width_rate])
 
         trackers = tracker.update(np.array(face_list), img_size, cluster_path, attribute_list, rgb_frame)
-
         tracker_sample = tracker.frame_count
         # this is a counter of the frame analysed by the tracker (so normalised respect to the video_speedup)
 
         for d in trackers:
             d = d.astype(int)
-
-            # FIXME how this is possible?
+            # the predicted position is outside the image
             if any(i < 0 for i in d) \
                     or d[0] >= frame_width or d[2] >= frame_width \
                     or d[1] >= frame_height or d[3] >= frame_height:
@@ -177,7 +175,7 @@ def parse_args():
     # files required in input
     parser.add_argument('-v', '--video', type=str, required=True,
                         help='Path or URI of the video to be analysed.')
-    parser.add_argument('--classifier_path', type=str, default='classifier/classifier.pkl',
+    parser.add_argument('--classifier_path', type=str, default='data/classifier/classifier.pkl',
                         help='Path to the KNN classifier')
 
     # paths for the output
