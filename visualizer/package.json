@@ -12,7 +12,9 @@
     "buefy": "^0.8.10",
     "core-js": "^3.5.0",
     "google-palette": "^1.1.0",
+    "nib": "^1.1.2",
     "numeral": "^2.0.6",
+    "rupture": "^0.7.1",
     "vue": "^2.6.11",
     "vue-router": "^3.1.3"
   },

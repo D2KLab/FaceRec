@@ -1,7 +1,21 @@
+flex-version = flex
+support-for-ie = false
+vendor-prefixes = official
+
+@import '~nib/lib/nib/index.styl'
+@import '~rupture/rupture/index.styl'
+
+.root
+  +above(900px)
+    display flex
+    justify-content center
+    align-items: flex-start;
+    max-width: 1200px
+    margin auto
+
 video
     width 100%
     margin auto
-
 
 .video-container,  .analysis
     margin-left auto

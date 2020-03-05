@@ -1,7 +1,7 @@
 <template src="./Home.html" ></template>
 
 <script>
-import { getTrainingSet } from '@/face-recognition-service';
+import { getTrainingSet } from '@/services/face-recognition';
 
 export default {
   name: 'Home',

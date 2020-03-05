@@ -1,0 +1,33 @@
+<div class="kg-panel">
+  <div v-if="data.title">
+    <h1 :inner-html.prop='data.title[0] | kgvalue'></h1>
+    <small v-for='t in data.title.slice(1)' :inner-html.prop='t | kgvalue'></small>
+  </div>
+
+  <div v-if='data.channel'>
+    <h2>Channel</h2>
+    <p v-for="d in data.channel"><a :href='d.id'>{{d.name}}</a></p>
+  </div>
+
+  <div v-if='data.date'>
+    <h2>Date</h2>
+    <p v-for="d in data.date">{{d}}</p>
+  </div>
+
+  <div v-if='data.genre'>
+    <h2>Genre</h2>
+    <p v-for="d in data.genre">{{d}}</p>
+  </div>
+
+  <div v-if='data.duration'>
+    <h2>Duration</h2>
+    <p v-for="d in data.duration">{{d}}</p>
+  </div>
+
+  <div v-if='data.theme'>
+    <h2>Theme</h2>
+    <p v-for="d in data.theme">{{d}}</p>
+  </div>
+
+  <a :href="url">(see more)</a>
+</div>

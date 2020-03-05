@@ -1,5 +1,5 @@
 import axios from 'axios';
-import config from '../app.config';
+import config from '../../app.config';
 
 export const SERVER = config.api;
 

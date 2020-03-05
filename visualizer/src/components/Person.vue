@@ -6,7 +6,7 @@
 <script>
 import {
   getTrainingSet, SERVER, getDisabled, setDisabled, crawl,
-} from '@/face-recognition-service';
+} from '@/services/face-recognition';
 
 function toggle(collection, item) {
   const idx = collection.indexOf(item);

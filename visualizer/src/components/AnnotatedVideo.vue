@@ -14,9 +14,9 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 
 import palette from 'google-palette';
-import { recognise, getLocator } from '@/face-recognition-service';
-// import memad from '@/connectors/memad';
+import { recognise, getLocator } from '@/services/face-recognition';
 import { hhmmss } from '@/utils';
+import KgPanel from '@/components/KgPanel.vue';
 
 function adaptDimension(bounding, origW, origH, destW, destH) {
   const rW = destW / origW;
@@ -35,8 +35,10 @@ function between(x, min, max) {
 
 export default {
   name: 'AnnotatedVideo',
+  components: { KgPanel },
   data() {
     return {
+      url: null,
       confidence: 0.7,
       locator: null,
       results: [],
@@ -60,18 +62,17 @@ export default {
         colour: `#${colours[i]}`,
       }));
     },
+    displayKgWidget() {
+      return this.url && this.url.startsWith('http://data.memad.eu');
+    },
   },
   mounted() {
     const url = this.$route.query.v;
+    this.url = url;
     getLocator(url)
       .then((d) => { this.locator = d; });
 
     this.trigService();
-
-    // if (url.startsWith('http://data.memad.eu')) {
-    //   memad.get('http://data.memad.eu')
-    //     .then((d) => { console.log(d); });
-    // }
   },
   methods: {
     onPersonToggle($event, person) {
