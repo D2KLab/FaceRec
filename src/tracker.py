@@ -60,8 +60,6 @@ def main(video_path, project='general',
     predictions_writer = init_csv(predictions_csv, ['x1', 'y1', 'x2', 'y2',
                                                     'track_id', 'name', 'confidence', 'frame', 'tracker_sample', 'npt'])
 
-    scale_rate = 0.9  # if set it smaller will make input frames smaller
-
     classifier = Classifier(classifier_path)
 
     detector = MTCNN(min_face_size=25)
@@ -72,6 +70,9 @@ def main(video_path, project='general',
     # frames per second
     fps = video_capture.get(cv2.CAP_PROP_FPS)
     video_length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    width  = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+
+    scale_rate = 0.9 if width > 700 else 1
 
     matches = []
 

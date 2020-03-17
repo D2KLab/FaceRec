@@ -4,3 +4,6 @@ limecraft:
 mongo:
     server: mongo
     port: 27017
+okapi:
+    username: xxx
+    password: xxx

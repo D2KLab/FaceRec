@@ -3,6 +3,11 @@
 <script>
 import { getTrainingSet } from '@/services/face-recognition';
 
+const EXAMPLES = {
+  memad: 'http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e',
+  antract: 'http://www.ina.fr/media/AFE86004833',
+};
+
 export default {
   name: 'Home',
   data() {
@@ -11,6 +16,9 @@ export default {
       people: [],
       projects: [],
     };
+  },
+  computed: {
+    exampleVideo() { return EXAMPLES[this.$store.state.proj]; },
   },
   mounted() {
     getTrainingSet(this.$store.state.proj)

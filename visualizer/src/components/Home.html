@@ -12,7 +12,7 @@
           <button type="submit" class="button is-large is-primary">GO</button>
         </div>
       </form>
-      <p>Try an example: <a @click="video = 'http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e'">http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e</a> </p>
+      <p>Try an example: <a @click="video = exampleVideo">{{exampleVideo}}</a> </p>
 
     </div>
   </section>
@@ -22,7 +22,7 @@
     <div class="container">
       <h1 class="title">Add a celebrity in the dataset</h1>
       <h2 class="subtitle">Crawl the web for new celebrities.</h2>
-      
+
       <form class="field has-addons" action="person">
         <div class="control is-expanded">
           <input name='p' list='people'

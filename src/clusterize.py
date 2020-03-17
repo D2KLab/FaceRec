@@ -23,11 +23,11 @@ def get_avg_rect(rects):
     return [x1, y1, x2, y2]
 
 
-def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluster=False):
+def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluster=False, min_length=1):
     predictions = predictions.sort_values(by=['track_id', 'tracker_sample'])
     # filter out tracks with less than 3 records
     stat = predictions.groupby('track_id').size().to_frame('size')
-    good_ids = [i for i, s in stat.iterrows() if s['size'] >= 3]
+    good_ids = [i for i, s in stat.iterrows() if s['size'] >= min_length]
     predictions = predictions[predictions['track_id'].isin(good_ids)]
 
     # START ALGORITHM

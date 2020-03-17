@@ -97,11 +97,13 @@ export default {
     },
     saveDimensions() {
       this.$video = this.$refs.video;
-      // const { videoWidth, videoHeight } = this.$video;
+      const { videoWidth, videoHeight } = this.$video;
 
       // looks like that the video dimensions are fixed in the software
-      this.$videoWidth = 864; // videoWidth;
-      this.$videoHeight = 486; // videoHeight;
+      // this.$videoWidth = 864; // videoWidth;
+      this.$videoWidth = videoWidth * 0.9;
+      // this.$videoHeight = 486; // videoHeight;
+      this.$videoHeight = videoHeight * 0.9;
     },
     updateAnnotations() {
       const { offsetWidth, offsetHeight } = this.$video;

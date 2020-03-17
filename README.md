@@ -26,7 +26,7 @@ python -m src.crawler --keyword "De Gasperi Alcide" --max_num 20 --project proj_
 ### 2. Preprocess the raw images (Face detection)
 Face alignment using MTCNN
 ```sh
-python -m src.FaceDetector  proj_name --image_size 160 --margin 44
+python -m src.FaceDetector  proj_name --image_size 160 --margin 44 --discard_disabled
 ```
 ### 3. Train a classifier on own images
 We perform training a classifier using the following command:
