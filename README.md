@@ -16,9 +16,9 @@ If you want to use also the server capabilities, you need to install [MongoDB](m
 ### 1. Building a Training Dataset
 Create a directory for raw images utilized for training. In order to download automatically images of celebrity to build the training dataset we need to call the following command:
 ```sh
-python -m src.crawler --keyword "Churchill Winston" --max_num 20 --image_dir data/training_img/ChurchillWinston
-python -m src.crawler --keyword "Roosevelt Franklin" --max_num 20 --image_dir data/training_img/RooseveltFranklin
-python -m src.crawler --keyword "De Gasperi Alcide" --max_num 20 --image_dir data/training_img/DeGasperiAlcide
+python -m src.crawler --keyword "Churchill Winston" --max_num 20 --project proj_name
+python -m src.crawler --keyword "Roosevelt Franklin" --max_num 20 --project proj_name
+python -m src.crawler --keyword "De Gasperi Alcide" --max_num 20 --project proj_name
 ```
 
 > NOTE: The crawler is temporarly out of service because of https://github.com/hellock/icrawler/issues/65
@@ -26,17 +26,17 @@ python -m src.crawler --keyword "De Gasperi Alcide" --max_num 20 --image_dir dat
 ### 2. Preprocess the raw images (Face detection)
 Face alignment using MTCNN
 ```sh
-python -m src.FaceDetector  data/training_img/ data/training_img_aligned --image_size 160 --margin 44
+python -m src.FaceDetector  proj_name --image_size 160 --margin 44
 ```
 ### 3. Train a classifier on own images
 We perform training a classifier using the following command:
 ```sh
-python -m src.classifier --data_dir data/training_img_aligned --classifier_path data/classifier/classifier.pkl --classifier SVM
+python -m src.classifier --project proj_name --classifier SVM
 ```
 ### 4. Perform face recognition on Video
 The below command helps us to recognize people from video using the trained classifier from the previous step:
 ```sh
-python -m src.FaceRecogniser --video video/xxx.mp4 --output_path data/output.txt --classifier_path data/classifier/classifier.pkl --video_speedup 1 --folder_containing_frame data/output
+python -m src.FaceRecogniser --video video/xxx.mp4 --output_path data/output.txt --project proj_name --video_speedup 1 --folder_containing_frame data/output
 ```
 ### 5. Adding new persons (or images of existing persons) into a system
 First, creating a directory for raw images of new persons as follow. 
@@ -60,7 +60,7 @@ person-m
 Please note that for every new person added, you should add as many images of that person as of previous ones.
 
 ```sh
-python -m src.crawler --keyword "Bardot Brigitte" --max_num 20 --image_dir data/new_person/BardotBrigitte
+python -m src.crawler --keyword "Bardot Brigitte" --max_num 20 --project proj_name
 ```
 
 Then, retrain the model.

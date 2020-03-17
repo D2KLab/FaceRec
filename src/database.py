@@ -55,42 +55,44 @@ def clean_invalid_states():
     db.status.remove({'status': Status.RUNNING.value})
 
 
-def save_status(uri, status):
+def save_status(uri, project, status):
     update = {
         'locator': uri,
+        'project': project,
         'status': Status[status].value,
         'timestamp': now()
     }
 
-    return db.status.replace_one({'locator': uri}, update, upsert=True)
+    return db.status.replace_one({'locator': uri, 'project': project}, update, upsert=True)
 
 
-def get_status(uri):
-    s = db.status.find_one({'locator': uri})
+def get_status(uri, project):
+    s = db.status.find_one({'locator': uri, 'project': project})
     if s is None:
         return None
     return Status(s.get('status', 0))
 
 
-def clean_analysis(uri):
-    return db.track.remove({'locator': uri})
+def clean_analysis(uri, project):
+    return db.track.remove({'locator': uri, 'project': project})
 
 
 def insert_partial_analysis(track):
     return db.track.insert_one(track)
 
 
-def get_analysis(uri):
-    return list(db.track.find({'locator': uri}))
+def get_analysis(uri, project):
+    return list(db.track.find({'locator': uri, 'project': project}))
 
 
-def get_all_about(uri):
+def get_all_about(uri, project):
     v = get_metadata(uri)
     if v:
         locator = v['locator']
-        status = get_status(locator)
+        status = get_status(locator, project)
 
         if status and status != Status.ERROR:
             v['status'] = status.name
-            v['tracks'] = get_analysis(locator)
+            v['project'] = project
+            v['tracks'] = get_analysis(locator, project)
     return v

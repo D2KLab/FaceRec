@@ -9,11 +9,12 @@ export default {
     return {
       video: '',
       people: [],
+      projects: [],
     };
   },
   mounted() {
-    getTrainingSet()
-      .then((d) => { this.people = d; });
+    getTrainingSet(this.$store.state.proj)
+      .then((p) => { this.people = p; });
   },
 };
 </script>

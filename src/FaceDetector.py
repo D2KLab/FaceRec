@@ -6,11 +6,15 @@ import numpy as np
 from PIL import Image
 from mtcnn import MTCNN
 
+import tensorflow as tf
 from .utils import utils
 
 
-def main(input_dir='data/training_img', output_dir='data/training_img_aligned', image_size=160, margin=44,
+def main(project='general', image_size=160, margin=44,
          detect_multiple_faces=False, discard_disabled=True):
+    input_dir = os.path.join('data/training_img/', project)
+    input_dir = os.path.expanduser(input_dir)
+    output_dir = os.path.join('data/training_img_aligned/', project)
     output_dir = os.path.expanduser(output_dir)
     os.makedirs(output_dir, exist_ok=True)
 
@@ -85,10 +89,8 @@ def main(input_dir='data/training_img', output_dir='data/training_img_aligned', 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('input_dir', type=str, default='data/training_img',
-                        help='Directory with unaligned images')
-    parser.add_argument('output_dir', type=str, default='data/training_img_aligned',
-                        help='Directory with aligned face thumbnails')
+    parser.add_argument('project', type=str, default='general',
+                        help='Name of the collection to be part of')
     parser.add_argument('--image_size', type=int, default=160,
                         help='Image size (height, width) in pixels')
     parser.add_argument('--margin', type=int, default=44,
@@ -102,4 +104,4 @@ def parse_arguments(argv):
 
 if __name__ == '__main__':
     args = parse_arguments(sys.argv[1:])
-    main(args.input_dir, args.output_dir, args.image_size, args.margin, args.detect_multiple_faces)
+    main(args.project, args.image_size, args.margin, args.detect_multiple_faces, args.discard_disabled)

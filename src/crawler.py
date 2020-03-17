@@ -9,18 +9,16 @@ from icrawler.builtin import GoogleImageCrawler
 logger = logging.getLogger('crawler')
 
 
-def main(keyword, max_num=20, image_dir=None):
+def main(keyword, max_num=20, project='general'):
     if not keyword:
         raise ValueError('Keyword parameter is required.')
 
     keyword = keyword.strip()
 
-    logger.info('Crawler run for: %s' % keyword)
-    print('Crawler run for: %s' % keyword)
+    logger.info('[%s] Crawler run for: %s' % (project, keyword))
+    print('[%s] Crawler run for: %s' % (project, keyword))
 
-    if image_dir is None:
-        image_dir = 'data/training_img/%s' % keyword.replace(" ", "_")
-
+    image_dir = os.path.join('data/training_img/', project, keyword.replace(" ", "_"))
     image_dir = os.path.expanduser(image_dir)
     os.makedirs(image_dir, exist_ok=True)
 
@@ -49,8 +47,8 @@ def parse_arguments(argv):
                         help='Keyword for searching')
     parser.add_argument("--max_num", type=int, default=20,
                         help='Max number of images to download')
-    parser.add_argument("--image_dir", type=str, default=None,
-                        help='Output folder for downloaded images')
+    parser.add_argument("--project", type=str, default='general',
+                        help='Name of the collection to be part of')
     return parser.parse_args(argv)
 
 

@@ -68,11 +68,11 @@ def normalize_video(video_path):
     return video_path
 
 
-def generate_output_path(base, video_path):
+def generate_output_path(base, project, video_path):
     temp = re.sub(r'[:/]', '_', video_path)
     if '?' in temp:
         temp = temp.split('?')[0]
-    out = os.path.join(base, temp)
+    out = os.path.join(base, project, temp)
     os.makedirs(out, exist_ok=True)
     return out
 

@@ -13,11 +13,6 @@ TRAINING_IMG = 'data/training_img/'
 
 IMG_DIR = os.path.join(os.getcwd(), TRAINING_IMG)
 VIDEO_DIR = os.path.join(os.getcwd(), 'video')
-DISABLED_FILE = TRAINING_IMG + 'disabled.txt'
-
-if not os.path.isfile(DISABLED_FILE):
-    f = open(DISABLED_FILE, "w")
-    f.close()
 
 os.makedirs('database', exist_ok=True)
 
@@ -35,14 +30,25 @@ def now():
     return datetime.datetime.now().isoformat()
 
 
+@api.route('/projects')
+@api.doc(description="Get list of active projects.")
+class Projects(Resource):
+    def get(self):
+        return jsonify([p for p in os.listdir(TRAINING_IMG) if os.path.isdir(os.path.join(TRAINING_IMG, p))])
+
+
 @api.route('/training-set')
-@api.doc(description="Get list of training images with classes.")
+@api.doc(description="Get list of training images with classes.",
+         params={'project': 'The project those images belong to'})
 class TrainingSet(Resource):
     def get(self):
-        labels, paths = utils.fetch_dataset(TRAINING_IMG)
+        dataset = request.args.get('project', 'general')
+        folder = os.path.join(TRAINING_IMG, dataset)
+
+        labels, paths = utils.fetch_dataset(folder)
         results = {}
         for path, c in zip(paths, labels):
-            path = path.replace(TRAINING_IMG, 'training-img/')
+            path = path.replace(TRAINING_IMG, 'training_img/')
             if c not in results:
                 results[c] = {
                     'class': c,
@@ -53,14 +59,18 @@ class TrainingSet(Resource):
         return jsonify(list(results.values()))
 
 
-# http://127.0.0.1:5000/crawler?q=Annastiina Heikkilä;Frans Timmermans;Manfred Weber;Markus Preiss;Ska Keller;Emilie Tran Nguyen;Jan Zahradil;Margrethe Vestager;Nico Cué;Laura Huhtasaari;Asseri Kinnunen
+# http://127.0.0.1:5000/crawler?project=antract&q=Charles De Gaulle;Vincent Auriol;Pierre Mendès France;Georges Bidault;Guy Mollet;François Mitterrand;Georges Pompidou;Elisabeth II;Konrad Adenauer;Dwight Eisenhower;Nikita Khrouchtchev;Viatcheslav Molotov;Ahmed Ben Bella
+# http://127.0.0.1:5000/crawler?project=memad&q=Annastiina Heikkilä;Frans Timmermans;Manfred Weber;Markus Preiss;Ska Keller;Emilie Tran Nguyen;Jan Zahradil;Margrethe Vestager;Nico Cué;Laura Huhtasaari;Asseri Kinnunen
 @api.route('/crawler')
 @api.doc(
     description="Search faces of people in the web to be added to the dataset.",
-    params={'q': {
-        'required': True,
-        'description': 'The name of the person, or multiple individuals separated by a semicolon, '
-                       'like in "Tom Hanks;Monica Bellucci"'}})
+    params={
+        'q': {
+            'required': True,
+            'description': 'The name of the person, or multiple individuals separated by a semicolon, '
+                           'like in "Tom Hanks;Monica Bellucci"'},
+        'project': 'The project those images belong to'
+    })
 class Crawler(Resource):
     def get(self):
         start_time = time.time()
@@ -68,8 +78,12 @@ class Crawler(Resource):
         q = request.args.get('q')
         if q is None:
             raise ValueError('Missing required parameter: q')
+
+        project = request.args.get('project', default='general')
+
         for keyword in q.split(';'):
-            crawler.main(keyword, max_num=50)
+            crawler.main(keyword, max_num=100, project=project)
+
         return jsonify({
             'task': 'crawl',
             'time': now(),
@@ -78,14 +92,14 @@ class Crawler(Resource):
         })
 
 
-@api.route('/train')
+@api.route('/train/<string:project>')
 @api.doc(description="Trigger the training of the model")
 class Training(Resource):
-    def get(self):
+    def get(self, project):
         start_time = time.time()
 
-        FaceDetector.main()
-        classifier.main(classifier='SVM')
+        FaceDetector.main(project=project)
+        classifier.main(classifier='SVM', project=project)
         return jsonify({
             'task': 'train',
             'time': now(),
@@ -100,22 +114,24 @@ class Training(Resource):
 @api.doc(description="Extract from the video all the continuous positions of the people in the dataset",
          params={
              'video': {'required': True, 'description': 'URI of the video to be analysed'},
+             'project': {'required': True, 'description': 'The collection of people to detect'},
              'speedup': {'default': 25, 'type': int,
                          'description': 'Number of frame to wait between two iterations of the algorithm'},
              'no_cache': {'type': bool, 'default': False,
                           'description': 'Set it if you want to recompute the annotations'},
-             'format': {'default': 'json', 'enum': ['json', 'ttl'], 'description': 'Set the output format'}
+             'format': {'default': 'json', 'enum': ['json', 'ttl'], 'description': 'Set the output format'},
          })
 class Track(Resource):
     def get(self):
         video = request.args.get('video')
+        project = request.args.get('project')
         speedup = request.args.get('speedup', type=int, default=25)
         no_cache = 'no_cache' in request.args.to_dict() and request.args.get('no_cache') != 'false'
 
         v = None
         video_path = video
         if not no_cache:
-            v = database.get_all_about(video)
+            v = database.get_all_about(video, project)
             if v:
                 video_path = v['locator']
 
@@ -131,10 +147,10 @@ class Track(Resource):
             database.save_metadata(v)
 
         if need_run:
-            database.save_status(video, 'RUNNING')
-            database.clean_analysis(video)
+            database.clean_analysis(video, project)
+            database.save_status(video, project, 'RUNNING')
             v['status'] = 'RUNNING'
-            Thread(target=run_tracker, args=(video_path, speedup, video)).start()
+            Thread(target=run_tracker, args=(video_path, speedup, video, project)).start()
         elif 'tracks' in v and len(v['tracks']) > 0:
             v['tracks'] = clusterize.main(clusterize.from_dict(v['tracks']),
                                           confidence_threshold=0, merge_cluster=False)
@@ -148,11 +164,11 @@ class Track(Resource):
         return jsonify(v)
 
 
-def run_tracker(video_path, speedup, video):
+def run_tracker(video_path, speedup, video, project):
     try:
-        return tracker.main(video_path, video_speedup=speedup, export_frames=True)
+        return tracker.main(video_path, project=project, video_speedup=speedup, export_frames=True)
     except RuntimeError:
-        database.save_status(video, 'ERROR')
+        database.save_status(video, project, 'ERROR')
 
 
 # # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
@@ -227,20 +243,28 @@ def send_video():
         return send_from_directory(VIDEO_DIR, path, as_attachment=True)
 
 
-@flask_app.route('/training-img/<folder>/<filename>')
-def send_img(folder=None, filename=None):
-    return send_from_directory(IMG_DIR + folder, filename, as_attachment=True)
+@flask_app.route('/training_img/<path:subpath>')
+def send_img(subpath=None):
+    dirname = os.path.dirname(subpath)
+    filename = os.path.basename(subpath)
+    return send_from_directory(os.path.join(IMG_DIR, dirname), filename, as_attachment=True)
 
 
-@api.route('/disabled')
+@api.route('/disabled/<string:project>')
 class Disabled(Resource):
-    def get(self):
+    def get(self, project):
+        DISABLED_FILE = os.path.join(TRAINING_IMG, project, 'disabled.txt')
+
+        if not os.path.isfile(DISABLED_FILE):
+            return jsonify([])
+
         with open(DISABLED_FILE) as f:
             dis = f.read().split('\n')
             return jsonify(dis)
 
-    def post(self):
+    def post(self, project):
         data = request.json
+        DISABLED_FILE = os.path.join(TRAINING_IMG, project, 'disabled.txt')
 
         with open(DISABLED_FILE, 'w') as f:
             for x in data:

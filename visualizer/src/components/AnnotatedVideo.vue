@@ -84,7 +84,7 @@ export default {
       this.$refs.video.currentTime = second;
     },
     trigService() {
-      recognise(this.$route.query.v)
+      recognise(this.$route.query.v, this.$store.state.proj)
         .then((data) => {
           this.results = data.tracks || [];
           this.results = this.results.sort((a, b) => ((a.start_npt > b.start_npt) ? 1 : -1));

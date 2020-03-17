@@ -41,10 +41,10 @@ export default {
   mounted() {
     this.person = this.$route.query.p;
 
-    getTrainingSet()
+    getTrainingSet(this.$store.state.proj)
       .then(this.updatePaths);
 
-    getDisabled()
+    getDisabled(this.$store.state.proj)
       .then((d) => {
         this.disabledOrigin = d.slice();
         this.disabled = d.slice();
@@ -70,7 +70,7 @@ export default {
       crawl(this.person).then(getTrainingSet).then(this.updatePaths);
     },
     saveChange() {
-      setDisabled(this.disabled);
+      setDisabled(this.$store.state.proj, this.disabled);
       this.disabledOrigin = this.disabled.slice();
     },
   },

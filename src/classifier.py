@@ -14,8 +14,14 @@ from tensorflow.keras.models import load_model
 from .utils import utils
 
 
-def main(classifier='SVM', data_dir='data/training_img_aligned', classifier_path='data/classifier/classifier.pkl'):
-    embedding_dir = "data/embedding/"
+def main(classifier='SVM', project='general'):
+    embedding_file = os.path.join('data/embedding/', project + '.csv')
+    label_file = os.path.join('data/embedding/', project + '_label.csv')
+    data_dir = os.path.join('data/training_img_aligned/', project)
+    data_dir = os.path.expanduser(data_dir)
+    classifier_path = os.path.join('data/classifier', project + '.pkl')
+    classifier_path = os.path.expanduser(classifier_path)
+    os.makedirs(os.path.dirname(classifier_path), exist_ok=True)
 
     # load train dataset
     trainX, trainy, paths, class_names = utils.load_dataset(data_dir)
@@ -26,13 +32,11 @@ def main(classifier='SVM', data_dir='data/training_img_aligned', classifier_path
     trainX = [utils.get_embedding(facenet, face_pixels) for face_pixels in trainX]
     trainX = np.asarray(trainX)
 
-    np.savetxt(embedding_dir + 'embedding.csv', trainX, delimiter=",")
-    with open(embedding_dir + 'label.csv', 'w') as f:
+    np.savetxt(embedding_file, trainX, delimiter=",")
+    with open(label_file, 'w') as f:
         writer = csv.writer(f)
         writer.writerows(zip(trainy, paths))
 
-    classifier_filename_exp = os.path.expanduser(classifier_path)
-    os.makedirs(os.path.dirname(classifier_filename_exp), exist_ok=True)
 
     # Train classifier
     print('Training classifier')
@@ -48,9 +52,9 @@ def main(classifier='SVM', data_dir='data/training_img_aligned', classifier_path
     model.fit(trainX, trainy)
 
     # Saving classifier model
-    with open(classifier_filename_exp, 'wb') as outfile:
+    with open(classifier_path, 'wb') as outfile:
         pickle.dump((model, class_names), outfile)
-    print('Saved classifier model to file "%s"' % classifier_filename_exp)
+    print('Saved classifier model to file "%s"' % classifier_path)
 
 
 def parse_arguments(argv):
@@ -59,14 +63,12 @@ def parse_arguments(argv):
                         choices=['KNN', 'SVM', 'RF', 'Softmax'],
                         help='The type of classifier to use.',
                         default='SVM')
-    parser.add_argument('--data_dir', type=str, default='data/training_img_aligned',
-                        help='Path to the data directory containing aligned LFW face patches.')
-    parser.add_argument('--classifier_path', type=str, default='data/classifier/classifier.pkl',
-                        help='Path to the KNN classifier')
+    parser.add_argument('--project', type=str, default='general',
+                        help='Name of the collection to be part of')
 
     return parser.parse_args(argv)
 
 
 if __name__ == '__main__':
     args = parse_arguments(sys.argv[1:])
-    main(args.classifier, args.data_dir, args.classifier_path)
+    main(args.classifier, args.project)

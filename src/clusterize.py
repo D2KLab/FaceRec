@@ -168,6 +168,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--video', type=str, required=True,
                         help='Path or URI of the video to be analysed.')
+    parser.add_argument('--project', type=str, default='general',
+                        help='Name of the collection to be part of')
     parser.add_argument('--confidence_threshold', type=float, default=0.7,
                         help='The threshold for the classification confidence')
     parser.add_argument('--tracker_path', type=str,
@@ -189,7 +191,7 @@ if __name__ == '__main__':
     args = parse_args()
 
     if args.tracker_path is None:
-        tracker_path = utils.generate_output_path('./data/out', args.video_path)
+        tracker_path = utils.generate_output_path('./data/out', args.project, args.video_path)
     else:
         tracker_path = args.tracker_path
 

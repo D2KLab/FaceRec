@@ -3,10 +3,11 @@ import config from '../../app.config';
 
 export const SERVER = config.api;
 
-export async function recognise(video) {
+export async function recognise(video, project) {
   const data = await axios.get(`${SERVER}track`, {
     params: {
       video,
+      project,
       speedup: 25,
     },
   });
@@ -21,18 +22,25 @@ export async function getLocator(video) {
   return data.data;
 }
 
-export async function getTrainingSet() {
-  const data = await axios.get(`${SERVER}training-set`);
+export async function getTrainingSet(project) {
+  if (!project) return [];
+  const data = await axios.get(`${SERVER}training-set`,
+    { params: { project } });
   return data.data;
 }
 
-export async function setDisabled(list) {
-  const data = await axios.post(`${SERVER}disabled`, list);
+export async function getProjects() {
+  const data = await axios.get(`${SERVER}projects`);
   return data.data;
 }
 
-export async function getDisabled() {
-  const data = await axios.get(`${SERVER}disabled`);
+export async function setDisabled(project, list) {
+  const data = await axios.post(`${SERVER}disabled/${project}`, list);
+  return data.data;
+}
+
+export async function getDisabled(project) {
+  const data = await axios.get(`${SERVER}disabled/${project}`);
   return data.data;
 }
 

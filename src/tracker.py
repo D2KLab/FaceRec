@@ -39,21 +39,19 @@ def init_csv(path, fieldnames):
     return writer
 
 
-def main(video_path, output_path=None,
-         classifier_path='data/classifier/classifier.pkl',
+def main(video_path, project='general',
          video_speedup=25, export_frames=False):
     print(video_path)
 
     video_capture = cv2.VideoCapture(video_path)
 
-    if output_path is None:
-        output_path = utils.generate_output_path('./data/out', video_path)
-
     # setup all paths
-    cluster_path = os.path.join(output_path, 'cluster')
-    frames_path = os.path.join(output_path, 'frames')
+    output_path = utils.generate_output_path('./data/out', project, video_path)
+    cluster_path = os.path.join(output_path, 'cluster', project)
+    frames_path = os.path.join(output_path, 'frames', project)
     if export_frames:
         os.makedirs(frames_path, exist_ok=True)
+    classifier_path = os.path.join('data/classifier', project + '.pkl')
     trackers_csv = os.path.join(output_path, 'trackers.csv')
     predictions_csv = os.path.join(output_path, 'predictions.csv')
 
@@ -142,6 +140,7 @@ def main(video_path, output_path=None,
 
             match = {
                 'name': best_name,
+                'project': project,
                 'track_id': int(d[4]),
                 'frame': int(frame_no),
                 'confidence': best_prob,
@@ -161,7 +160,7 @@ def main(video_path, output_path=None,
     # TODO final track
 
     if database.is_on():
-        database.save_status(utils.clean_locator(video_path), 'COMPLETE')
+        database.save_status(utils.clean_locator(video_path), project, 'COMPLETE')
 
     for f in file_to_be_close:
         f.close()
@@ -175,13 +174,8 @@ def parse_args():
     # files required in input
     parser.add_argument('-v', '--video', type=str, required=True,
                         help='Path or URI of the video to be analysed.')
-    parser.add_argument('--classifier_path', type=str, default='data/classifier/classifier.pkl',
-                        help='Path to the KNN classifier')
-
-    # paths for the output
-    parser.add_argument('--output', type=str,
-                        help='Path for saving all the ouput of the script.\n'
-                             'By default is in `data\\out\\<video_name>`')
+    parser.add_argument('--project', type=str, default='general',
+                        help='Name of the collection to be part of')
 
     # parameters
     parser.add_argument('--video_speedup', type=int, default=25,
@@ -195,6 +189,4 @@ if __name__ == '__main__':
     args = parse_args()
     video = utils.normalize_video(args.video)
 
-    main(video, args.output,
-         args.classifier_path,
-         args.video_speedup, args.export_frames)
+    main(video, args.project, args.video_speedup, args.export_frames)
