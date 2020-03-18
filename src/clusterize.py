@@ -1,21 +1,20 @@
 import argparse
-import os
 import json
+import os
 import shutil
-from statistics import mode, StatisticsError
 
 import numpy as np
 import pandas as pd
 from scipy.spatial import distance
+from sklearn.utils.extmath import weighted_mode
 
 from .utils import utils
 
 
 # IMPORTANT: this has to be run AFTER the tracker
 
-# predictions is a pandas dataframe
 def get_avg_rect(rects):
-    rects = np.array(rects.values.tolist())
+    rects = np.array(rects)
     x1 = min(rects[:, 0])
     y1 = min(rects[:, 1])
     x2 = max(rects[:, 2])
@@ -23,11 +22,18 @@ def get_avg_rect(rects):
     return [x1, y1, x2, y2]
 
 
-def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluster=False, min_length=1):
+def update_rect_in(previous_cluster, rects):
+    avg_rect = get_avg_rect([r for r in rects])
+    previous_cluster['rect'] = avg_rect
+    previous_cluster['bounding'] = utils.rect2xywh(*avg_rect)
+
+
+# predictions is a pandas dataframe
+def main(predictions, confidence_threshold=0.7, dominant_ratio=0.4, merge_cluster=False, min_length=1):
     predictions = predictions.sort_values(by=['track_id', 'tracker_sample'])
     # filter out tracks with less than 3 records
     stat = predictions.groupby('track_id').size().to_frame('size')
-    good_ids = [i for i, s in stat.iterrows() if s['size'] >= min_length]
+    good_ids = [i for i, s in stat.iterrows()]
     predictions = predictions[predictions['track_id'].isin(good_ids)]
 
     # START ALGORITHM
@@ -35,14 +41,12 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluste
     for track in predictions.track_id.unique():
         involved = predictions[predictions.track_id == track]
         involved = involved[involved.confidence >= confidence_threshold]
+        confidences = involved.confidence.values.tolist()
         predicted = involved.name.values.tolist()
         name = ""
-        try:
-            dominant = mode(predicted)  # TODO normalise with confidence
-            if predicted.count(dominant) / float(len(predicted)) > dominant_ratio:
-                name = dominant
-        except StatisticsError:  # no clear winner
-            pass
+        dominant, count = weighted_mode(predicted, confidences)
+        if count[0] / float(len(predicted)) > dominant_ratio:
+            name = dominant[0]
 
         interest_cluster.update({track: name})
 
@@ -61,11 +65,21 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluste
             max = x.tracker_sample.max()
             min = x.tracker_sample.min()
 
-            if merge_cluster and previous_cluster is not None and previous_cluster['end_sample'] - min == 1:
+            if merge_cluster and previous_cluster is not None and min - previous_cluster['end_sample'] == 1:
                 # merge here
+                duration_prev = float(previous_cluster['end_sample'] - previous_cluster['start_sample'] + 1)
                 previous_cluster['end_sample'] = max
                 previous_cluster['end_frame'] = x.frame.max()
                 previous_cluster['end_npt'] = x.npt.max()
+                rc = x.rect.values.tolist()
+                rc.append(previous_cluster['rect'])
+                update_rect_in(previous_cluster, rc)
+
+                duration_cur = float(max - min + 1)
+                confidence_prev = previous_cluster['confidence']
+                confidence = x[x.name == person].confidence.mean()
+                previous_cluster['confidence'] = ((confidence_prev * duration_prev) + (
+                        confidence * duration_cur)) / (duration_prev + duration_cur)
                 continue
                 # in case, merge the folders
             elif previous_cluster is not None:
@@ -79,25 +93,30 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.5, merge_cluste
             previous_cluster['start_frame'] = x.frame.min()
             previous_cluster['end_npt'] = x.npt.max()
             previous_cluster['start_npt'] = x.npt.min()
-            previous_cluster['confidence'] = x.confidence.mean()  # FIXME give a smarter confidence
+            confidence = x[x.name == person].confidence
+            previous_cluster['confidence'] = confidence.mean()
             previous_cluster['name'] = person
 
-            avg_rect = get_avg_rect(x.rect)
-            previous_cluster['rect'] = avg_rect
-            previous_cluster['bounding'] = utils.rect2xywh(*avg_rect)
+            update_rect_in(previous_cluster, x.rect.values.tolist())
 
             del previous_cluster['npt']
             del previous_cluster['frame']
             del previous_cluster['tracker_sample']
             del previous_cluster['_id']
 
-        if previous_cluster is not None:
+        if previous_cluster is not None:  # last cluster
             person_clusters.append(previous_cluster['track_id'])
             final_clusters.append(previous_cluster)
 
         # print("* {}: {}".format(person, person_clusters))
 
+    final_clusters = [s for s in final_clusters if longer_than(min_length, s)]
     return sanitize(final_clusters)
+
+
+def longer_than(length, cluster):
+    duration = cluster['end_sample'] - cluster['start_sample']
+    return duration >= length
 
 
 def convert(o):

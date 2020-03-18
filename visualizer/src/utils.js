@@ -2,7 +2,9 @@ function pad(num) {
   return (`0${num}`).slice(-2);
 }
 
-export function hhmmss(secs) {
+export function hhmmss(seconds) {
+  // ignore the decimal part
+  const secs = Math.round(seconds)
   let minutes = Math.floor(secs / 60);
   const sec = secs % 60;
   const hours = Math.floor(minutes / 60);

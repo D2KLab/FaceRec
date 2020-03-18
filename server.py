@@ -153,7 +153,7 @@ class Track(Resource):
             Thread(target=run_tracker, args=(video_path, speedup, video, project)).start()
         elif 'tracks' in v and len(v['tracks']) > 0:
             v['tracks'] = clusterize.main(clusterize.from_dict(v['tracks']),
-                                          confidence_threshold=0, merge_cluster=False)
+                                          confidence_threshold=0, merge_cluster=True)
 
         if '_id' in v:
             del v['_id']  # the database id should not appear on the output

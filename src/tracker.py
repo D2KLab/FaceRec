@@ -20,7 +20,7 @@ file_to_be_close = []
 def export_frame(input_frame, d, classname, frame_num, frames_path):
     frame = input_frame.copy()
     cv2.rectangle(frame, (d[0], d[1]), (d[2], d[3]), colours[d[4] % 32, :] * 255, 3)
-    cv2.putText(frame, 'a' + classname, (d[0] - 10, d[1] - 10),
+    cv2.putText(frame, classname, (d[0] - 10, d[1] - 10),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.75,
                 colours[d[4] % 32, :] * 255, 2)
@@ -65,12 +65,12 @@ def main(video_path, project='general',
     detector = MTCNN(min_face_size=25)
 
     # init tracker
-    tracker = Sort(min_hits=1)
+    tracker = Sort(min_hits=0)
 
     # frames per second
     fps = video_capture.get(cv2.CAP_PROP_FPS)
     video_length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-    width  = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+    width = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
 
     scale_rate = 0.9 if width > 700 else 1
 
@@ -103,8 +103,8 @@ def main(video_path, project='general',
             facial_landmarks = list(item['keypoints'].values())
 
             f = round(item['confidence'], 6)
-            if f <= 0.99:
-                continue
+            # if f <= 0.99:
+            #     continue
             face_list.append(bb)
 
             # face cropped
@@ -139,6 +139,8 @@ def main(video_path, project='general',
             predictions_writer.writerow(
                 [str(i) for i in d] + [best_name, best_prob, str(frame_no), tracker_sample, npt])
 
+            # apply back the scale rate
+            box = [x / scale_rate for x in d[0:4].tolist()]
             match = {
                 'name': best_name,
                 'project': project,
@@ -148,8 +150,8 @@ def main(video_path, project='general',
                 'tracker_sample': tracker_sample,
                 'npt': npt,
                 'locator': utils.clean_locator(video_path),
-                'bounding': utils.rect2xywh(*d[0:4]),
-                'rect': d[0:4].tolist()
+                'bounding': utils.rect2xywh(*box),
+                'rect': box
             }
             matches.append(match)
             if database.is_on():
