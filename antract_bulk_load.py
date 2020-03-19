@@ -1,0 +1,49 @@
+from SPARQLWrapper import SPARQLWrapper, JSON
+from src.utils import utils
+from src import database, tracker
+
+ENDPOINT = "https://okapi.ina.fr/antract/api/saphir/sparql_search"
+sparql = SPARQLWrapper(ENDPOINT)
+
+PREFIXES = """
+PREFIX core: <http://www.ina.fr/core#> 
+PREFIX ina: <http://www.ina.fr/notice.owl#>
+PREFIX antract: <http://www.ina.fr/antract#>
+"""
+
+
+def all_media_with(person):
+    query = """%s
+SELECT distinct * WHERE { 
+    ?notice ina:imageContient | ina:aPourParticipant <%s> ;  # Eisenhower
+           rdfs:label ?title ;
+           core:beginTime ?start ;
+           core:endTime ?end .
+
+    ?analysis a antract:AntractAnalysis ;
+             core:document ?media ;
+             core:layer / core:segment ?notice .
+
+    ?media core:instance ?instance .
+    ?instance core:http_url ?url .
+ }""" % (PREFIXES, person)
+    sparql.setQuery(query)
+    sparql.setReturnFormat(JSON)
+    return sparql.query().convert()["results"]["bindings"]
+
+database.init()
+
+for data in all_media_with('http://www.ina.fr/thesaurus/pp/concept_10128605'):
+    media = data['media']['value']
+    print(media)
+
+    v = database.get_all_about(media, 'antract')
+    need_run = not v or 'tracks' not in v and v.get('status') != 'RUNNING'
+    if need_run:
+        locator, _ = utils.uri2video(media)
+        database.clean_analysis(locator, 'antract')
+        database.save_status(locator, 'antract', 'RUNNING')
+        try:
+            tracker.main(locator, project='antract', video_speedup=25, export_frames=True)
+        except RuntimeError:
+            database.save_status(locator, 'antract', 'ERROR')

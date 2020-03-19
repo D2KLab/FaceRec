@@ -46,10 +46,11 @@ def get_metadata_for(media):
         'proto': {
             'id': '?media',
             'title': '?title',
+            "date": "?date",
             'segments': {
                 'id': '?notice',
-                'label': '$rdfs:label',
-                'start': '$core:beginTime',
+                'label': '$rdfs:label$required',
+                'start': '$core:beginTime$required',
                 'end': '$core:endTime',
             }
         },
@@ -59,7 +60,8 @@ def get_metadata_for(media):
                          core:layer / core:segment ?notice ;
                          core:layer / core:segment ?summary''',
             '''?summary a ina:NoticeSommaire ;
-                    rdfs:label ?title''',
+                    rdfs:label ?title ;
+                    ina:aPourDateDiffusion ?date''',
             '?notice a ina:NoticeSujet'
         ],
         '$values': {

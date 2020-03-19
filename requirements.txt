@@ -18,3 +18,4 @@ SPARQLTransformer
 requests
 pyyaml
 pymongo
+mtcnn
