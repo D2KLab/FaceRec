@@ -65,7 +65,6 @@ export default {
     displayKgWidget() {
       if (!this.url) return false;
       const host = new URL(this.url).hostname;
-      console.log(host);
       return ['data.memad.eu', 'www.ina.fr'].includes(host);
     },
   },

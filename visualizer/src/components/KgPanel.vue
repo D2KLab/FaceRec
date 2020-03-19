@@ -30,7 +30,6 @@ export default {
       .then((d) => {
         Object.entries(d).forEach(([i, x]) => { if (!Array.isArray(x)) d[i] = [x]; });
         this.data = d;
-        console.log(d);
       });
   },
   filters: {
