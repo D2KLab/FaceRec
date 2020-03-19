@@ -8,6 +8,7 @@ from threading import Thread
 
 from src import *
 from src.utils import utils
+from src.connectors import antract_connector as antract
 
 TRAINING_IMG = 'data/training_img/'
 
@@ -241,6 +242,16 @@ def send_video():
         return video_path
     else:
         return send_from_directory(VIDEO_DIR, path, as_attachment=True)
+
+
+@flask_app.route('/get_metadata')
+def get_metadata():
+    path = request.args.get('video')
+
+    if path.startswith('http://www.ina.fr/'):
+        return jsonify(antract.get_metadata_for(path)[0])
+    else:
+        return None
 
 
 @flask_app.route('/training_img/<path:subpath>')

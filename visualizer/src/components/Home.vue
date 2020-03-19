@@ -5,7 +5,7 @@ import { getTrainingSet } from '@/services/face-recognition';
 
 const EXAMPLES = {
   memad: 'http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e',
-  antract: 'http://www.ina.fr/media/AFE86004833',
+  antract: 'http://www.ina.fr/media/AFE86004832',
 };
 
 export default {

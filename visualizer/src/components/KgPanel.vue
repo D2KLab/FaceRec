@@ -5,7 +5,12 @@
 /* eslint no-param-reassign: "off" */
 
 import memad from '@/services/memad';
+import antract from '@/services/antract';
 
+const services = {
+  'www.ina.fr': antract,
+  'data.memad.eu': memad,
+};
 export default {
   name: 'KgPanel',
   data() {
@@ -15,14 +20,18 @@ export default {
   },
   props: ['url'],
   mounted() {
-    if (this.url.startsWith('http://data.memad.eu')) {
-      memad.get(this.url)
-        .then((d) => {
-          Object.entries(d).forEach(([i, x]) => { if (!Array.isArray(x)) d[i] = [x]; });
-          this.data = d;
-          console.log(d);
-        });
-    }
+    if (!this.url) return;
+    const host = new URL(this.url).hostname;
+
+    const service = services[host];
+    if (!service) return;
+
+    service.get(this.url)
+      .then((d) => {
+        Object.entries(d).forEach(([i, x]) => { if (!Array.isArray(x)) d[i] = [x]; });
+        this.data = d;
+        console.log(d);
+      });
   },
   filters: {
     kgvalue(value) {

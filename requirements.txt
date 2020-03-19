@@ -14,6 +14,7 @@ flask_restplus
 rdflib
 uuid
 SPARQLWrapper
+SPARQLTransformer
 requests
 pyyaml
 pymongo

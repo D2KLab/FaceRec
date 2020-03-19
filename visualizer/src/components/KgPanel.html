@@ -29,5 +29,16 @@
     <p v-for="d in data.theme">{{d}}</p>
   </div>
 
-  <a :href="url">(see more)</a>
+  <div v-if='data.segments'>
+
+    <h2>Segments</h2>
+    <ul>
+      <li v-for="seg in data.segments ">
+        {{seg.label}}
+        <small>{{seg.start}} - {{seg.end}}</small>
+      </li>
+    </ul>
+  </div>
+
+  <a v-if="url.startsWith('http://data.memad')" :href="url">(see more)</a>
 </div>

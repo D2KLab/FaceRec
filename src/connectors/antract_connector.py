@@ -1,7 +1,9 @@
 import yaml
 from SPARQLWrapper import SPARQLWrapper, JSON
+from SPARQLTransformer import sparqlTransformer
 
-sparql = SPARQLWrapper("https://okapi.ina.fr/antract/api/saphir/sparql_search")
+ENDPOINT = "https://okapi.ina.fr/antract/api/saphir/sparql_search"
+sparql = SPARQLWrapper(ENDPOINT)
 
 PREFIXES = """
 PREFIX core: <http://www.ina.fr/core#> 
@@ -37,3 +39,36 @@ SELECT DISTINCT * WHERE {
         return results[0]
     else:
         return {}
+
+
+def get_metadata_for(media):
+    query = {
+        'proto': {
+            'id': '?media',
+            'title': '?title',
+            'segments': {
+                'id': '?notice',
+                'label': '$rdfs:label',
+                'start': '$core:beginTime',
+                'end': '$core:endTime',
+            }
+        },
+        '$where': [
+            '''[] a antract:AntractAnalysis ;
+                         core:document ?media;
+                         core:layer / core:segment ?notice ;
+                         core:layer / core:segment ?summary''',
+            '''?summary a ina:NoticeSommaire ;
+                    rdfs:label ?title''',
+            '?notice a ina:NoticeSujet'
+        ],
+        '$values': {
+            'media': media,
+        },
+        '$prefixes': {
+            'core': 'http://www.ina.fr/core#',
+            'ina': 'http://www.ina.fr/notice.owl#',
+            'antract': 'http://www.ina.fr/antract#',
+        }
+    }
+    return sparqlTransformer(query, {'endpoint': ENDPOINT})
