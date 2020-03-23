@@ -8,7 +8,7 @@ import pandas as pd
 from scipy.spatial import distance
 from sklearn.utils.extmath import weighted_mode
 
-from .utils import utils
+from .utils.utils import  rect2xywh, generate_output_path
 
 
 # IMPORTANT: this has to be run AFTER the tracker
@@ -25,7 +25,7 @@ def get_avg_rect(rects):
 def update_rect_in(previous_cluster, rects):
     avg_rect = get_avg_rect([r for r in rects])
     previous_cluster['rect'] = avg_rect
-    previous_cluster['bounding'] = utils.rect2xywh(*avg_rect)
+    previous_cluster['bounding'] = rect2xywh(*avg_rect)
 
 
 # predictions is a pandas dataframe
@@ -40,7 +40,6 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.4, merge_cluste
     interest_cluster = {}
     for track in predictions.track_id.unique():
         involved = predictions[predictions.track_id == track]
-        involved = involved[involved.confidence >= confidence_threshold]
         confidences = involved.confidence.values.tolist()
         predicted = involved.name.values.tolist()
         name = ""
@@ -110,7 +109,8 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.4, merge_cluste
 
         # print("* {}: {}".format(person, person_clusters))
 
-    final_clusters = [s for s in final_clusters if longer_than(min_length, s)]
+    final_clusters = [s for s in final_clusters
+                      if longer_than(min_length, s) and s['confidence'] >= confidence_threshold]
     return sanitize(final_clusters)
 
 
@@ -210,7 +210,7 @@ if __name__ == '__main__':
     args = parse_args()
 
     if args.tracker_path is None:
-        tracker_path = utils.generate_output_path('./data/out', args.project, args.video_path)
+        tracker_path = generate_output_path('./data/out', args.project, args.video_path)
     else:
         tracker_path = args.tracker_path
 

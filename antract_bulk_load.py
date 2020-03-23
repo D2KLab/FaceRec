@@ -1,5 +1,5 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
-from src.utils import utils
+from src.utils.uri_utils import uri2video
 from src import database, tracker
 
 ENDPOINT = "https://okapi.ina.fr/antract/api/saphir/sparql_search"
@@ -38,9 +38,10 @@ for data in all_media_with('http://www.ina.fr/thesaurus/pp/concept_10128605'):
     print(media)
 
     v = database.get_all_about(media, 'antract')
-    need_run = not v or 'tracks' not in v and v.get('status') != 'RUNNING'
+    tracks = [] if 'tracks' not in v else v['tracks']
+    need_run = not v or (len(tracks) < 1 and v.get('status') != 'RUNNING')
     if need_run:
-        locator, _ = utils.uri2video(media)
+        locator, _ = uri2video(media)
         database.clean_analysis(locator, 'antract')
         database.save_status(locator, 'antract', 'RUNNING')
         try:

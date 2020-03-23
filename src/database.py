@@ -3,16 +3,17 @@ import yaml
 from enum import Enum
 from pymongo import MongoClient
 
-with open("config/config.yaml", 'r') as ymlfile:
-    cfg = yaml.load(ymlfile, Loader=yaml.BaseLoader)['mongo']
 
 on = False
 db = None
 
 
-def init():
+def init(conf="config/config.yaml"):
     global db, on
     on = True
+
+    with open(conf, 'r') as ymlfile:
+        cfg = yaml.load(ymlfile, Loader=yaml.BaseLoader)['mongo']
 
     client = MongoClient(cfg['server'], int(cfg['port']))
     db = client.facerec

@@ -7,7 +7,7 @@ from flask_restplus import Api, Resource
 from threading import Thread
 
 from src import *
-from src.utils import utils
+from src.utils import utils, uri_utils
 from src.connectors import antract_connector as antract
 
 TRAINING_IMG = 'data/training_img/'
@@ -139,8 +139,8 @@ class Track(Resource):
         need_run = not v or 'tracks' not in v and v.get('status') != 'RUNNING'
         if not v or need_run:
             if video.startswith('http'):  # it is a uri!
-                video_path, v = utils.uri2video(video)
-                video = utils.clean_locator(v['locator'])
+                video_path, v = uri_utils.uri2video(video)
+                video = uri_utils.clean_locator(v['locator'])
             elif not os.path.isfile(video):
                 raise FileNotFoundError('video not found: %s' % video)
             else:
@@ -238,7 +238,7 @@ def send_video():
     path = request.args.get('video')
 
     if path.startswith('http'):
-        video_path, info = utils.uri2video(path)
+        video_path, info = uri_utils.uri2video(path)
         return video_path
     else:
         return send_from_directory(VIDEO_DIR, path, as_attachment=True)

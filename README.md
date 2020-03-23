@@ -77,7 +77,7 @@ We track the face from the first frame in which it is detected, and we assign to
 
 Execute the following command:
 ```sh
-python -m src.tracker --video video/xxx.mp4 --output data/out/
+python -m src.tracker --video video/xxx.mp4 --project proj_name 
 ```
 
          
@@ -95,6 +95,7 @@ A service is available as Docker image.
 
 ```sh
 docker build -t facerec .
+docker run -d -p 5050:5000 --name facerec-mongo mongo
 docker run -d -p 5050:5000 --restart=unless-stopped  -v /home/semantic/Repositories/Face-Celebrity-Recognition/video:/app/video -v /home/semantic/Repositories/Face-Celebrity-Recognition/data:/app/data -v /home/semantic/Repositories/Face-Celebrity-Recognition/config:/app/config --name facerec1 facerec
 ```
 
