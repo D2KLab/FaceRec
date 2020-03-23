@@ -1,0 +1,18 @@
+PREFIX core: <http://www.ina.fr/core#>
+PREFIX ina: <http://www.ina.fr/notice.owl#>
+PREFIX antract: <http://www.ina.fr/antract#>
+
+SELECT DISTINCT * WHERE {
+    ?notice ?prop <http://www.ina.fr/thesaurus/pp/concept_10128605> ;  # Eisenhower
+           rdfs:label ?title ;
+           core:beginTime ?start ;
+           core:endTime ?end .
+
+    ?analysis a antract:AntractAnalysis ;
+             core:document ?media ;
+             core:layer / core:segment ?notice .
+
+    ?media core:instance / core:http_url ?url .
+
+    VALUES ?prop {ina:imageContient ina:aPourParticipant}
+ }
