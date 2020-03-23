@@ -38,7 +38,7 @@ for data in all_media_with('http://www.ina.fr/thesaurus/pp/concept_10128605'):
     print(media)
 
     v = database.get_all_about(media, 'antract')
-    tracks = [] if 'tracks' not in v else v['tracks']
+    tracks = [] if (not v or 'tracks' not in v) else v['tracks']
     need_run = not v or (len(tracks) < 1 and v.get('status') != 'RUNNING')
     if need_run:
         locator, _ = uri2video(media)

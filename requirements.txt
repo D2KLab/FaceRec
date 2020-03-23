@@ -19,3 +19,4 @@ requests
 pyyaml
 pymongo
 mtcnn
+python-ffmpeg
