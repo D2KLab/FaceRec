@@ -26,14 +26,14 @@
           <b-dropdown class="navbar-link" v-model="proj" aria-role="menu">
               <span slot="trigger">
                   <template>
-                      <strong class='mobile-only'>Project:</strong> <span>{{proj}}</span>
+                      <strong class='mobile-only'>Project:</strong> <span>{{labelFrom(proj)}}</span>
                   </template>
               </span>
 
               <b-dropdown-item :value="p" aria-role="menuitem"
               v-for="p in projects" class="navbar-item"
               :key="p" @click="changeProject(p)">
-                    {{p}}
+                    {{labelFrom(p)}}
               </b-dropdown-item>
           </b-dropdown>
         </b-navbar-item>
@@ -49,6 +49,10 @@
 <script>
 import { getProjects } from '@/services/face-recognition';
 
+const projLabel = {
+  memad: 'MeMAD',
+  antract: 'ANTRACT',
+};
 // http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
 export default {
   name: 'app',
@@ -72,6 +76,9 @@ export default {
     changeProject(project) {
       this.$store.commit('SET_PROJ', project);
       this.$router.go();
+    },
+    labelFrom(project) {
+      return projLabel[project] || project;
     },
   },
 };
