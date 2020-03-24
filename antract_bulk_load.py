@@ -1,6 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 from src.utils.uri_utils import uri2video
 from src import database, tracker
+import time
 
 ENDPOINT = "https://okapi.ina.fr/antract/api/saphir/sparql_search"
 sparql = SPARQLWrapper(ENDPOINT)
@@ -45,6 +46,9 @@ for data in all_media_with('http://www.ina.fr/thesaurus/pp/concept_10128605'):
         database.clean_analysis(locator, 'antract')
         database.save_status(locator, 'antract', 'RUNNING')
         try:
+            time1 = time.time()
             tracker.main(locator, project='antract', video_speedup=25, export_frames=True)
+            time2 = time.time()
+            print('{:s} processed in {:.3f} s'.format(media, (time2 - time1)))
         except RuntimeError:
             database.save_status(locator, 'antract', 'ERROR')
