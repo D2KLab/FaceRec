@@ -67,6 +67,8 @@ export default {
     },
   },
   mounted() {
+    if (this.proj !== this.$route.query.project) this.changeProject(this.$route.query.project);
+
     getProjects().then((p) => {
       this.projects = p;
       if (!this.proj) this.changeProject(p[0]);
@@ -84,45 +86,4 @@ export default {
 };
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-}
-
-@media screen and (min-width: 1024px){
-.mobile-only {
-  display:none;
-}
-.navbar .dropdown-content {
-  border-radius: 0;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
-  box-shadow: 0 8px 8px rgba(10, 10, 10, 0.1)
-}
-
-.navbar .dropdown-menu {
-  background-color: white;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
-  border-top: 2px solid #dbdbdb;
-  border-radius: 0;
-  left: 0;
-  min-width: 100%;
-  position: absolute;
-  top: 100%;
-  z-index: 20;
-  padding:0;
-}
-.navbar .dropdown.navbar-link{
-  padding: 0
-}
-.navbar .dropdown-trigger {
-  height: 100%;
-  padding: 0.9rem 2.5rem 0.5rem 0.75rem;
-  display:inline-block;
-}
-}
-</style>
+<style lang="stylus" src='./App.styl'></style>

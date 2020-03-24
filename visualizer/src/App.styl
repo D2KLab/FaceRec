@@ -1,0 +1,44 @@
+#app
+    font-family 'Avenir', Helvetica, Arial, sans-serif
+    -webkit-font-smoothing antialiased
+    -moz-osx-font-smoothing grayscale
+    color #2c3e50
+
+.container ul
+  list-style-type: square
+  padding-left 1em
+  small
+    color #555
+    font-size 0.6em
+    display: block
+
+
+
+@media screen and (min-width: 1024px)
+    .mobile-only
+        display none
+    .navbar
+        .dropdown-content
+            border-radius 0
+            border-bottom-left-radius 6px
+            border-bottom-right-radius 6px
+            box-shadow 0 8px 8px rgba(10, 10, 10, 0.1)
+        .dropdown-menu
+            background-color white
+            border-bottom-left-radius 6px
+            border-bottom-right-radius 6px
+            border-top 2px solid #dbdbdb
+            border-radius 0
+            left 0
+            min-width 100%
+            position absolute
+            top 100%
+            z-index 20
+            padding 0
+        .dropdown
+            &.navbar-link
+                padding 0
+        .dropdown-trigger
+            height 100%
+            padding 0.9rem 2.5rem 0.5rem 0.75rem
+            display inline-block

@@ -8,10 +8,12 @@ const routes = [{
   component: Home,
 },
 {
+  name: 'video',
   path: '/video',
   component: AnnotatedVideo,
 },
 {
+  name: 'person',
   path: '/person',
   component: Person,
 },

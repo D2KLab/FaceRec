@@ -124,8 +124,8 @@ class Training(Resource):
          })
 class Track(Resource):
     def get(self):
-        video = request.args.get('video')
-        project = request.args.get('project')
+        video = request.args.get('video').strip()
+        project = request.args.get('project').strip()
         speedup = request.args.get('speedup', type=int, default=25)
         no_cache = 'no_cache' in request.args.to_dict() and request.args.get('no_cache') != 'false'
 

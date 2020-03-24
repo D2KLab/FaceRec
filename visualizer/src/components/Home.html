@@ -7,6 +7,7 @@
         <div class="control is-expanded">
           <input name='v' v-model="video"
           class="input is-large" type="uri" placeholder="Insert URI of a video" required>
+          <input type='hidden' name='project' :value='$store.state.proj' />
         </div>
         <div class="control">
           <button type="submit" class="button is-large is-primary">GO</button>
@@ -35,6 +36,14 @@
           <button type="submit" class="button is-large is-primary">GO</button>
         </div>
       </form>
+
+      <h2>Already in the dataset:</h2>
+      <ul>
+        <li v-for="p in people">
+          <router-link :to="{name: 'person', query: {p: p.class, project: $store.state.proj}}">{{p.class}}</router-link>
+        </li>
+      </ul>
+
     </div>
   </section>
 
