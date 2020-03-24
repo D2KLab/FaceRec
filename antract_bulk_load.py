@@ -1,5 +1,5 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
-from src.utils.uri_utils import uri2video
+from src.utils.uri_utils import uri2video, clean_locator
 from src import database, tracker
 import time
 
@@ -42,7 +42,10 @@ for data in all_media_with('http://www.ina.fr/thesaurus/pp/concept_10128605'):
     tracks = [] if (not v or 'tracks' not in v) else v['tracks']
     need_run = not v or (len(tracks) < 1 and v.get('status') != 'RUNNING')
     if need_run:
-        locator, _ = uri2video(media)
+        locator, v = uri2video(media)
+        v['locator'] = clean_locator(locator)
+        database.save_metadata(v)
+
         database.clean_analysis(locator, 'antract')
         database.save_status(locator, 'antract', 'RUNNING')
         try:
