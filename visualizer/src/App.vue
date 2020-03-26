@@ -67,11 +67,15 @@ export default {
     },
   },
   mounted() {
-    if (this.proj !== this.$route.query.project) this.changeProject(this.$route.query.project);
-
+    if (this.proj
+      && this.proj !== 'undefined'
+      && this.$route.query.project
+      && this.proj !== this.$route.query.project) {
+      this.changeProject(this.$route.query.project);
+    }
     getProjects().then((p) => {
       this.projects = p;
-      if (!this.proj) this.changeProject(p[0]);
+      if (!this.proj || this.proj === 'undefined') this.changeProject(p[0]);
     });
   },
   methods: {
