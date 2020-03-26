@@ -44,7 +44,7 @@ export async function getDisabled(project) {
   return data.data;
 }
 
-export async function crawl(q) {
-  const data = await axios.get(`${SERVER}crawler`, { params: { q } });
+export async function crawl(q, project) {
+  const data = await axios.get(`${SERVER}crawler`, { params: { q, project } });
   return data.data;
 }

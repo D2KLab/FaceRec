@@ -67,7 +67,9 @@ export default {
     },
     runCrawler() {
       this.crawling = true;
-      crawl(this.person).then(getTrainingSet).then(this.updatePaths);
+      crawl(this.person, this.$store.state.proj)
+        .then(() => getTrainingSet(this.$store.state.proj))
+        .then(this.updatePaths);
     },
     saveChange() {
       setDisabled(this.$store.state.proj, this.disabled);
