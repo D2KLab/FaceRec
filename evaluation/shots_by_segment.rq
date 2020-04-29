@@ -1,0 +1,12 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX core: <http://www.ina.fr/core#>
+PREFIX ina: <http://www.ina.fr/notice.owl#>
+PREFIX antract: <http://www.ina.fr/antract#>
+
+SELECT DISTINCT * WHERE {
+    ?layer a core:SceneLayer;
+        core:document ?media;
+        core:segment ?segment.
+    ?segment core:beginTime ?start;
+        core:endTime ?end .
+}
