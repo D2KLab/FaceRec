@@ -3,7 +3,7 @@ import time
 import datetime
 from flask import Flask, request, jsonify, Response, send_from_directory
 from flask_cors import CORS
-from flask_restplus import Api, Resource
+from flask_restx import Api, Resource
 from threading import Thread
 
 from src import *

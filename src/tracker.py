@@ -3,14 +3,13 @@ import csv
 import os
 
 import cv2
-import ffmpeg
 import numpy as np
 from mtcnn import MTCNN
 
 import src.database as database
 from .FaceRecogniser import Classifier
 from .SORT.sort import Sort
-from .utils import utils, uri_utils
+from .utils import utils, uri_utils, media_fragment
 from .utils.face_utils import judge_side_face
 
 colours = np.random.rand(32, 3)
@@ -40,19 +39,22 @@ def init_csv(path, fieldnames):
     return writer
 
 
-def main(video_path, project='general',
-         video_speedup=25, export_frames=False):
-    # print(video_path)
+def parse_fragment(fragment, fps):
+    frag = media_fragment.t_parser(fragment)
+    return frag['startNormalized'] * fps, frag['endNormalized'] * fps
 
-    # video_capture = cv2.VideoCapture(video_path)
+
+def main(video_path, project='general', video_speedup=25, export_frames=False, fragment=None):
+    # print(video_path)
+    video_capture = cv2.VideoCapture(video_path)
     # I use ffmpeg workaround because of https://stackoverflow.com/a/41551213/1218213
     # probably this can be removed after next release of https://github.com/skvark/opencv-python
-    video_capture = ffmpeg.probe(video_path)['streams'][0]
+    # video_capture = ffmpeg.probe(video_path)['streams'][0]
 
     # setup all paths
     output_path = utils.generate_output_path('./data/out', project, video_path)
-    cluster_path = os.path.join(output_path, 'cluster', project)
-    frames_path = os.path.join(output_path, 'frames', project)
+    cluster_path = os.path.join(output_path, 'cluster')
+    frames_path = os.path.join(output_path, 'frames')
     if export_frames:
         os.makedirs(frames_path, exist_ok=True)
     classifier_path = os.path.join('data/classifier', project + '.pkl')
@@ -61,8 +63,7 @@ def main(video_path, project='general',
 
     # init csv outputs
     trackers_writer = init_csv(trackers_csv, ['x1', 'y1', 'x2', 'y2', 'track_id', 'frame'])
-    predictions_writer = init_csv(predictions_csv, ['x1', 'y1', 'x2', 'y2',
-                                                    'track_id', 'name', 'confidence', 'frame', 'tracker_sample', 'npt'])
+    predictions_writer = init_csv(predictions_csv, ['x1', 'y1', 'x2', 'y2','track_id', 'name', 'confidence', 'frame', 'tracker_sample', 'npt'])
 
     classifier = Classifier(classifier_path)
 
@@ -72,34 +73,29 @@ def main(video_path, project='general',
     tracker = Sort(min_hits=0)
 
     # frames per second
-    # fps = video_capture.get(cv2.CAP_PROP_FPS)
-    # video_length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-    # width = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
-    fps = int(video_capture['r_frame_rate'].split('/')[0])
-    video_length = int(video_capture['nb_frames'])
-    width = int(video_capture['width'])
+    fps = video_capture.get(cv2.CAP_PROP_FPS)
+    video_length = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    width = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
 
     scale_rate = 0.9 if width > 700 else 1
+
+    frame_start = 0
+    frame_end = video_length
+    if fragment is not None:
+        frame_start, frame_end = parse_fragment(fragment, fps)
 
     matches = []
 
     # iterate over the frames
-    for frame_no in np.arange(0, video_length, video_speedup):
-        print('frame %d/%d' % (frame_no, video_length))
-        # video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
+    for frame_no in np.arange(frame_start, frame_end, video_speedup):
+        print('frame %d/%d' % (frame_no, frame_end))
+        video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
 
         # read the frame
-        # ret, frame = video_capture.retrieve()
-        frame, err = ffmpeg.input(video_path) \
-            .filter('select', 'gte(n,{})'.format(frame_no)) \
-            .output('pipe:', vframes=1, format='image2', vcodec='mjpeg') \
-            .run(capture_stdout=True, quiet=True)
+        ret, frame = video_capture.retrieve()
 
         if frame is None:
             raise RuntimeError
-
-        frame = np.asarray(bytearray(frame), dtype=np.uint8)
-        frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
 
         face_list = []
         attribute_list = []

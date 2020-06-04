@@ -10,7 +10,7 @@ Pillow
 filterpy
 flask
 flask-cors
-flask_restplus
+flask_restx
 rdflib
 uuid
 SPARQLWrapper
@@ -19,4 +19,3 @@ requests
 pyyaml
 pymongo
 mtcnn
-ffmpeg-python

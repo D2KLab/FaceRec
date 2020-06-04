@@ -58,7 +58,7 @@ def load_dataset(directory, keep_original_size=False):
         if not os.path.isdir(path):
             continue
         # load all faces in the subdirectory
-        files = [os.path.join(path, p) for p in os.listdir(path) if p != '.DS_Store']
+        files = [os.path.join(path, p) for p in sorted(os.listdir(path)) if p != '.DS_Store']
         faces = [Image.open(file).convert('RGB') for file in files]
         if not keep_original_size:
             faces = [resize_img(img) for img in faces]

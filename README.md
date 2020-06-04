@@ -26,7 +26,7 @@ python -m src.crawler --keyword "De Gasperi Alcide" --max_num 20 --project proj_
 ### 2. Preprocess the raw images (Face detection)
 Face alignment using MTCNN
 ```sh
-python -m src.FaceDetector  proj_name --image_size 160 --margin 44 --discard_disabled
+python -m src.FaceDetector  proj_name --image_size 160 --margin 44
 ```
 ### 3. Train a classifier on own images
 We perform training a classifier using the following command:
@@ -94,8 +94,8 @@ python -m src.clusterize --video video/xxx.mp4 --confidence_threshold 0.7 --domi
 A service is available as Docker image.
 
 ```sh
-docker build -t facerec .
-docker run -d -p 5050:5000 --name facerec-mongo mongo
+docker build -t_parser facerec .
+docker run -d -p 5050:5000 -p 27017:27017 --name facerec-mongo mongo
 docker run -d -p 5050:5000 --restart=unless-stopped  -v /home/semantic/Repositories/Face-Celebrity-Recognition/video:/app/video -v /home/semantic/Repositories/Face-Celebrity-Recognition/data:/app/data -v /home/semantic/Repositories/Face-Celebrity-Recognition/config:/app/config --name facerec1 facerec
 ```
 
