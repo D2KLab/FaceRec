@@ -1,27 +1,12 @@
-FROM node:lts-alpine
-
-RUN apk add --update nginx
-
-# Create the directories we will need
-RUN mkdir -p /var/log/nginx
-
-# Copy the respective nginx configuration files
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY default.conf /etc/nginx/conf.d/default.conf
-
+FROM node:lts-alpine as build-stage
 WORKDIR /app
-
 COPY package*.json ./
-
 RUN npm install
-
-COPY . ./
+COPY . .
 COPY app.config.prod.js app.config.js
-
 RUN npm run build
 
-RUN chown nginx:nginx /app/dist
-
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+FROM nginx as production-stage
+RUN mkdir /app
+COPY --from=build-stage /app/dist /app
+COPY nginx.conf /etc/nginx/nginx.conf
