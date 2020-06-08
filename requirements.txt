@@ -3,9 +3,8 @@ scikit-learn
 numpy
 scipy
 icrawler
-tensorflow==2.1.0
+tensorflow==2.2.0
 opencv-python
-face_recognition
 Pillow
 filterpy
 flask

@@ -1,16 +1,17 @@
+import datetime
 import os
 import time
-import datetime
+from threading import Thread
+
 from flask import Flask, request, jsonify, Response, send_from_directory
 from flask_cors import CORS
 from flask_restx import Api, Resource
-from threading import Thread
 
 from src import *
-from src.utils import utils, uri_utils
 from src.connectors import antract_connector as antract
+from src.utils import utils, uri_utils
 
-TRAINING_IMG = 'data/training_img/'
+TRAINING_IMG = 'data/training_img_aligned/'
 
 IMG_DIR = os.path.join(os.getcwd(), TRAINING_IMG)
 VIDEO_DIR = os.path.join(os.getcwd(), 'video')
@@ -26,6 +27,9 @@ api = Api(app=flask_app,
           description="Recognise celebrities on videos.", )
 CORS(flask_app)
 
+PROJECTS = [p for p in os.listdir(TRAINING_IMG) if os.path.isdir(os.path.join(TRAINING_IMG, p))]
+project_param = {'description': 'The project context of the call', 'enum': PROJECTS, 'required': True}
+
 
 def now():
     return datetime.datetime.now().isoformat()
@@ -35,12 +39,12 @@ def now():
 @api.doc(description="Get list of active projects.")
 class Projects(Resource):
     def get(self):
-        return jsonify([p for p in os.listdir(TRAINING_IMG) if os.path.isdir(os.path.join(TRAINING_IMG, p))])
+        return jsonify(PROJECTS)
 
 
 @api.route('/training-set')
 @api.doc(description="Get list of training images with classes.",
-         params={'project': 'The project those images belong to'})
+         params={'project': project_param})
 class TrainingSet(Resource):
     def get(self):
         dataset = request.args.get('project', 'general')
@@ -49,7 +53,7 @@ class TrainingSet(Resource):
         labels, paths = utils.fetch_dataset(folder)
         results = {}
         for path, c in zip(paths, labels):
-            path = path.replace(TRAINING_IMG, 'training_img/')
+            path = path.replace(TRAINING_IMG, 'training_img_aligned/')
             if c not in results:
                 results[c] = {
                     'class': c,
@@ -70,7 +74,7 @@ class TrainingSet(Resource):
             'required': True,
             'description': 'The name of the person, or multiple individuals separated by a semicolon, '
                            'like in "Tom Hanks;Monica Bellucci"'},
-        'project': 'The project those images belong to'
+        'project': project_param
     })
 class Crawler(Resource):
     def get(self):
@@ -115,7 +119,7 @@ class Training(Resource):
 @api.doc(description="Extract from the video all the continuous positions of the people in the dataset",
          params={
              'video': {'required': True, 'description': 'URI of the video to be analysed'},
-             'project': {'required': True, 'description': 'The collection of people to detect'},
+             'project': project_param,
              'speedup': {'default': 25, 'type': int,
                          'description': 'Number of frame to wait between two iterations of the algorithm'},
              'no_cache': {'type': bool, 'default': False,
@@ -172,67 +176,6 @@ def run_tracker(video_path, speedup, video, project):
         database.save_status(video, project, 'ERROR')
 
 
-# # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
-# # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/eurovaalit-2019-kuka-johtaa-eurooppaa/0460c1b7d735e3fc796aa2829811aa1ae5dc9fa8
-# # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&video=yle/eurovaalit-2019-kuka-johtaa-eurooppaa/d9d05488b35db559cdef35bac95f518ee0dda76a
-# # http://127.0.0.1:5000/recognise?speedup=50&format=ttl&no_cache&video=http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
-# @api.route('/recognise')
-# @api.doc(description="Extract from each frame of the video the positions of the people in the dataset",
-#          params={
-#              'video': {'required': True, 'description': 'URI of the video to be analysed'},
-#              'speedup': {'default': 25, 'type': int,
-#                          'description': 'Number of frame to wait between two iterations of the algorithm'},
-#              'no_cache': {'type': bool, 'default': False,
-#                           'description': 'Set it if you want to recompute the annotations'},
-#              'format': {'default': 'json', 'enum': ['json', 'ttl'], 'description': 'Set the output format'}
-#          })
-# class Recognise(Resource):
-#     def get(self):
-#         start_time = time.time()
-#
-#         video = request.args.get('video')
-#         speedup = request.args.get('speedup', type=int, default=25)
-#         no_cache = 'no_cache' in request.args.to_dict()
-#
-#         results = None
-#         info = None
-#         if not no_cache:
-#             results = db_detection.search(Query().video == video)
-#             if results and len(results) > 0:
-#                 results = results[0]
-#
-#         if not results:
-#             video_path = video
-#             if video.startswith('http'):  # it is a uri!
-#                 video_path, info = utils.uri2video(video)
-#             elif not os.path.isfile(video):
-#                 raise FileNotFoundError('video not found: %s' % video)
-#
-#             r = FaceRecogniser.main(video_path, video_speedup=speedup, confidence_threshold=0.2)
-#             results = {
-#                 'task': 'recognise',
-#                 'status': 'ok',
-#                 'execution_time': (time.time() - start_time),
-#                 'time': now(),
-#                 'video': video,
-#                 'info': info,
-#                 'results': r
-#             }
-#
-#             # TODO insert aliases in the cache
-#             # delete previous results
-#             db_detection.remove(where('video') == video)
-#             db_detection.insert(results)
-#
-#         # with open('recognise.json', 'w') as outfile:
-#         #     json.dump(r, outfile)
-#         fmt = request.args.get('format')
-#         if fmt == 'ttl':
-#             return Response(semantifier.semantify(results), mimetype='text/turtle')
-#
-#         return jsonify(results)
-
-
 @flask_app.route('/get_locator')
 def send_video():
     path = request.args.get('video')
@@ -254,7 +197,7 @@ def get_metadata():
         return None
 
 
-@flask_app.route('/training_img/<path:subpath>')
+@flask_app.route('/training_img_aligned/<path:subpath>')
 def send_img(subpath=None):
     dirname = os.path.dirname(subpath)
     filename = os.path.basename(subpath)

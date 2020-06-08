@@ -2,14 +2,54 @@ import argparse
 import os
 import sys
 
+import cv2
 import numpy as np
 from PIL import Image
 from mtcnn import MTCNN
 
 from .utils import utils
+from .FaceAligner import FaceAligner
 
 
-def main(project='general', image_size=160, margin=44,
+class FaceDetector:
+    def __init__(self, image_size=160, margin=10, detect_multiple_faces=False):
+        self.aligner = FaceAligner(desiredFaceWidth=image_size, margin=margin)
+        self.detector = MTCNN()
+        self.detect_multiple_faces = detect_multiple_faces
+
+    def extract(self, img):
+        """ Extract the portions of a single img or frame including faces """
+        bounding_box, landmarks = self.detect(img)
+        return [self.aligner.align(img, det) for det in zip(bounding_box, landmarks)]
+
+    def detect(self, img):
+        bounding_boxes = self.detector.detect_faces(img)
+        nrof_faces = len(bounding_boxes)
+        if nrof_faces <= 0:
+            return [], []
+
+        det = np.array([utils.fix_box(b['box']) for b in bounding_boxes])
+        img_size = np.asarray(img.shape)[0:2]
+
+        if nrof_faces > 1 and not self.detect_multiple_faces:
+            # select the biggest and most central
+            bounding_box_size = det[:, 2] * det[:, 3]
+            img_center = img_size / 2
+            offsets = np.vstack([det[:, 0] + (det[:, 2] / 2) - img_center[1],
+                                 det[:, 1] + (det[:, 3] / 2) - img_center[0]])
+            offset_dist_squared = np.sum(np.power(offsets, 2.0), 0)
+            # some extra weight on the centering
+            index = np.argmax(bounding_box_size - offset_dist_squared * 2.0)
+            det_arr = [det[index, :]]
+            landmarks = [bounding_boxes[index]['keypoints']]
+        else:
+            det_arr = [np.squeeze(d) for d in det]
+            landmarks = [b['keypoints'] for b in bounding_boxes]
+
+        return det_arr, landmarks
+
+
+def main(project='general', image_size=160, margin=10,
          detect_multiple_faces=False, discard_disabled=True):
     input_dir = os.path.join('data/training_img/', project)
     input_dir = os.path.expanduser(input_dir)
@@ -19,7 +59,7 @@ def main(project='general', image_size=160, margin=44,
 
     data, labels, paths, _ = utils.load_dataset(input_dir, keep_original_size=True)
 
-    detector = MTCNN()
+    detector = FaceDetector(image_size, margin, detect_multiple_faces)
 
     nrof_successfully_aligned = 0
 
@@ -36,50 +76,19 @@ def main(project='general', image_size=160, margin=44,
         os.makedirs(output_class_dir, exist_ok=True)
 
         filename = os.path.splitext(os.path.split(path)[1])[0]
-        output_filename = os.path.join(output_class_dir, filename + '.png')
 
-        bounding_boxes = detector.detect_faces(img)
-        nrof_faces = len(bounding_boxes)
-        if nrof_faces > 0:
-            det = np.array([utils.fix_box(b['box']) for b in bounding_boxes])
-            det_arr = []
-            img_size = np.asarray(img.shape)[0:2]
-            if nrof_faces > 1:
-                if detect_multiple_faces:
-                    for i in range(nrof_faces):
-                        det_arr.append(np.squeeze(det[i]))
-                else:
-                    bounding_box_size = det[:, 2] * det[:, 3]
-                    img_center = img_size / 2
-                    offsets = np.vstack([det[:, 0] + (det[:, 2] / 2) - img_center[1],
-                                         det[:, 1] + (det[:, 3] / 2) - img_center[0]])
-                    offset_dist_squared = np.sum(np.power(offsets, 2.0), 0)
-                    # some extra weight on the centering
-                    index = np.argmax(bounding_box_size - offset_dist_squared * 2.0)
-                    det_arr.append(det[index, :])
-            else:
-                det_arr.append(np.squeeze(det))
+        extracted_faces = detector.extract(img)
+        if len(extracted_faces) == 0:
+            print('Unable to detect faces in %s' % path)
+            continue
 
-            for i, det in enumerate(det_arr):
-                det = np.squeeze(utils.xywh2rect(*det))
-                bb = np.zeros(4, dtype=np.int32)
-                bb[0] = np.maximum(det[0] - margin / 2, 0)
-                bb[1] = np.maximum(det[1] - margin / 2, 0)
-                bb[2] = np.minimum(det[2] + margin / 2, img_size[1])
-                bb[3] = np.minimum(det[3] + margin / 2, img_size[0])
-                cropped = img[bb[1]:bb[3], bb[0]:bb[2], :]
-                scaled = np.array(Image.fromarray(cropped)
-                                  .resize((image_size, image_size), resample=Image.BILINEAR)
-                                  .convert('L'))
-                filename_base, file_extension = os.path.splitext(output_filename)
-                if detect_multiple_faces:
-                    output_filename_n = "{}_{}{}".format(filename_base, i, file_extension)
-                else:
-                    output_filename_n = "{}{}".format(filename_base, file_extension)
-                Image.fromarray(scaled).save(output_filename_n)
-                nrof_successfully_aligned += 1
-        else:
-            print('Unable to align "%s"' % path)
+        nrof_successfully_aligned += 1
+
+        # save images to file
+        for i, face in enumerate(extracted_faces):
+            suffix = ('_%d' % i) if detect_multiple_faces else ''
+            output_filename = os.path.join(output_class_dir, filename + suffix + '.png')
+            Image.fromarray(face).save(output_filename)
 
     print('Total number of images: %d' % len(paths))
     print('Number of successfully aligned images: %d' % nrof_successfully_aligned)
@@ -92,7 +101,7 @@ def parse_arguments(argv):
                         help='Name of the collection to be part of')
     parser.add_argument('--image_size', type=int, default=160,
                         help='Image size (height, width) in pixels')
-    parser.add_argument('--margin', type=int, default=44,
+    parser.add_argument('--margin', type=int, default=10,
                         help='Margin for the crop around the bounding box (height, width) in pixels')
     parser.add_argument('--detect_multiple_faces', default=False, action='store_true',
                         help='Detect and align multiple faces per image')

@@ -1,15 +1,18 @@
+import argparse
+import logging
 import os
 import sys
 import time
-import argparse
-import logging
-import face_recognition
+
+import cv2
 from icrawler.builtin import GoogleImageCrawler
+
+from .FaceDetector import FaceDetector
 
 logger = logging.getLogger('crawler')
 
 
-def main(keyword, max_num=20, project='general'):
+def main(keyword, max_num=50, project='general'):
     if not keyword:
         raise ValueError('Keyword parameter is required.')
 
@@ -18,9 +21,10 @@ def main(keyword, max_num=20, project='general'):
     logger.info('[%s] Crawler run for: %s' % (project, keyword))
     print('[%s] Crawler run for: %s' % (project, keyword))
 
-    image_dir = os.path.join('data/training_img/', project, keyword.replace(" ", "_"))
-    image_dir = os.path.expanduser(image_dir)
+    image_dir = os.path.expanduser(os.path.join('data/training_img/', project, keyword.replace(" ", "_")))
     os.makedirs(image_dir, exist_ok=True)
+    al_image_dir = os.path.expanduser(os.path.join('data/training_img_aligned/', project, keyword.replace(" ", "_")))
+    os.makedirs(al_image_dir, exist_ok=True)
 
     google_crawler = GoogleImageCrawler(feeder_threads=10, parser_threads=10, log_level=logging.DEBUG,
                                         downloader_threads=25, storage={'root_dir': image_dir})
@@ -29,14 +33,17 @@ def main(keyword, max_num=20, project='general'):
     google_crawler.crawl(keyword=keyword, offset=0, max_num=max_num,
                          min_size=(200, 200), max_size=None, file_idx_offset=0)
 
-    for (rootDir, dirNames, filenames) in os.walk(image_dir):
-        for f in filenames:
-            filename = os.path.join(rootDir, f)
-            image = face_recognition.load_image_file(filename)
-            face_locations = face_recognition.face_locations(image)
-            # I just keep images with 1 single face
-            if len(face_locations) != 1:
-                os.remove(filename)
+    detector = FaceDetector(detect_multiple_faces=True)
+
+    for f in sorted(os.listdir(image_dir)):
+        filename = f.rsplit('.', 1)[0]
+        print(filename)
+        image = cv2.cvtColor(cv2.imread(os.path.join(image_dir, f)), cv2.COLOR_BGR2GRAY)
+        extracted_faces = detector.extract(image)
+        for i, face in enumerate(extracted_faces):
+            output_filename = os.path.join(al_image_dir, '%s_%d.png' % (filename, i))
+            cv2.imwrite(output_filename, face)
+
     end = time.time()
     logger.info("Time elapsed: %.2f seconds", end - start)
 
