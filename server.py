@@ -6,6 +6,7 @@ from threading import Thread
 from flask import Flask, request, jsonify, Response, send_from_directory
 from flask_cors import CORS
 from flask_restx import Api, Resource
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from src import *
 from src.connectors import antract_connector as antract
@@ -21,8 +22,10 @@ os.makedirs('database', exist_ok=True)
 database.init()
 
 flask_app = Flask(__name__)
+flask_app.wsgi_app = ProxyFix(flask_app.wsgi_app, x_proto=1, x_port=1, x_for=1, x_host=1, x_prefix=1)
 api = Api(app=flask_app,
           version="0.1.0",
+          default='facerec',
           title="Face Recognition Api",
           description="Recognise celebrities on videos.", )
 CORS(flask_app)
@@ -103,7 +106,6 @@ class Training(Resource):
     def get(self, project):
         start_time = time.time()
 
-        FaceDetector.main(project=project)
         classifier.main(classifier='SVM', project=project)
         return jsonify({
             'task': 'train',
