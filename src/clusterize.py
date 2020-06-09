@@ -129,26 +129,6 @@ def sanitize(input):
     j = json.dumps(input, default=convert)
     return json.loads(j)
 
-    # COSINE SIMILARITY
-    # I don't see any utility now, but maybe in the future
-
-    # train_embs contains the embeddings of the faces used for training
-    # train_embs = pd.read_csv('data/embedding/embedding.csv', header=None)
-    # train_embs = np.array(train_embs.values)
-    # train_labels = pd.read_csv('data/embedding/label.csv', header=None, names=["label", "path"])
-    # train_labels = np.array(train_labels['label'].values)
-
-    # for cluster_id in person_clusters:
-    #     # get the training faces of the current person
-    #     emb_array_training = train_embs[np.nonzero(train_labels == person_id)]
-    #     # get the video faces of the current cluster
-    #     emb_array_testing = cur_embs[np.nonzero(cur_labels == cluster_id)]
-    #
-    #     distances = cluster_distance(emb_array_testing, emb_array_training)
-    #     distances.sort(reverse=True)
-    #     mean_of_best_3 = mean(distances[0:3])  # TODO why?
-    #     print("Cluster %s - %s - Cosine distance Mean: %f" % (cluster_id, person, mean_of_best_3))
-
 
 def merge_folders(root_src_dir, root_dst_dir):
     for src_dir, dirs, files in os.walk(root_src_dir):
@@ -215,7 +195,6 @@ if __name__ == '__main__':
         tracker_path = args.tracker_path
 
     # setup all paths
-    # cluster_path = os.path.join(tracker_path, 'cluster')
     predictions_csv = os.path.join(tracker_path, 'predictions.csv')
 
     predictions_load = pd.read_csv(predictions_csv,

@@ -23,8 +23,8 @@ def uri2video(uri):
         for attr, value in data.items():
             metadata[attr] = value['value']
 
-        loc = antract.apply_auth('https://okapi.ina.fr/antract' + metadata['locator'])
-        return loc, metadata
+        metadata['locator'] = 'https://okapi.ina.fr/antract' + metadata['locator']
+        return antract.apply_auth(metadata['locator']), metadata
     else:
         return uri, {'locator': uri}  # it is already a location (probably)
 

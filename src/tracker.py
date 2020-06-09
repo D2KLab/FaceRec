@@ -44,15 +44,13 @@ def parse_fragment(fragment, fps):
     return frag['startNormalized'] * fps, frag['endNormalized'] * fps
 
 
-def main(video_path, project='general', video_speedup=25, export_frames=False, fragment=None):
-    # print(video_path)
+def main(video_path, project='general', video_speedup=25, export_frames=False, fragment=None, video_id=None):
+    if not video_id:
+        video_id = video_path
     video_capture = cv2.VideoCapture(video_path)
-    # I use ffmpeg workaround because of https://stackoverflow.com/a/41551213/1218213
-    # probably this can be removed after next release of https://github.com/skvark/opencv-python
-    # video_capture = ffmpeg.probe(video_path)['streams'][0]
 
     # setup all paths
-    output_path = utils.generate_output_path('./data/out', project, video_path)
+    output_path = utils.generate_output_path('./data/out', project, video_id)
     cluster_path = os.path.join(output_path, 'cluster')
     frames_path = os.path.join(output_path, 'frames')
     if export_frames:
@@ -63,7 +61,8 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
 
     # init csv outputs
     trackers_writer = init_csv(trackers_csv, ['x1', 'y1', 'x2', 'y2', 'track_id', 'frame'])
-    predictions_writer = init_csv(predictions_csv, ['x1', 'y1', 'x2', 'y2','track_id', 'name', 'confidence', 'frame', 'tracker_sample', 'npt'])
+    predictions_writer = init_csv(predictions_csv, ['x1', 'y1', 'x2', 'y2', 'track_id', 'name',
+                                                    'confidence', 'frame', 'tracker_sample', 'npt'])
 
     classifier = Classifier(classifier_path)
 
@@ -85,7 +84,6 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
         frame_start, frame_end = parse_fragment(fragment, fps)
 
     matches = []
-
     # iterate over the frames
     for frame_no in np.arange(frame_start, frame_end, video_speedup):
         print('frame %d/%d' % (frame_no, frame_end))
@@ -111,10 +109,6 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
             bb = utils.xywh2rect(*utils.fix_box(item['box']))
             # use 5 face landmarks to judge the face is front or side
             facial_landmarks = list(item['keypoints'].values())
-
-            f = round(item['confidence'], 6)
-            # if f <= 0.99:
-            #     continue
             face_list.append(bb)
 
             # face cropped
@@ -159,7 +153,7 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
                 'confidence': best_prob,
                 'tracker_sample': tracker_sample,
                 'npt': npt,
-                'locator': uri_utils.clean_locator(video_path),
+                'locator': video_id,
                 'bounding': utils.rect2xywh(*box),
                 'rect': box
             }
@@ -173,7 +167,8 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
     # TODO final track
 
     if database.is_on():
-        database.save_status(uri_utils.clean_locator(video_path), project, 'COMPLETE')
+        print('COMPLETE')
+        database.save_status(video_id, project, 'COMPLETE')
 
     for f in file_to_be_close:
         f.close()

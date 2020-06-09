@@ -4,11 +4,10 @@ import sys
 
 import cv2
 import numpy as np
-from PIL import Image
 from mtcnn import MTCNN
 
-from .utils import utils
 from .FaceAligner import FaceAligner
+from .utils import utils
 
 
 class FaceDetector:
@@ -49,8 +48,7 @@ class FaceDetector:
         return det_arr, landmarks
 
 
-def main(project='general', image_size=160, margin=10,
-         detect_multiple_faces=False, discard_disabled=True):
+def main(project='general', image_size=160, margin=10, detect_multiple_faces=False):
     input_dir = os.path.join('data/training_img/', project)
     input_dir = os.path.expanduser(input_dir)
     output_dir = os.path.join('data/training_img_aligned/', project)
@@ -63,15 +61,7 @@ def main(project='general', image_size=160, margin=10,
 
     nrof_successfully_aligned = 0
 
-    disabled = []
-    if discard_disabled:
-        with open(os.path.join(input_dir, 'disabled.txt')) as f:
-            disabled = [i.split('training_img/')[1] for i in f.read().splitlines() if i]
-
     for img, label, path in zip(data, labels, paths):
-        if path.split('training_img/')[1] in disabled:
-            continue
-
         output_class_dir = os.path.join(output_dir, label.replace(' ', '_'))
         os.makedirs(output_class_dir, exist_ok=True)
 
@@ -88,7 +78,7 @@ def main(project='general', image_size=160, margin=10,
         for i, face in enumerate(extracted_faces):
             suffix = ('_%d' % i) if detect_multiple_faces else ''
             output_filename = os.path.join(output_class_dir, filename + suffix + '.png')
-            Image.fromarray(face).save(output_filename)
+            cv2.imwrite(output_filename, face)
 
     print('Total number of images: %d' % len(paths))
     print('Number of successfully aligned images: %d' % nrof_successfully_aligned)
@@ -105,11 +95,9 @@ def parse_arguments(argv):
                         help='Margin for the crop around the bounding box (height, width) in pixels')
     parser.add_argument('--detect_multiple_faces', default=False, action='store_true',
                         help='Detect and align multiple faces per image')
-    parser.add_argument('--discard_disabled', default=False, action='store_true',
-                        help='If true, skip the images in the file "disabled.txt"')
     return parser.parse_args(argv)
 
 
 if __name__ == '__main__':
     args = parse_arguments(sys.argv[1:])
-    main(args.project, args.image_size, args.margin, args.detect_multiple_faces, args.discard_disabled)
+    main(args.project, args.image_size, args.margin, args.detect_multiple_faces)

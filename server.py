@@ -128,50 +128,50 @@ class Training(Resource):
          })
 class Track(Resource):
     def get(self):
-        video = request.args.get('video').strip()
+        video_id = request.args.get('video').strip()
         project = request.args.get('project').strip()
         speedup = request.args.get('speedup', type=int, default=25)
         no_cache = 'no_cache' in request.args.to_dict() and request.args.get('no_cache') != 'false'
 
-        v = None
-        video_path = video
+        video = None
+        locator = video_id
         if not no_cache:
-            v = database.get_all_about(video, project)
-            if v:
-                video_path = v['locator']
+            video = database.get_all_about(video_id, project)
+            if video:
+                locator = video['locator']
 
-        need_run = not v or 'tracks' not in v and v.get('status') != 'RUNNING'
-        if not v or need_run:
-            if video.startswith('http'):  # it is a uri!
-                video_path, v = uri_utils.uri2video(video)
-                video = uri_utils.clean_locator(v['locator'])
-            elif not os.path.isfile(video):
-                raise FileNotFoundError('video not found: %s' % video)
+        need_run = not video or 'tracks' not in video and video.get('status') != 'RUNNING'
+        if not video or need_run:
+            if video_id.startswith('http'):  # it is a uri!
+                locator, video = uri_utils.uri2video(video_id)
+                video_id = video['locator']
+            elif not os.path.isfile(video_id):
+                raise FileNotFoundError('video not found: %s' % video_id)
             else:
-                v = {'locator': video}
-            database.save_metadata(v)
+                video = {'locator': video_id}
+            database.save_metadata(video)
 
         if need_run:
-            database.clean_analysis(video, project)
-            database.save_status(video, project, 'RUNNING')
-            v['status'] = 'RUNNING'
-            Thread(target=run_tracker, args=(video_path, speedup, video, project)).start()
-        elif 'tracks' in v and len(v['tracks']) > 0:
-            v['tracks'] = clusterize.main(clusterize.from_dict(v['tracks']),
-                                          confidence_threshold=0, merge_cluster=True)
+            database.clean_analysis(video_id, project)
+            database.save_status(video_id, project, 'RUNNING')
+            video['status'] = 'RUNNING'
+            Thread(target=run_tracker, args=(locator, speedup, video_id, project)).start()
+        elif 'tracks' in video and len(video['tracks']) > 0:
+            video['tracks'] = clusterize.main(clusterize.from_dict(video['tracks']),
+                                              confidence_threshold=0, merge_cluster=True)
 
-        if '_id' in v:
-            del v['_id']  # the database id should not appear on the output
+        if '_id' in video:
+            del video['_id']  # the database id should not appear on the output
 
         fmt = request.args.get('format')
         if fmt == 'ttl':
-            return Response(semantifier.semantify(v), mimetype='text/turtle')
-        return jsonify(v)
+            return Response(semantifier.semantify(video), mimetype='text/turtle')
+        return jsonify(video)
 
 
 def run_tracker(video_path, speedup, video, project):
     try:
-        return tracker.main(video_path, project=project, video_speedup=speedup, export_frames=True)
+        return tracker.main(video_path, project=project, video_speedup=speedup, export_frames=True, video_id=video)
     except RuntimeError:
         database.save_status(video, project, 'ERROR')
 

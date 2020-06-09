@@ -8,6 +8,7 @@ import cv2
 from icrawler.builtin import GoogleImageCrawler
 
 from .FaceDetector import FaceDetector
+from .utils import utils
 
 logger = logging.getLogger('crawler')
 
@@ -38,7 +39,7 @@ def main(keyword, max_num=50, project='general'):
     for f in sorted(os.listdir(image_dir)):
         filename = f.rsplit('.', 1)[0]
         print(filename)
-        image = cv2.cvtColor(cv2.imread(os.path.join(image_dir, f)), cv2.COLOR_BGR2GRAY)
+        image = utils.load_gray(os.path.join(image_dir, f))
         extracted_faces = detector.extract(image)
         for i, face in enumerate(extracted_faces):
             output_filename = os.path.join(al_image_dir, '%s_%d.png' % (filename, i))
