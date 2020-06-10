@@ -54,6 +54,7 @@ def load_dataset(directory, keep_original_size=False, disabled=None):
         disabled = []
 
     X, y, paths = list(), list(), list()
+    proj = directory.rsplit('/')[-1]
     # enumerate folders, on per class
     for subdir in sorted(os.listdir(directory)):
         # path
@@ -62,7 +63,8 @@ def load_dataset(directory, keep_original_size=False, disabled=None):
         if not os.path.isdir(path):
             continue
         # load all faces in the subdirectory
-        files = [os.path.join(path, p) for p in sorted(os.listdir(path)) if p != '.DS_Store' and p not in disabled]
+        files = [os.path.join(path, p) for p in sorted(os.listdir(path))
+                 if p != '.DS_Store' and os.path.join(proj, subdir, p) not in disabled]
 
         faces = [load_gray(file) for file in files]
         if not keep_original_size:
@@ -72,6 +74,7 @@ def load_dataset(directory, keep_original_size=False, disabled=None):
         labels = [subdir for _ in range(len(faces))]
         # summarize progress
         print('>loaded %d examples for class: %s' % (len(faces), subdir))
+
         # store
         X.extend(faces)
         y.extend(labels)

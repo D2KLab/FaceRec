@@ -106,7 +106,7 @@ class Training(Resource):
     def get(self, project):
         start_time = time.time()
 
-        classifier.main(classifier='SVM', project=project)
+        classifier.main(classifier='SVM', project=project, discard_disabled=True)
         return jsonify({
             'task': 'train',
             'time': now(),
