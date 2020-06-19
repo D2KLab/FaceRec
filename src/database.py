@@ -96,4 +96,5 @@ def get_all_about(uri, project):
             v['status'] = status.name
             v['project'] = project
             v['tracks'] = get_analysis(locator, project)
+
     return v

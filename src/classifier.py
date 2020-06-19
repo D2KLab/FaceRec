@@ -26,6 +26,7 @@ def main(classifier='SVM', project='general', discard_disabled=True):
         with open(os.path.join(data_dir, 'disabled.txt')) as f:
             disabled = [i.split('training_img_aligned/')[1] for i in f.read().splitlines() if i]
 
+    print(disabled)
     # load train dataset
     trainX, trainy, paths, class_names = utils.load_dataset(data_dir, disabled=disabled)
 

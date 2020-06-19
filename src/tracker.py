@@ -79,7 +79,7 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
     scale_rate = 0.9 if width > 700 else 1
 
     frame_start = 0
-    frame_end = video_length
+    frame_end = 2000 # video_length
     if fragment is not None:
         frame_start, frame_end = parse_fragment(fragment, fps)
 

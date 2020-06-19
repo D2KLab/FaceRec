@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import VueRouter from 'vue-router';
 import Buefy from 'buefy';
+import moment from 'moment';
 import numeral from 'numeral';
 import App from './App.vue';
 import routes from './routes';
@@ -12,6 +13,8 @@ Vue.use(VueRouter);
 Vue.use(Buefy);
 Vue.use(Vuex);
 
+
+Vue.filter('formatDate', (value) => value && moment(String(value)).format('DD/MM/YYYY hh:mm'));
 
 Vue.filter('formatNumber', (value) => numeral(value).format('0.00'));
 

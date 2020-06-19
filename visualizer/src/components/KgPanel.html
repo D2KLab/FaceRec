@@ -29,6 +29,17 @@
     <p v-for="d in data.theme">{{d}}</p>
   </div>
 
+  <div v-if='data.publication'>
+
+    <h2>Brodcasted on</h2>
+    <ul>
+      <li v-for="p in data.publication ">
+        <span>{{p.date|formatDate}}</span>
+        - <a :href='p.channel.id'>{{p.channel.name}}</a>
+      </li>
+    </ul>
+  </div>
+
   <div v-if='data.segments'>
 
     <h2>Segments</h2>
