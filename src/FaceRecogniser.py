@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 from mtcnn import MTCNN
 from tensorflow.keras.models import load_model
+import scipy.cluster as cluster
 
 from .utils import utils
 
@@ -24,6 +25,9 @@ class Classifier:
 
         self.facenet = load_model(facenet_model, compile=False)
         self.facenet.load_weights(facenet_weights)
+        self.features = []
+        self.boxnames = []
+        self.collect_features = False
 
         # Load classifier
         classifier_filename = os.path.expanduser(classifier_path)
@@ -33,18 +37,61 @@ class Classifier:
             self.classifier = classifier
             self.class_names = class_names
 
-    def predict(self, img):
-        scaled = cv2.resize(img, (self.image_size, self.image_size), interpolation=cv2.INTER_CUBIC)
-        scaled = scaled.reshape(-1, self.image_size, self.image_size, 3)
-
+    def predict(self, img, boxname=None):
+        scaledx = cv2.resize(img, (self.image_size, self.image_size), interpolation=cv2.INTER_CUBIC)
+        scaled = scaledx.reshape(-1, self.image_size, self.image_size, 3)
         # convert to array and predict among the known ones
-        emb_array = [utils.get_embedding(self.facenet, face_pixels) for face_pixels in scaled]
-        emb_array = np.asarray(emb_array)
+        emb_arrayx = [utils.get_embedding(self.facenet, face_pixels) for face_pixels in scaled]
+        emb_array = np.asarray(emb_arrayx)
+        if self.collect_features:
+            # print(boxname) ; cv2.imwrite(boxname+".png", scaledx)
+            self.features.append(emb_arrayx[0])
+            self.boxnames.append(boxname)
         return self.classifier.predict_proba(emb_array).flatten()
 
-    def predict_best(self, img):
-        predictions = self.predict(img)
+    def predict_best(self, img, boxname=None):
+        predictions = self.predict(img, boxname)
         return select_best(predictions, self.class_names)
+
+    def cluster_features(self, nclusters, minsamples, maxsamples):
+        print('NOW CLUSTERING', len(self.features),
+              'feature vectors of dimensionality', len(self.features[0]),
+              'to', nclusters, 'clusters and showing max', maxsamples,
+              'samples of clusters that contain min', minsamples, 'vectors')
+        link = cluster.hierarchy.linkage(self.features, method='complete')
+        #print(link)
+        fc = cluster.hierarchy.fcluster(link, nclusters, criterion='maxclust')
+        #print(fc)
+        ret = []
+        for i in range(nclusters):
+            x = []
+            y = []
+            for j, k in enumerate(fc):
+                if k==i+1:
+                    x.append(self.features[j])
+                    y.append(self.boxnames[j])
+
+            m = np.mean(x, axis=0)
+            #print(m)
+            d = np.linalg.norm(x-m, axis=1)
+            #print(d)
+            d = zip(range(len(d)), y, d)
+            e = sorted(d, key=lambda a: a[2])
+            #print(e)
+
+            eff_m = len(e)//2
+            if eff_m>maxsamples:
+                eff_m = maxsamples
+            if len(e)<minsamples:
+                eff_m = 0
+            print('cluster', i+1, 'has total', len(x), 'samples, showing', eff_m)
+            r = []
+            for j in range(eff_m):
+                r.append(e[j][1])
+                print(' ', e[j][1])
+            ret.append(r)
+            
+        return ret
 
 
 def main(video_path, output_path='data/cluster.txt',

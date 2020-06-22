@@ -45,6 +45,8 @@ def parse_fragment(fragment, fps):
 
 
 def main(video_path, project='general', video_speedup=25, export_frames=False, fragment=None, video_id=None):
+    cluster_features = True
+    
     if not video_id:
         video_id = video_path
     video_capture = cv2.VideoCapture(video_path)
@@ -65,7 +67,8 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
                                                     'confidence', 'frame', 'tracker_sample', 'npt'])
 
     classifier = Classifier(classifier_path)
-
+    classifier.collect_features = cluster_features
+    
     detector = MTCNN(min_face_size=25)
 
     # init tracker
@@ -137,7 +140,8 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
 
             # cutting the img on the face
             trackers_cropped = frame[d[1]:d[3], d[0]:d[2], :]
-            best_name, best_prob = classifier.predict_best(trackers_cropped)
+            boxname = str(frame_no)+"_"+str(d[0])+"_"+str(d[1])+"_"+str(d[2])+"_"+str(d[3])
+            best_name, best_prob = classifier.predict_best(trackers_cropped, boxname)
 
             npt = utils.frame2npt(frame_no, fps)
             predictions_writer.writerow(
@@ -172,6 +176,11 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
 
     for f in file_to_be_close:
         f.close()
+
+    if cluster_features:
+        clus = classifier.cluster_features(5, 3, 4)
+        print(clus)
+        
     return matches
 
 
