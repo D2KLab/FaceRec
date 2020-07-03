@@ -3,8 +3,8 @@
 /data/
 /video/
 /database/
-/data/classifier/
 /config
+/evaluation
 
 /visualizer/node_modules
 

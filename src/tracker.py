@@ -8,6 +8,7 @@ from mtcnn import MTCNN
 
 import src.database as database
 from .FaceRecogniser import Classifier
+from .FaceAligner import FaceAligner
 from .SORT.sort import Sort
 from .utils import utils, uri_utils, media_fragment
 from .utils.face_utils import judge_side_face
@@ -46,7 +47,7 @@ def parse_fragment(fragment, fps):
 
 def main(video_path, project='general', video_speedup=25, export_frames=False, fragment=None, video_id=None):
     cluster_features = True
-    
+
     if not video_id:
         video_id = video_path
     video_capture = cv2.VideoCapture(video_path)
@@ -68,7 +69,8 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
 
     classifier = Classifier(classifier_path)
     classifier.collect_features = cluster_features
-    
+    aligner = FaceAligner(desiredFaceWidth=160, margin=10)
+
     detector = MTCNN(min_face_size=25)
 
     # init tracker
@@ -82,7 +84,7 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
     scale_rate = 0.9 if width > 700 else 1
 
     frame_start = 0
-    frame_end = 2000 # video_length
+    frame_end = video_length
     if fragment is not None:
         frame_start, frame_end = parse_fragment(fragment, fps)
 
@@ -110,17 +112,16 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
         # print('Detected %d faces' % len(bounding_boxes))
         for item in bounding_boxes:
             bb = utils.xywh2rect(*utils.fix_box(item['box']))
+            face_list.append(bb)
+
             # use 5 face landmarks to judge the face is front or side
             facial_landmarks = list(item['keypoints'].values())
-            face_list.append(bb)
+            dist_rate, high_ratio_variance, width_rate = judge_side_face(facial_landmarks)
+            # dist_rate 0 => front face ; 1 => side face
 
             # face cropped
             cropped = frame.copy()[bb[1]:bb[3], bb[0]:bb[2], :]
 
-            dist_rate, high_ratio_variance, width_rate = judge_side_face(facial_landmarks)
-
-            # face additional attribute
-            # (index 0:face score; index 1:0 represents front face and 1 for side face )
             attribute_list.append([cropped, item['confidence'], dist_rate, high_ratio_variance, width_rate])
 
         trackers = tracker.update(np.array(face_list), img_size, cluster_path, attribute_list, rgb_frame)
@@ -139,8 +140,9 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
             trackers_writer.writerow([str(i) for i in d] + [str(frame_no)])
 
             # cutting the img on the face
-            trackers_cropped = frame[d[1]:d[3], d[0]:d[2], :]
-            boxname = str(frame_no)+"_"+str(d[0])+"_"+str(d[1])+"_"+str(d[2])+"_"+str(d[3])
+            trackers_cropped = aligner.align(frame[d[1]:d[3], d[0]:d[2], :])
+
+            boxname = str(frame_no) + "_" + str(d[0]) + "_" + str(d[1]) + "_" + str(d[2]) + "_" + str(d[3])
             best_name, best_prob = classifier.predict_best(trackers_cropped, boxname)
 
             npt = utils.frame2npt(frame_no, fps)
@@ -180,7 +182,7 @@ def main(video_path, project='general', video_speedup=25, export_frames=False, f
     if cluster_features:
         clus = classifier.cluster_features(5, 3, 4)
         print(clus)
-        
+
     return matches
 
 

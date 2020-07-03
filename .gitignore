@@ -4,6 +4,9 @@
 /database/
 /data/classifier/
 
+evaluation/dataset/
+evaluation/frames/
+
 .idea
 
 # Byte-compiled / optimized / DLL files
