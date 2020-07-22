@@ -132,14 +132,16 @@ class Tracker:
                 # face cropped
                 cropped = frame.copy()[bb[1]:bb[3], bb[0]:bb[2], :]
 
-                attribute_list.append([cropped, item['confidence'], dist_rate, high_ratio_variance, width_rate])
+                attribute_list.append(
+                    [cropped, item['confidence'], dist_rate, high_ratio_variance, width_rate, facial_landmarks])
 
             trackers = tracker.update(np.array(face_list), img_size, cluster_path, attribute_list, rgb_frame)
             tracker_sample = tracker.frame_count
             # this is a counter of the frame analysed by the tracker (so normalised respect to the video_speedup)
 
             for d in trackers:
-                d = d.astype(int)
+                landmarks = d[5][-1]
+                d = d[0:5].astype(int)
                 # the predicted position is outside the image
                 if any(i < 0 for i in d) \
                         or d[0] >= frame_width or d[2] >= frame_width \
@@ -150,7 +152,7 @@ class Tracker:
                 trackers_writer.writerow([str(i) for i in d] + [str(frame_no)])
 
                 # cutting the img on the face
-                trackers_cropped = self.aligner.align(frame[d[1]:d[3], d[0]:d[2], :])
+                trackers_cropped = self.aligner.align(frame, (d[0:4], landmarks))
 
                 boxname = str(frame_no) + "_" + str(d[0]) + "_" + str(d[1]) + "_" + str(d[2]) + "_" + str(d[3])
                 best_name, best_prob = self.classifier.predict_best(trackers_cropped, boxname)

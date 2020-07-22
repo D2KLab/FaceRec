@@ -71,7 +71,7 @@ class Sort:
             d = trk.get_state()
 
             if (trk.time_since_update < 1) and (trk.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
-                ret.append(np.concatenate((d, [trk.id])).reshape(1, -1))
+                ret.append(np.concatenate((d, [trk.id, trk.face_additional_attribute])).reshape(1, -1))
             i -= 1
             # remove dead tracklet
             if trk.time_since_update >= self.max_age or \
@@ -81,4 +81,4 @@ class Sort:
         if len(ret) > 0:
             return np.concatenate(ret)
 
-        return np.empty((0, 5))
+        return np.empty((0, 6))
