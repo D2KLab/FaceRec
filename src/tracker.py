@@ -4,10 +4,10 @@ import os
 
 import cv2
 import numpy as np
-from mtcnn import MTCNN
 
 import src.database as database
 from .FaceRecogniser import Classifier
+from .FaceDetector import FaceDetector
 from .FaceAligner import FaceAligner
 from .SORT.sort import Sort
 from .utils import utils, media_fragment
@@ -58,7 +58,7 @@ class Tracker:
         classifier_path = os.path.join('data/classifier', project + '.pkl')
         self.classifier = Classifier(classifier_path)
         self.aligner = FaceAligner(desiredFaceWidth=160, margin=10)
-        self.detector = MTCNN(min_face_size=25)
+        self.detector = FaceDetector(detect_multiple_faces=True, min_face_size=25)
 
     def run(self, video_path, video_speedup=25, export_frames=False, fragment=None, video_id=None):
         cluster_features = True  # TODO parametrise
@@ -117,30 +117,26 @@ class Tracker:
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             rgb_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_GRAY2RGB)
             img_size = np.asarray(frame.shape)[0:2]
-            bounding_boxes = self.detector.detect_faces(rgb_frame)
+            bounding_boxes, landmarks = self.detector.detect(rgb_frame)
 
             # print('Detected %d faces' % len(bounding_boxes))
-            for item in bounding_boxes:
+            for item, landmarks in zip(bounding_boxes, landmarks):
                 bb = utils.xywh2rect(*utils.fix_box(item['box']))
                 face_list.append(bb)
 
                 # use 5 face landmarks to judge the face is front or side
-                facial_landmarks = list(item['keypoints'].values())
-                dist_rate, high_ratio_variance, width_rate = judge_side_face(facial_landmarks)
+                # TODO use this value
+                # dist_rate, high_ratio_variance, width_rate = judge_side_face(landmarks)
                 # dist_rate 0 => front face ; 1 => side face
 
-                # face cropped
-                cropped = frame.copy()[bb[1]:bb[3], bb[0]:bb[2], :]
-
-                attribute_list.append(
-                    [cropped, item['confidence'], dist_rate, high_ratio_variance, width_rate, facial_landmarks])
+                attribute_list.append(landmarks)
 
             trackers = tracker.update(np.array(face_list), img_size, cluster_path, attribute_list, rgb_frame)
             tracker_sample = tracker.frame_count
             # this is a counter of the frame analysed by the tracker (so normalised respect to the video_speedup)
 
             for d in trackers:
-                landmarks = d[5][-1]
+                landmarks = d[5]
                 d = d[0:5].astype(int)
                 # the predicted position is outside the image
                 if any(i < 0 for i in d) \
