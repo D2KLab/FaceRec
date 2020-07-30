@@ -19,7 +19,9 @@ def select_best(predictions, class_names):
 
 
 class Classifier:
-    def __init__(self, classifier_path='data/classifier/classifier.pkl', facenet_model='./model/facenet_keras.h5',
+    def __init__(self,
+                 classifier_path='data/classifier/classifier.pkl',
+                 facenet_model='./model/facenet_keras.h5',
                  facenet_weights='./model/facenet_keras_weights.h5'):
         self.image_size = 160
 
@@ -90,7 +92,7 @@ class Classifier:
                 r.append(e[j][1])
                 print(' ', e[j][1])
             ret.append(r)
-            
+
         return ret
 
 
@@ -100,7 +102,7 @@ def main(video_path, output_path='data/cluster.txt',
     video_capture = cv2.VideoCapture(video_path)
 
     if folder_containing_frame is None:
-        folder_containing_frame = utils.generate_output_path('./data/frames', video_path)
+        folder_containing_frame = utils.generate_output_path('./data/frames', '', video_path=video_path)
 
     detector = MTCNN()
 

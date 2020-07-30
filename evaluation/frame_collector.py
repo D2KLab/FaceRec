@@ -1,17 +1,16 @@
 import os
-import re
 
 import cv2
-import numpy as np
 from mtcnn import MTCNN
 
 detector = MTCNN(min_face_size=25)
 
 
 class FrameCollector:
-    def __init__(self, video_path, project='general'):
+    def __init__(self, video_path, project='general', id=None):
         self.video_path = video_path
         self.video_capture = cv2.VideoCapture(video_path)
+        self.video_id = id if id is not None else video_path
 
         # setup all paths
         self.frames_path = './frames/%s/' % project
@@ -49,7 +48,7 @@ class FrameCollector:
         # if there is at least 1 face, try predict
 
         # save the frame
-        fname = self.video_path.split('/')[-1].split('.')[0]
+        fname = self.video_id.split('/', 4)[-1].replace('/', '_').split('.')[0]
         filename = os.path.join(self.frames_path, fname + '_%d.jpg' % frame_no)
         cv2.imwrite(filename, frame)
         return filename

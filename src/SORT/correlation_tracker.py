@@ -2,7 +2,12 @@
 @author: Mahmoud I.Zidan & Linzai
 """
 
-from dlib import correlation_tracker, rectangle
+try:
+    from dlib import correlation_tracker, rectangle
+except ImportError:
+    correlation_tracker = None
+    rectangle = None
+
 
 '''Appearance Model'''
 
@@ -11,6 +16,8 @@ class CorrelationTracker:
     count = 0
 
     def __init__(self, bbox, img):
+        if not correlation_tracker:
+            raise RuntimeError('The correlation tracker requires dlib to be installed')
         self.tracker = correlation_tracker()
         self.tracker.start_track(img, rectangle(int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])))
         self.confidence = 0.  # measures how confident the tracker is! (a.k.a. correlation score)

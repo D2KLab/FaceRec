@@ -5,7 +5,7 @@ import os
 import cv2
 import numpy as np
 
-import src.database as database
+from . import database
 from .FaceRecogniser import Classifier
 from .FaceDetector import FaceDetector
 from .FaceAligner import FaceAligner
@@ -120,23 +120,25 @@ class Tracker:
             bounding_boxes, landmarks = self.detector.detect(rgb_frame)
 
             # print('Detected %d faces' % len(bounding_boxes))
-            for item, landmarks in zip(bounding_boxes, landmarks):
-                bb = utils.xywh2rect(*utils.fix_box(item['box']))
+            for item, ld in zip(bounding_boxes, landmarks):
+                bb = utils.xywh2rect(*utils.fix_box(item))
                 face_list.append(bb)
 
                 # use 5 face landmarks to judge the face is front or side
                 # TODO use this value
-                # dist_rate, high_ratio_variance, width_rate = judge_side_face(landmarks)
+                dist_rate, high_ratio_variance, width_rate = judge_side_face(ld)
                 # dist_rate 0 => front face ; 1 => side face
 
-                attribute_list.append(landmarks)
+                cropped = frame.copy()[bb[1]:bb[3], bb[0]:bb[2], :]
+
+                attribute_list.append([cropped, 0.99, dist_rate, high_ratio_variance, width_rate, ld])
 
             trackers = tracker.update(np.array(face_list), img_size, cluster_path, attribute_list, rgb_frame)
             tracker_sample = tracker.frame_count
             # this is a counter of the frame analysed by the tracker (so normalised respect to the video_speedup)
 
             for d in trackers:
-                landmarks = d[5]
+                ld = d[5]
                 d = d[0:5].astype(int)
                 # the predicted position is outside the image
                 if any(i < 0 for i in d) \
@@ -148,7 +150,7 @@ class Tracker:
                 trackers_writer.writerow([str(i) for i in d] + [str(frame_no)])
 
                 # cutting the img on the face
-                trackers_cropped = self.aligner.align(frame, (d[0:4], landmarks))
+                trackers_cropped = self.aligner.align(frame, (d[0:4], ld))
 
                 boxname = str(frame_no) + "_" + str(d[0]) + "_" + str(d[1]) + "_" + str(d[2]) + "_" + str(d[3])
                 best_name, best_prob = self.classifier.predict_best(trackers_cropped, boxname)

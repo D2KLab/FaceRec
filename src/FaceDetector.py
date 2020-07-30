@@ -13,7 +13,7 @@ from .utils import utils
 class FaceDetector:
     def __init__(self, image_size=160, margin=10, detect_multiple_faces=False, min_face_size=20):
         self.aligner = FaceAligner(desiredFaceWidth=image_size, margin=margin)
-        self.detector = MTCNN(min_face_size)
+        self.detector = MTCNN(min_face_size=min_face_size)
         self.detect_multiple_faces = detect_multiple_faces
 
     def extract(self, img):
