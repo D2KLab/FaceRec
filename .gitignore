@@ -5,7 +5,10 @@
 /data/classifier/
 
 evaluation/dataset/
+evaluation/data/
 evaluation/frames/
+
+challenge/data/
 
 .idea
 
@@ -113,3 +116,4 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+*.jpg
