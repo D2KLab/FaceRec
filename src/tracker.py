@@ -61,7 +61,7 @@ class Tracker:
         self.detector = FaceDetector(detect_multiple_faces=True, min_face_size=25)
 
     def run(self, video_path, video_speedup=25, export_frames=False, fragment=None, video_id=None):
-        cluster_features = True  # TODO parametrise
+        cluster_features = False # TODO parametrise
 
         video_capture = cv2.VideoCapture(video_path)
 
