@@ -13,7 +13,6 @@ Vue.use(VueRouter);
 Vue.use(Buefy);
 Vue.use(Vuex);
 
-
 Vue.filter('formatDate', (value) => value && moment(String(value)).format('DD/MM/YYYY hh:mm'));
 
 Vue.filter('formatNumber', (value) => numeral(value).format('0.00'));
@@ -30,13 +29,11 @@ const store = new Vuex.Store({ // eslint-disable-line no-new
   },
 });
 
-
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes,
 });
-
 
 new Vue({
   router,

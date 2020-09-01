@@ -43,15 +43,15 @@ def locator2video(locator):
     if locator is None or len(locator) == 0:
         return None
 
-    token = _get_token()
+    _token = _get_token()
 
     # moa
-    r = requests.get(url=locator, params={'access_token': token})
+    r = requests.get(url=locator, params={'access_token': _token})
     data = r.json()
     moi = data['hrefs']['moi']
 
     # moi
-    r = requests.get(url=moi, params={'access_token': token})
+    r = requests.get(url=moi, params={'access_token': _token})
     data = r.json()
     videos = [d for d in data if d['mimeType'].startswith('video')]
     if len(videos) == 0:
@@ -59,5 +59,5 @@ def locator2video(locator):
     download_link = videos[0]['hrefs']['downloadLink']
 
     # downloadLink
-    r = requests.get(url=download_link, params={'access_token': token})
+    r = requests.get(url=download_link, params={'access_token': _token})
     return r.text

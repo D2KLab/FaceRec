@@ -2,7 +2,6 @@
 
 <style scoped lang="stylus" src='./Person.styl'></style>
 
-
 <script>
 import {
   getTrainingSet, SERVER, getDisabled, setDisabled, crawl,
@@ -25,7 +24,6 @@ function arraysIdentical(a, b) {
   }
   return true;
 }
-
 
 export default {
   name: 'Person',

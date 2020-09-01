@@ -1,0 +1,14 @@
+\begin{tabular}{lrrrr}
+\toprule
+                     index &  precision &    recall &    fscore &  support \\
+\midrule
+          Le Saint, Sophie &   0.666667 &  0.800000 &  0.727273 &       10 \\
+       Delahousse, Laurent &   0.428571 &  0.600000 &  0.500000 &        5 \\
+              Lucet, Elise &   0.714286 &  0.500000 &  0.588235 &       10 \\
+           Gastrin, Sophie &   0.857143 &  0.600000 &  0.705882 &       10 \\
+ Rincquesen, Nathanaël de &   0.421053 &  0.800000 &  0.551724 &       10 \\
+            Drucker, Marie &   0.600000 &  0.900000 &  0.720000 &       10 \\
+                         0 &   0.515152 &  0.377778 &  0.435897 &       45 \\
+          tot (excluded 0) &   0.631533 &  0.709091 &  0.644203 &      100 \\
+\bottomrule
+\end{tabular}

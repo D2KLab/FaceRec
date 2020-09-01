@@ -3,7 +3,6 @@ import numpy as np
 
 def judge_side_face(facial_landmarks):
     fl = facial_landmarks
-    print('here')
     wide_dist = np.linalg.norm(np.subtract(fl['left_eye'], fl['right_eye']))
     high_dist = np.linalg.norm(np.subtract(fl['left_eye'], fl['mouth_left']))
     dist_rate = high_dist / wide_dist

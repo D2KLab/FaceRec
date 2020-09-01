@@ -8,7 +8,7 @@ import pandas as pd
 from scipy.spatial import distance
 from sklearn.utils.extmath import weighted_mode
 
-from .utils.utils import  rect2xywh, generate_output_path
+from .utils.utils import rect2xywh, generate_output_path
 
 
 # IMPORTANT: this has to be run AFTER the tracker
@@ -30,6 +30,8 @@ def update_rect_in(previous_cluster, rects):
 
 # predictions is a pandas dataframe
 def main(predictions, confidence_threshold=0.7, dominant_ratio=0.4, merge_cluster=False, min_length=1):
+    if len(predictions) < 1:
+        return []
     predictions = predictions.sort_values(by=['track_id', 'tracker_sample'])
     # filter out tracks with less than 3 records
     stat = predictions.groupby('track_id').size().to_frame('size')
@@ -101,7 +103,8 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.4, merge_cluste
             del previous_cluster['npt']
             del previous_cluster['frame']
             del previous_cluster['tracker_sample']
-            del previous_cluster['_id']
+            if '_id' in previous_cluster:
+                del previous_cluster['_id']
 
         if previous_cluster is not None:  # last cluster
             person_clusters.append(previous_cluster['track_id'])
