@@ -41,7 +41,8 @@ export async function setDisabled(project, list) {
 
 export async function getDisabled(project) {
   const data = await axios.get(`${SERVER}disabled/${project}`);
-  return data.data;
+  const x = data.data;
+  return x.map((y) => y.replace('data/', SERVER));
 }
 
 export async function crawl(q, project) {

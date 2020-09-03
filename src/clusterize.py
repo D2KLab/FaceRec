@@ -6,6 +6,7 @@ import shutil
 import numpy as np
 import pandas as pd
 from scipy.spatial import distance
+from scipy.stats import mode
 from sklearn.utils.extmath import weighted_mode
 
 from .utils.utils import rect2xywh, generate_output_path
@@ -29,7 +30,8 @@ def update_rect_in(previous_cluster, rects):
 
 
 # predictions is a pandas dataframe
-def main(predictions, confidence_threshold=0.7, dominant_ratio=0.4, merge_cluster=False, min_length=1):
+def main(predictions, confidence_threshold=0.7, dominant_ratio=0.6, weighted_dominant_ratio=0.4, merge_cluster=False,
+         min_length=1):
     if len(predictions) < 1:
         return []
     predictions = predictions.sort_values(by=['track_id', 'tracker_sample'])
@@ -46,9 +48,10 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.4, merge_cluste
         predicted = involved.name.values.tolist()
         name = ""
         dominant, count = weighted_mode(predicted, confidences)
-        if count[0] / float(len(predicted)) > dominant_ratio:
+        dominant2, count2 = mode(predicted)
+        if count[0] / float(len(predicted)) > weighted_dominant_ratio and dominant[0] == dominant2[0] and count2[
+            0] / float(len(predicted)) > dominant_ratio:
             name = dominant[0]
-
         interest_cluster.update({track: name})
 
     known_persons = list(set([j for i, j in interest_cluster.items() if j]))
@@ -81,6 +84,7 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.4, merge_cluste
                 confidence = x[x.name == person].confidence.mean()
                 previous_cluster['confidence'] = ((confidence_prev * duration_prev) + (
                         confidence * duration_cur)) / (duration_prev + duration_cur)
+
                 continue
                 # in case, merge the folders
             elif previous_cluster is not None:

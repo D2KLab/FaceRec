@@ -106,7 +106,7 @@ class Training(Resource):
     def get(self, project):
         start_time = time.time()
 
-        classifier.main(classifier='SVM', project=project, discard_disabled=True)
+        classifier.main(classifier='SVM', project=project, discard_disabled="true")
         return jsonify({
             'task': 'train',
             'time': now(),
@@ -212,7 +212,8 @@ class Disabled(Resource):
         DISABLED_FILE = os.path.join(TRAINING_IMG, project, 'disabled.txt')
 
         if not os.path.isfile(DISABLED_FILE):
-            return jsonify([])
+            # automatic disable
+            return jsonify(classifier.get_outlier_list(project))
 
         with open(DISABLED_FILE) as f:
             dis = f.read().split('\n')
