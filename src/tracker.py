@@ -28,7 +28,7 @@ def export_frame(input_frame, d, classname, frame_num, frames_path):
 
     # print([str(i) for i in d] + [classname, str(frame_num)])
 
-    filename = 'frame' + str(frame_num) + '.jpg'
+    filename = 'frame_%d.t%d.jpg' % (frame_num, d[4])
     cv2.imwrite(os.path.join(frames_path, filename), frame)
 
 
@@ -60,9 +60,8 @@ class Tracker:
         self.aligner = FaceAligner(desiredFaceWidth=160, margin=10)
         self.detector = FaceDetector(detect_multiple_faces=True, min_face_size=25)
 
-    def run(self, video_path, video_speedup=25, export_frames=False, fragment=None, video_id=None):
-        cluster_features = False # TODO parametrise
-
+    def run(self, video_path, video_speedup=25, export_frames=False, fragment=None, video_id=None, verbose=True,
+            cluster_features=True):
         video_capture = cv2.VideoCapture(video_path)
 
         # setup all paths
@@ -101,7 +100,8 @@ class Tracker:
         matches = []
         # iterate over the frames
         for frame_no in np.arange(frame_start, frame_end, video_speedup):
-            print('frame %d/%d' % (frame_no, frame_end))
+            if verbose:
+                print('frame %d/%d' % (frame_no, frame_end))
             video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
 
             # read the frame
@@ -152,8 +152,7 @@ class Tracker:
                 # cutting the img on the face
                 trackers_cropped = self.aligner.align(frame, (d[0:4], ld))
 
-                boxname = str(frame_no) + "_" + str(d[0]) + "_" + str(d[1]) + "_" + str(d[2]) + "_" + str(d[3])
-                best_name, best_prob = self.classifier.predict_best(trackers_cropped, boxname)
+                best_name, best_prob = self.classifier.predict_best(trackers_cropped, [frame_no, d[0:4]])
 
                 npt = utils.frame2npt(frame_no, fps)
                 predictions_writer.writerow(
@@ -183,7 +182,8 @@ class Tracker:
         # TODO final track
 
         if database.is_on():
-            print('COMPLETE')
+            if verbose:
+                print('COMPLETE')
             database.save_status(video_id, self.project, 'COMPLETE')
 
         for f in file_to_be_close:
