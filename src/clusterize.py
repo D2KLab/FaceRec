@@ -84,7 +84,7 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.6, weighted_dom
                 confidence = x[x.name == person].confidence.mean()
                 previous_cluster['confidence'] = ((confidence_prev * duration_prev) + (
                         confidence * duration_cur)) / (duration_prev + duration_cur)
-
+                previous_cluster['merged_tracks'].append(int(x.track_id.iloc[0]))
                 continue
                 # in case, merge the folders
             elif previous_cluster is not None:
@@ -101,6 +101,7 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.6, weighted_dom
             confidence = x[x.name == person].confidence
             previous_cluster['confidence'] = confidence.mean()
             previous_cluster['name'] = person
+            previous_cluster['merged_tracks'] = [int(previous_cluster['track_id'])]
 
             update_rect_in(previous_cluster, x.rect.values.tolist())
 
@@ -119,6 +120,42 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.6, weighted_dom
     final_clusters = [s for s in final_clusters
                       if longer_than(min_length, s) and s['confidence'] >= confidence_threshold]
     return sanitize(final_clusters)
+
+
+def unknown_clusterise(feat_clusters, assigned_tracks, raw_tracks):
+    tracks_done = []
+    for clus in feat_clusters:
+        elems = clus['elements']
+        if any([x['track'] in assigned_tracks for x in elems]):
+            continue
+
+        for e in elems:
+            tr = e['track']
+            if tr in tracks_done:
+                continue
+
+            raw_tracks.loc[raw_tracks.track_id == tr, 'name'] = f'Unknown {clus["id"]}'
+            tracks_done.append(tr)
+
+    tracks = raw_tracks[raw_tracks.track_id.isin(tracks_done)]
+    tracks = main(tracks, confidence_threshold=0, dominant_ratio=0, weighted_dominant_ratio=0, merge_cluster=True,
+                  min_length=1)
+    total_time = {}
+    for t in tracks:
+        del t['confidence']
+        t['unknown'] = True
+        if '_id' in t:
+            del t['_id']
+
+        time = t['end_npt'] - t['start_npt']
+        if t['name'] not in total_time:
+            total_time[t['name']] = time
+        else:
+            total_time[t['name']] += time
+
+    output = [t for t in tracks if total_time[t['name']] > 5]
+
+    return output
 
 
 def longer_than(length, cluster):

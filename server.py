@@ -159,8 +159,13 @@ class Track(Resource):
             video['status'] = 'RUNNING'
             Thread(target=run_tracker, args=(locator, speedup, video_id, project)).start()
         elif 'tracks' in video and len(video['tracks']) > 0:
-            video['tracks'] = clusterize.main(clusterize.from_dict(video['tracks']),
-                                              confidence_threshold=0, merge_cluster=True)
+            raw_tracks = clusterize.from_dict(video['tracks'])
+
+            video['tracks'] = clusterize.main(raw_tracks, confidence_threshold=0, merge_cluster=True)
+            assigned_tracks = [t['merged_tracks'] for t in video['tracks']]
+            if 'feat_clusters' in video:
+                video['feat_clusters'] = clusterize.unknown_clusterise(video['feat_clusters'], assigned_tracks,
+                                                                       raw_tracks)
 
         if '_id' in video:
             del video['_id']  # the database id should not appear on the output

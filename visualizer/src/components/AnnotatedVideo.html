@@ -27,6 +27,11 @@
               {{d.name}} <small>Confidence: {{d.confidence | formatNumber}}</small>
             </li>
           </ul>
+          <label>
+            Show unknown:
+            <input type="checkbox" v-model="showunknown" name="showunknown"/>
+          </label>
+
         </div>
         <div class="column legenda">
           <p>In this video:</p>

@@ -28,7 +28,7 @@ class Classifier:
         self.facenet = load_model(facenet_model, compile=False)
         self.facenet.load_weights(facenet_weights)
         self.features = []
-        self.boxnames = []
+        self.meta = []
         self.collect_features = False
 
         # Load classifier
@@ -46,43 +46,67 @@ class Classifier:
         emb_arrayx = [utils.get_embedding(self.facenet, face_pixels) for face_pixels in scaled]
         emb_array = np.asarray(emb_arrayx)
         if self.collect_features:
-            # print(boxname) ; cv2.imwrite(boxname+".png", scaledx)
-            self.features.append(emb_array[0])
-            self.boxnames.append(meta)
+            _, _, rect, _ = meta
+            dim = (rect[3] - rect[1]) * (rect[2] - rect[0])
+            if dim >= 2000:
+                self.features.append(emb_array[0])
+                self.meta.append(meta)
         return self.classifier.predict_proba(emb_array).flatten()
 
     def predict_best(self, img, meta=None):
         predictions = self.predict(img, meta)
         return select_best(predictions, self.class_names)
 
-    def cluster_features(self, nclusters, minsamples, maxsamples):
-        print('NOW CLUSTERING', len(self.features),
-              'feature vectors of dimensionality', len(self.features[0]),
-              'to', nclusters, 'clusters and showing max', maxsamples,
-              'samples of clusters that contain min', minsamples, 'vectors')
+    def cluster_features(self, clustering_distance=14, distance_threshold=1.3, side_face_threshold=0.6, min_samples=7,
+                         max_samples=5, min_involved_tracks=3):
+        # print('NOW CLUSTERING', len(self.features),
+        #       'feature vectors of dimensionality', len(self.features[0]),
+        #       'to', nclusters, 'clusters and showing max', maxsamples,
+        #       'samples of clusters that contain min', minsamples, 'vectors')
         features = np.array(self.features)
         link = cluster.hierarchy.linkage(features, method='complete')
-        print(link)
-        fc = cluster.hierarchy.fcluster(link, nclusters, criterion='maxclust')
-        ret = []
-        for i in range(nclusters):
-            cur_indexes = [j for j, k in enumerate(fc) if k == i + 1]
-            x = features[cur_indexes]
-            y = np.array(self.boxnames)[cur_indexes]
+        fc = cluster.hierarchy.fcluster(link, clustering_distance, criterion='distance')
+        clusters = []
+        for i in np.unique(fc):
+            cur_indexes = [j for j, k in enumerate(fc) if k == i]
+            x = np.array(features)[cur_indexes]
+            y = np.array(self.meta)[cur_indexes]
 
             m = np.mean(x, axis=0)
-            d = np.linalg.norm(x - m, axis=1)
-            d = zip(range(len(d)), y, d)
-            e = sorted(d, key=lambda a: a[2])
+            avg = np.linalg.norm(x - m, axis=1)
+            e = sorted(zip(y, avg), key=lambda a: a[1])
 
-            eff_m = min(len(e) // 2, maxsamples)
-            if len(e) < minsamples:
-                eff_m = 0
-            print('cluster', i + 1, 'has total', len(x), 'samples, showing', eff_m)
-            r = [e[j][1] for j in range(eff_m)]
-            ret.append(r)
+            if len(e) < min_samples:
+                continue
 
-        return ret
+            avg = np.mean(avg)
+            distance_score = avg / len(e)
+
+            if distance_score > distance_threshold:
+                continue
+
+            elements = [x[0] for x in e]
+            involved_tracks = np.unique([track for frame_no, track, bb, ld in elements])
+            if len(involved_tracks) < min_involved_tracks:
+                continue
+            # TODO
+            # if any([x in official_cluster_mapping for x in involved_tracks]):
+            #     continue
+
+            lds = [ld for frame_no, track, bb, ld in elements[0:5]]
+            side_face_score = np.sum([(1 / (i + 1) * ld) for i, ld in enumerate(lds)]) / len(lds)
+            if side_face_score > side_face_threshold:
+                continue
+
+            clusters.append({
+                'id': len(clusters),
+                'elements': [{
+                    'frame': int(frame_no),
+                    'track': int(track),
+                    'rect': [int(b) for b in bb]
+                } for frame_no, track, bb, ld in elements[0:max_samples]]
+            })
+        return clusters
 
 
 def main(video_path, output_path='data/cluster.txt',

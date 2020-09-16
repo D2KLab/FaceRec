@@ -140,6 +140,9 @@ class Tracker:
             for d in trackers:
                 ld = d[5]
                 d = d[0:5].astype(int)
+
+                dist_rate, high_ratio_variance, width_rate = judge_side_face(ld)
+
                 # the predicted position is outside the image
                 if any(i < 0 for i in d) \
                         or d[0] >= frame_width or d[2] >= frame_width \
@@ -152,7 +155,8 @@ class Tracker:
                 # cutting the img on the face
                 trackers_cropped = self.aligner.align(frame, (d[0:4], ld))
 
-                best_name, best_prob = self.classifier.predict_best(trackers_cropped, [frame_no, d[0:4]])
+                best_name, best_prob = self.classifier.predict_best(trackers_cropped,
+                                                                    [frame_no, d[4], d[0:4], dist_rate])
 
                 npt = utils.frame2npt(frame_no, fps)
                 predictions_writer.writerow(
@@ -182,17 +186,24 @@ class Tracker:
         # TODO final track
 
         if database.is_on():
-            if verbose:
-                print('COMPLETE')
             database.save_status(video_id, self.project, 'COMPLETE')
 
         for f in file_to_be_close:
             f.close()
 
         if cluster_features:
-            clus = self.classifier.cluster_features(5, 3, 4)
-            print(clus)
+            if verbose:
+                print('Feature clustering started')
+            clus = self.classifier.cluster_features()
+            for c in clus:
+                c['video'] = video_id
+                c['project'] = self.project
+            if database.is_on():
+                database.insert_feat_cluster(clus)
+            return matches, cluster_features
 
+        if verbose:
+            print('COMPLETE')
         return matches
 
 

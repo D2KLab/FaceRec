@@ -40,6 +40,7 @@ export default {
     return {
       url: null,
       confidence: 0.7,
+      showunknown: false,
       locator: null,
       results: [],
       boxes: [],
@@ -49,7 +50,7 @@ export default {
   computed: {
     data() {
       return this.results
-        .filter((d) => d.confidence >= this.confidence);
+        .filter((d) => d.confidence >= this.confidence || (this.showunknown && d.unknown));
     },
     classes() {
       const classes = [...new Set(this.data.map((c) => c.name))];
@@ -88,7 +89,7 @@ export default {
     trigService() {
       recognise(this.$route.query.v, this.$store.state.proj)
         .then((data) => {
-          this.results = data.tracks || [];
+          this.results = data.tracks.concat(data.feat_clusters) || [];
           this.results = this.results.sort((a, b) => ((a.start_npt > b.start_npt) ? 1 : -1));
 
           if (data.status === 'RUNNING') {

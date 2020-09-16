@@ -3,7 +3,6 @@ import yaml
 from enum import Enum
 from pymongo import MongoClient
 
-
 on = False
 db = None
 
@@ -75,11 +74,21 @@ def get_status(uri, project):
 
 
 def clean_analysis(uri, project):
+    db.feat_cluster.remove({'video': uri, 'project': project})
     return db.track.remove({'locator': uri, 'project': project})
 
 
 def insert_partial_analysis(track):
     return db.track.insert_one(track)
+
+
+def insert_feat_cluster(clusters):
+    for x in clusters:
+        db.feat_cluster.insert_one(x)
+
+
+def get_feat_cluster(uri, project):
+    return list(db.feat_cluster.find({'video': uri, 'project': project}))
 
 
 def get_analysis(uri, project):
@@ -96,5 +105,6 @@ def get_all_about(uri, project):
             v['status'] = status.name
             v['project'] = project
             v['tracks'] = get_analysis(locator, project)
+            v['feat_clusters'] = get_feat_cluster(locator, project)
 
     return v
