@@ -39,6 +39,11 @@ export async function setDisabled(project, list) {
   return data.data;
 }
 
+export async function getAppearances(person, project) {
+  const data = await axios.get(`${SERVER}appearance/${person}?project=${project}`);
+  return data.data;
+}
+
 export async function getDisabled(project) {
   const data = await axios.get(`${SERVER}disabled/${project}`);
   const x = data.data;
@@ -47,5 +52,10 @@ export async function getDisabled(project) {
 
 export async function crawl(q, project) {
   const data = await axios.get(`${SERVER}crawler`, { params: { q, project } });
+  return data.data;
+}
+
+export async function train(project) {
+  const data = await axios.get(`${SERVER}train/${project}`);
   return data.data;
 }

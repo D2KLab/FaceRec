@@ -4,7 +4,7 @@
 
 <script>
 import {
-  getTrainingSet, SERVER, getDisabled, setDisabled, crawl,
+  getTrainingSet, SERVER, getDisabled, getAppearances, setDisabled, crawl,
 } from '@/services/face-recognition';
 
 function toggle(collection, item) {
@@ -31,6 +31,7 @@ export default {
     return {
       person: '',
       paths: [],
+      appearences: [],
       disabled: [],
       disabledOrigin: [],
       crawling: false,
@@ -46,6 +47,11 @@ export default {
       .then((d) => {
         this.disabledOrigin = d.slice();
         this.disabled = d.slice();
+      });
+
+    getAppearances(this.person, this.$store.state.proj)
+      .then((d) => {
+        this.appearences = Array.from(new Set(d.map((s) => s.locator)));
       });
   },
   methods: {

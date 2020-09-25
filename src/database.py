@@ -108,3 +108,7 @@ def get_all_about(uri, project):
             v['feat_clusters'] = get_feat_cluster(locator, project)
 
     return v
+
+
+def get_video_with(person, project):
+    return list(db.track.find({'name': person, 'project': project, 'confidence': {'$gte': 0.6}}))

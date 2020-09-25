@@ -43,6 +43,18 @@
           <router-link :to="{name: 'person', query: {p: p.class, project: $store.state.proj}}">{{p.class}}</router-link>
         </li>
       </ul>
+</div>
+</section>
+<section class="section">
+  <div class="container">
+
+      <h1 class="title">Train the model</h1>
+      When you are satisfied with the list of people, start the training!
+
+      <div class="buttons">
+        <button class="button is-success" :class="{'is-loading': training}" @click="startTrain()">Start Training</button>
+      </div>
+
 
     </div>
   </section>

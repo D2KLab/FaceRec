@@ -1,5 +1,6 @@
 import datetime
 import os
+import json
 import time
 from threading import Thread
 
@@ -11,6 +12,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from src import *
 from src.connectors import antract_connector as antract
 from src.utils import utils, uri_utils
+from bson.json_util import dumps
 
 TRAINING_IMG = 'data/training_img_aligned/'
 
@@ -90,7 +92,7 @@ class Crawler(Resource):
         project = request.args.get('project', default='general')
 
         for keyword in q.split(';'):
-            crawler.main(keyword, max_num=100, project=project)
+            crawler.main(keyword, max_num=30, project=project)
 
         return jsonify({
             'task': 'crawl',
@@ -202,6 +204,13 @@ def get_metadata():
         return jsonify(antract.get_metadata_for(path)[0])
     else:
         return None
+
+
+@flask_app.route('/appearance/<string:person>')
+def get_appearances(person):
+    project = request.args.get('project')
+
+    return jsonify(json.loads(dumps(database.get_video_with(person, project))))
 
 
 @flask_app.route('/training_img_aligned/<path:subpath>')

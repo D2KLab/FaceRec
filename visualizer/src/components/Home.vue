@@ -1,7 +1,7 @@
 <template src="./Home.html" ></template>
 
 <script>
-import { getTrainingSet } from '@/services/face-recognition';
+import { getTrainingSet, train } from '@/services/face-recognition';
 
 const EXAMPLES = {
   memad: 'http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e',
@@ -15,6 +15,7 @@ export default {
       video: '',
       people: [],
       projects: [],
+      training: false,
     };
   },
   computed: {
@@ -23,6 +24,14 @@ export default {
   mounted() {
     getTrainingSet(this.$store.state.proj)
       .then((p) => { this.people = p; });
+  },
+  methods: {
+
+    startTrain() {
+      this.training = true;
+      train(this.$store.state.proj)
+        .then(() => { this.training = false; });
+    },
   },
 };
 </script>

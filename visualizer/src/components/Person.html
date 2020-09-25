@@ -17,10 +17,19 @@
       <button class="button" @click="reset()">Reset</button>
     </div>
 
-    <ul>
+    <ul class='pics'>
       <li v-for="p in paths" @click="togglePath($event, p)" :class="{disabled: disabled.includes(p)}">
         <img :src='p' />
       </li>
     </ul>
+  </div>
+
+  <div v-if="appearences.length">
+    Appears in:
+    <ul>
+      <li v-for="a in appearences">
+        <router-link :to="{name: 'video', query: {v: a, project: $store.state.proj}}">{{a}}</router-link>
+      </li>
+      </ul>
   </div>
 </div>

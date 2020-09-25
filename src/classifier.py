@@ -76,7 +76,7 @@ def main(classifier='SVM', project='general', discard_disabled="true"):
 
     disabled_file = os.path.join(data_dir, 'disabled.txt')
     disabled = []
-    if discard_disabled == "true":
+    if discard_disabled == "true" and os.path.exists(disabled_file):
         with open(disabled_file) as f:
             disabled = [i.split('training_img_aligned/')[1] for i in f.read().splitlines() if i]
             print(disabled)
