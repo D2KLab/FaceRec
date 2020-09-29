@@ -3,14 +3,14 @@ import config from '../../app.config';
 
 export const SERVER = config.api;
 
-export async function recognise(video, project) {
-  const data = await axios.get(`${SERVER}track`, {
-    params: {
-      video,
-      project,
-      speedup: 25,
-    },
-  });
+export async function recognise(video, project, disableCache = false) {
+  const params = {
+    video,
+    project,
+    speedup: 25,
+  };
+  if (disableCache) params.no_cache = true;
+  const data = await axios.get(`${SERVER}track`, { params });
   return data.data;
 }
 

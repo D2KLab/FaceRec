@@ -44,8 +44,8 @@
 
     <h2>Segments</h2>
     <ul>
-      <li v-for="seg in data.segments ">
-        {{seg.label}}
+      <li v-for="seg in data.segments">
+        <a @click="toSeg(seg)">{{seg.label}}</a>
         <small>{{seg.start}} - {{seg.end}}</small>
       </li>
     </ul>

@@ -40,5 +40,10 @@ export default {
       return `<span class="flag-icon flag-icon-${value.language}"></span>${value.value}`;
     },
   },
+  methods: {
+    toSeg(seg) {
+      this.$root.$emit('toSeg', seg);
+    },
+  },
 };
 </script>

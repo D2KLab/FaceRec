@@ -19,7 +19,21 @@ def apply_auth(uri):
     return uri.replace(r"https://", "https://%s:%s@" % (cfg['username'], cfg['password']))
 
 
-def get_locator_for(media):
+def get_locator_for(uri):
+    # the uri can be a ebucore:MediaResource
+    results = get_media(uri)
+    if len(results) > 0:
+        return results[0]
+
+    # the uri can be a ebucore:TVProgramme
+    results = get_notice(uri)
+    if len(results) > 0:
+        return results[0]
+
+    return None
+
+
+def get_media(media):
     query = """%s
 SELECT DISTINCT * WHERE { 
     ?analysis a antract:AntractAnalysis ;
@@ -34,14 +48,30 @@ SELECT DISTINCT * WHERE {
  }""" % (PREFIXES, media)
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
-    results = sparql.query().convert()["results"]["bindings"]
-    if len(results):
-        return results[0]
-    else:
-        return {}
+    return sparql.query().convert()["results"]["bindings"]
 
 
-def get_metadata_for(media):
+def get_notice(media):
+    query = """%s
+    SELECT DISTINCT * WHERE { 
+    ?analysis a antract:AntractAnalysis ;
+             core:document ?media ;
+             core:layer / core:segment ?notice .
+    ?notice a ina:NoticeSujet ;
+        rdfs:label ?title .
+
+    ?media core:instance ?instance .
+    ?instance core:http_url ?locator .
+    VALUES ?notice { <%s> }
+ }""" % (PREFIXES, media)
+    sparql.setQuery(query)
+    sparql.setReturnFormat(JSON)
+    return sparql.query().convert()["results"]["bindings"]
+
+
+def get_metadata_for(uri):
+    x = get_locator_for(uri)
+    media = x['media']['value']
     query = {
         'proto': {
             'id': '?media',
@@ -74,3 +104,26 @@ def get_metadata_for(media):
         }
     }
     return sparqlTransformer(query, {'endpoint': ENDPOINT})
+
+
+def get_segment_for(person):
+    q = '''%s
+    SELECT DISTINCT ?media SAMPLE(?title) as ?title ?start ?end ?url WHERE {
+        ?notice ?prop ?person ;
+               rdfs:label %s ;
+               core:beginTime ?start ;
+               core:endTime ?end .
+    
+        ?analysis a antract:AntractAnalysis ;
+                 core:document ?media ;
+                 core:layer / core:segment ?notice .
+    
+        ?media core:instance / core:http_url ?url .
+    
+        VALUES ?prop {ina:imageContient ina:aPourParticipant ina:aPourInterprete}
+     }
+    ''' % (PREFIXES, person)
+
+    sparql.setQuery(q)
+    sparql.setReturnFormat(JSON)
+    return sparql.query().convert()["results"]["bindings"]

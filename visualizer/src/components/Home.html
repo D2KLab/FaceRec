@@ -29,7 +29,7 @@
           <input name='p' list='people'
           class="input is-large" type="uri" placeholder="Insert the name of a person" required>
           <datalist id="people">
-            <option v-for="p in people" v-bind:value="p.class"/>
+            <option v-for="p in autocomplete" v-bind:value="p.class || p"/>
           </datalist>
         </div>
         <div class="control">
@@ -49,7 +49,7 @@
   <div class="container">
 
       <h1 class="title">Train the model</h1>
-      When you are satisfied with the list of people, start the training!
+      <h2 class="subtitle">When you are satisfied with the list of people, start the training!</h2>
 
       <div class="buttons">
         <button class="button is-success" :class="{'is-loading': training}" @click="startTrain()">Start Training</button>

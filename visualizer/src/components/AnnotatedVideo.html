@@ -48,6 +48,14 @@
               </label>
             </li>
           </ul>
+
+          <div v-if='running'>
+            Analysis running <span class="loader" style='display: inline-block'></span>
+          </div>
+          <div class="buttons" v-else>
+            <button class="button is-success" @click="trigService(true)">Recompute</button>
+          </div>
+
         </div>
       </div>
 

@@ -41,6 +41,7 @@ export default {
       url: null,
       confidence: 0.7,
       showunknown: false,
+      running: false,
       locator: null,
       results: [],
       boxes: [],
@@ -76,6 +77,12 @@ export default {
       .then((d) => { this.locator = d; });
 
     this.trigService();
+
+    this.$root.$on('toSeg', (x) => {
+      const start = x.start.split(':').map((ss) => parseInt(ss, 10));
+      const sec = start[0] * 3600 + start[1] * 60 + start[2];
+      this.goToSecond(sec);
+    });
   },
   methods: {
     onPersonToggle($event, person) {
@@ -86,15 +93,17 @@ export default {
     goToSecond(second) {
       this.$refs.video.currentTime = second;
     },
-    trigService() {
-      recognise(this.$route.query.v, this.$store.state.proj)
+    trigService(disableCache = false) {
+      recognise(this.$route.query.v, this.$store.state.proj, disableCache)
         .then((data) => {
-          this.results = data.tracks.concat(data.feat_clusters) || [];
+          this.results = data.tracks || [];
+          this.results = this.results.concat(data.feat_clusters || []);
           this.results = this.results.sort((a, b) => ((a.start_npt > b.start_npt) ? 1 : -1));
 
-          if (data.status === 'RUNNING') {
-            // check for new results every 5 seconds
-            setTimeout(this.trigService, 5000);
+          this.running = data.status === 'RUNNING';
+          if (this.running) {
+            // check for new results every 15 seconds
+            setTimeout(this.trigService, 15000);
           }
         });
     },

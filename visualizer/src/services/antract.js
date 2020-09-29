@@ -1,5 +1,6 @@
 import axios from 'axios';
 import config from '../../app.config';
+import people from './antract.people';
 
 export const SERVER = config.api;
 
@@ -24,4 +25,5 @@ export async function get(video) {
 
 export default {
   get,
+  people,
 };

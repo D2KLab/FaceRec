@@ -70,7 +70,7 @@ class Classifier:
         for i in np.unique(fc):
             cur_indexes = [j for j, k in enumerate(fc) if k == i]
             x = np.array(features)[cur_indexes]
-            y = np.array(self.meta)[cur_indexes]
+            y = np.array(self.meta, dtype=object)[cur_indexes]
 
             m = np.mean(x, axis=0)
             avg = np.linalg.norm(x - m, axis=1)

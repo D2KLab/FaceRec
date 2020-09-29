@@ -22,6 +22,9 @@ RUN pip install -r /app/requirements.txt
 COPY mtcnn_patch.sh /app/
 RUN app/mtcnn_patch.sh
 
+COPY icrawler_patch.sh /app/
+RUN app/icrawler_patch.sh
+
 COPY . /app
 
 EXPOSE 5000

@@ -46,6 +46,7 @@ def get_metadata(uri):
             {'media': uri},
             {'programme': uri},
             {'locator': uri},
+            {'notice': uri},
         ]
     })
 
