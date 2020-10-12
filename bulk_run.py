@@ -1,3 +1,5 @@
+import os
+
 import argparse
 import json
 import sys
@@ -5,9 +7,13 @@ import sys
 import pandas as pd
 from tqdm import tqdm
 
-from src import clusterize
+from src import clusterize, database
 from src.tracker import Tracker
 from src.utils import uri_utils
+
+os.makedirs('database', exist_ok=True)
+
+database.init()
 
 
 # 'evaluation/dataset_memad.csv'
@@ -33,10 +39,15 @@ def main(input, project, skip_tracking=False):
                 video_id = x['media']
                 if media != old:
                     v, metadata = uri_utils.uri2video(media)
+                    database.save_metadata(metadata)
             else:
                 v = '/data/memad-uc22/' + x['Name']
                 video_id = x['kgURI']
+                _, metadata = uri_utils.uri2video(video_id)
+                database.save_metadata(metadata)
 
+            database.clean_analysis(video_id, project)
+            database.save_status(video_id, project, 'RUNNING')
             res = tr.run(v, export_frames=True, fragment=fragment, video_id=video_id, verbose=False)
             all_results.append(res)
         with open(f'results_{project}.json', 'w') as f:

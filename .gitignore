@@ -3,6 +3,7 @@
 /video/
 /database/
 /data/classifier/
+/results
 
 evaluation/dataset/
 evaluation/data/
