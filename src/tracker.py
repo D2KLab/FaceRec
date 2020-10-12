@@ -174,7 +174,8 @@ class Tracker:
                     'npt': npt,
                     'locator': video_id,
                     'bounding': utils.rect2xywh(*box),
-                    'rect': box
+                    'rect': box,
+                    'frame_size': img_size
                 }
                 matches.append(match)
                 if database.is_on():

@@ -1,3 +1,4 @@
+#!/bin/sh
 b=$(pip show icrawler | grep Location)
 loc="$(cut -d':' -f2 <<<$b)"
 loc=$(echo $loc | tr -d ' ')

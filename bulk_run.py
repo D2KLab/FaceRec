@@ -22,14 +22,22 @@ def main(input, project, skip_tracking=False):
         v = None
         old = None
         for i, x in tqdm(df.iterrows(), total=len(df)):
+            if 'type' in x and x['type'] != 'VIDEO':
+                continue
             start = int(x['start']) if 'start' in x else None
             end = int(x['end']) if 'end' in x else None
-            fragment = f'{start},{end+1}' if start is not None else None
-            media = x['media']
-            if media != old:
-                v, metadata = uri_utils.uri2video(media)
+            fragment = f'{start},{end + 1}' if start is not None else None
 
-            res = tr.run(v, export_frames=True, fragment=fragment, video_id=x['media'], verbose=False)
+            if 'media' in x:
+                media = x['media']
+                video_id = x['media']
+                if media != old:
+                    v, metadata = uri_utils.uri2video(media)
+            else:
+                v = '/data/memad-uc22/' + x['Name']
+                video_id = x['kgURI']
+
+            res = tr.run(v, export_frames=True, fragment=fragment, video_id=video_id, verbose=False)
             all_results.append(res)
         with open(f'results_{project}.json', 'w') as f:
             json.dump(all_results, f)
