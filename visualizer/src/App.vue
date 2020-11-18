@@ -7,7 +7,7 @@
         </b-navbar-item>
 
         <b-navbar-item>
-          <form class="field has-addons" action="video">
+          <form class="field has-addons" :action="$router.resolve('video').href">
             <div class="control">
               <input name="v" class="input" type="uri"
               placeholder="Insert URI of a video" required>

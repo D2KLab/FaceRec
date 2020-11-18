@@ -3,7 +3,7 @@
     <div class="container">
       <h1 class="title">Analyze a video</h1>
       <h2 class="subtitle">Search celebrities in our datasets in a video.</h2>
-      <form class="field has-addons" action="video">
+      <form class="field has-addons" :action="$router.resolve('video').href">
         <div class="control is-expanded">
           <input name='v' v-model="video"
           class="input is-large" type="uri" placeholder="Insert URI of a video" required>
@@ -24,7 +24,7 @@
       <h1 class="title">Add a celebrity in the dataset</h1>
       <h2 class="subtitle">Crawl the web for new celebrities.</h2>
 
-      <form class="field has-addons" action="person">
+      <form class="field has-addons" :action="$router.resolve('person').href">
         <div class="control is-expanded">
           <input name='p' list='people'
           class="input is-large" type="uri" placeholder="Insert the name of a person" required>

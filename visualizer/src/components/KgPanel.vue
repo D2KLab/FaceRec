@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     toSeg(seg) {
-      this.$root.$emit('toSeg', seg);
+      this.$root.$emit('to-seg', seg);
     },
   },
 };
