@@ -71,7 +71,7 @@ export default {
     },
   },
   mounted() {
-    const url = this.$route.query.v;
+    const url = this.$route.query.v.trim();
     this.url = url;
     getLocator(url)
       .then((d) => { this.locator = d; });

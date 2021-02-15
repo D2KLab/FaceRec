@@ -6,7 +6,7 @@
       <form class="field has-addons" :action="$router.resolve('video').href">
         <div class="control is-expanded">
           <input name='v' v-model="video"
-          class="input is-large" type="uri" placeholder="Insert URI of a video" required>
+          class="input is-large" type="url" placeholder="Insert URI of a video" required>
           <input type='hidden' name='project' :value='$store.state.proj' />
         </div>
         <div class="control">
