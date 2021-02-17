@@ -6,9 +6,9 @@ import cv2
 import numpy as np
 
 from . import database
-from .FaceRecogniser import Classifier
-from .FaceDetector import FaceDetector
 from .FaceAligner import FaceAligner
+from .FaceDetector import FaceDetector
+from .FaceRecogniser import Classifier
 from .SORT.sort import Sort
 from .utils import utils, media_fragment
 from .utils.face_utils import judge_side_face
@@ -98,11 +98,25 @@ class Tracker:
             frame_start, frame_end = parse_fragment(fragment, fps)
 
         matches = []
-        # iterate over the frames
-        for frame_no in np.arange(frame_start, frame_end, video_speedup):
+
+        video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_start - 1)
+
+        # for frame_no in np.arange(frame_start, frame_end, video_speedup):
+        #     video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
+
+        while True:
+            grabbed = video_capture.grab()
+            if grabbed:
+                frame_no = int(video_capture.get(cv2.CAP_PROP_POS_FRAMES))
+                if frame_no >= frame_end:
+                    break
+                elif (frame_no - frame_start) % video_speedup != 0:
+                    continue
+            else:
+                break
+
             if verbose:
                 print('frame %d/%d' % (frame_no, frame_end))
-            video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
 
             # read the frame
             ret, frame = video_capture.retrieve()
@@ -175,7 +189,7 @@ class Tracker:
                     'locator': video_id,
                     'bounding': utils.rect2xywh(*box),
                     'rect': box,
-                    'frame_size': img_size
+                    'frame_size': img_size.tolist()
                 }
                 matches.append(match)
                 if database.is_on():
@@ -183,8 +197,6 @@ class Tracker:
 
                 if export_frames:
                     export_frame(frame, d, best_name, frame_no, frames_path)
-
-        # TODO final track
 
         if database.is_on():
             database.save_status(video_id, self.project, 'COMPLETE')

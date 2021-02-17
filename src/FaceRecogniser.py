@@ -89,9 +89,6 @@ class Classifier:
             involved_tracks = np.unique([track for frame_no, track, bb, ld in elements])
             if len(involved_tracks) < min_involved_tracks:
                 continue
-            # TODO
-            # if any([x in official_cluster_mapping for x in involved_tracks]):
-            #     continue
 
             lds = [ld for frame_no, track, bb, ld in elements[0:5]]
             side_face_score = np.sum([(1 / (i + 1) * ld) for i, ld in enumerate(lds)]) / len(lds)

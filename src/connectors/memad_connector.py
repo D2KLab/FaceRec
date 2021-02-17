@@ -4,7 +4,7 @@ sparql = SPARQLWrapper("http://data.memad.eu/sparql-endpoint")
 
 
 def get_media(media):
-    sparql.setQuery("""
+    q = """
         SELECT DISTINCT *
     WHERE {
     VALUES ?media { <%s> } 
@@ -12,7 +12,9 @@ def get_media(media):
     ?media a ebucore:MediaResource;
       ebucore:locator ?locator .
     }
-    """ % media)
+    """ % media
+    sparql.setQuery(q)
+    # print(q)
     sparql.setReturnFormat(JSON)
     return sparql.query().convert()["results"]["bindings"]
 
