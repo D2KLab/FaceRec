@@ -1,0 +1,12 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX core: <http://www.ina.fr/core#>
+PREFIX ina: <http://www.ina.fr/notice.owl#>
+PREFIX antract: <http://www.ina.fr/antract#>
+
+SELECT DISTINCT ?person ?label WHERE {
+    ?person a ina:PersonnePhysique ;
+        skos:prefLabel ?label .
+    [] ?prop ?person.
+
+    VALUES ?prop {ina:imageContient ina:aPourParticipant ina:aPourInterprete}
+}

@@ -1,0 +1,9 @@
+limecraft:
+    username: xxx
+    password: xxx
+mongo:
+    server: 0.0.0.0
+    port: 27017
+okapi:
+    username: xxx
+    password: xxx

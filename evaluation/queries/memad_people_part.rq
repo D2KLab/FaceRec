@@ -1,0 +1,13 @@
+select ?g ?c sample(?label) as ?label count (distinct ?p) as ?nb
+where  {
+ graph ?g {
+   ?p a ebucore:Part .
+   ?media a ebucore:TVProgramme;
+    ebucore:hasPart ?p;
+    ebucore:isInstantiatedBy / ebucore:locator ?locator
+ }
+ ?p ebucore:hasContributor ?c .
+ ?c a ebucore:Agent ;  ebucore:agentName ?label .
+}
+group by ?g ?c
+order by desc(?nb)

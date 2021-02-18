@@ -1,0 +1,1568 @@
+[
+  [],
+  [],
+  [
+    {
+      "name": "Ahmed Ben Bella",
+      "project": "antract",
+      "track_id": 8,
+      "confidence": 0.6015469122632207,
+      "locator": "http://www.ina.fr/media/AFE86003847",
+      "bounding": {
+        "x": 236,
+        "y": 108,
+        "w": 82,
+        "h": 108,
+        "xywh": "236,108,82,108"
+      },
+      "rect": [
+        236.0,
+        108.0,
+        318.0,
+        216.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 4675,
+      "start_frame": 4650,
+      "end_npt": 187.0,
+      "start_npt": 186.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Ahmed Ben Bella",
+      "project": "antract",
+      "track_id": 63,
+      "confidence": 0.5119820401118725,
+      "locator": "http://www.ina.fr/media/AFE86003845",
+      "bounding": {
+        "x": 228,
+        "y": 183,
+        "w": 41,
+        "h": 62,
+        "xywh": "228,183,41,62"
+      },
+      "rect": [
+        228.0,
+        183.0,
+        269.0,
+        245.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 9125,
+      "start_frame": 9100,
+      "end_npt": 365.0,
+      "start_npt": 364.0
+    }
+  ],
+  [],
+  [
+    {
+      "name": "Fran\u00e7ois Mitterrand",
+      "project": "antract",
+      "track_id": 111,
+      "confidence": 0.6752826720781835,
+      "locator": "http://www.ina.fr/media/AFE86004144",
+      "bounding": {
+        "x": 306,
+        "y": 118,
+        "w": 79,
+        "h": 100,
+        "xywh": "306,118,79,100"
+      },
+      "rect": [
+        306.0,
+        118.0,
+        385.0,
+        218.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 3075,
+      "start_frame": 3050,
+      "end_npt": 123.0,
+      "start_npt": 122.0
+    }
+  ],
+  [],
+  [],
+  [
+    {
+      "name": "Vincent Auriol",
+      "project": "antract",
+      "track_id": 135,
+      "confidence": 0.5406539246247027,
+      "locator": "http://www.ina.fr/media/AFE86004780",
+      "bounding": {
+        "x": 280,
+        "y": 81,
+        "w": 121,
+        "h": 89,
+        "xywh": "280,81,121,89"
+      },
+      "rect": [
+        280.0,
+        81.0,
+        401.0,
+        170.0
+      ],
+      "end_sample": 4,
+      "start_sample": 2,
+      "end_frame": 2400,
+      "start_frame": 2350,
+      "end_npt": 96.0,
+      "start_npt": 94.0
+    }
+  ],
+  [],
+  [],
+  [
+    {
+      "name": "Fran\u00e7ois Mitterrand",
+      "project": "antract",
+      "track_id": 151,
+      "confidence": 0.5135966369187541,
+      "locator": "http://www.ina.fr/media/AFE86003556",
+      "bounding": {
+        "x": 58,
+        "y": 110,
+        "w": 85,
+        "h": 117,
+        "xywh": "58,110,85,117"
+      },
+      "rect": [
+        58.0,
+        110.0,
+        143.0,
+        227.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 3475,
+      "start_frame": 3450,
+      "end_npt": 139.0,
+      "start_npt": 138.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Fran\u00e7ois Mitterrand",
+      "project": "antract",
+      "track_id": 159,
+      "confidence": 0.5400450030166128,
+      "locator": "http://www.ina.fr/media/AFE86004079",
+      "bounding": {
+        "x": 302,
+        "y": 111,
+        "w": 55,
+        "h": 77,
+        "xywh": "302,111,55,77"
+      },
+      "rect": [
+        302.0,
+        111.0,
+        357.0,
+        188.0
+      ],
+      "end_sample": 2,
+      "start_sample": 1,
+      "end_frame": 2625,
+      "start_frame": 2600,
+      "end_npt": 105.0,
+      "start_npt": 104.0
+    }
+  ],
+  [],
+  [
+    {
+      "name": "Fran\u00e7ois Mitterrand",
+      "project": "antract",
+      "track_id": 173,
+      "confidence": 0.5586736537925181,
+      "locator": "http://www.ina.fr/media/AFE86004527",
+      "bounding": {
+        "x": 186,
+        "y": 109,
+        "w": 67,
+        "h": 85,
+        "xywh": "186,109,67,85"
+      },
+      "rect": [
+        186.0,
+        109.0,
+        253.0,
+        194.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 2575,
+      "start_frame": 2550,
+      "end_npt": 103.0,
+      "start_npt": 102.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Pierre Mend\u00e8s France",
+      "project": "antract",
+      "track_id": 225,
+      "confidence": 0.5494089284925985,
+      "locator": "http://www.ina.fr/media/AFE86003424",
+      "bounding": {
+        "x": 322,
+        "y": 96,
+        "w": 88,
+        "h": 118,
+        "xywh": "322,96,88,118"
+      },
+      "rect": [
+        322.0,
+        96.0,
+        410.0,
+        214.0
+      ],
+      "end_sample": 2,
+      "start_sample": 1,
+      "end_frame": 6175,
+      "start_frame": 6150,
+      "end_npt": 247.0,
+      "start_npt": 246.0
+    }
+  ],
+  [],
+  [],
+  [
+    {
+      "name": "Pierre Mend\u00e8s France",
+      "project": "antract",
+      "track_id": 237,
+      "confidence": 0.7093558123140019,
+      "locator": "http://www.ina.fr/media/AFE86003424",
+      "bounding": {
+        "x": 306,
+        "y": 91,
+        "w": 115,
+        "h": 155,
+        "xywh": "306,91,115,155"
+      },
+      "rect": [
+        306.0,
+        91.0,
+        421.0,
+        246.0
+      ],
+      "end_sample": 4,
+      "start_sample": 1,
+      "end_frame": 6125,
+      "start_frame": 6050,
+      "end_npt": 245.0,
+      "start_npt": 242.0
+    }
+  ],
+  [],
+  [
+    {
+      "name": "Guy Mollet",
+      "project": "antract",
+      "track_id": 248,
+      "confidence": 0.7146500263341748,
+      "locator": "http://www.ina.fr/media/AFE86003850",
+      "bounding": {
+        "x": 344,
+        "y": 95,
+        "w": 110,
+        "h": 130,
+        "xywh": "344,95,110,130"
+      },
+      "rect": [
+        344.0,
+        95.0,
+        454.0,
+        225.0
+      ],
+      "end_sample": 2,
+      "start_sample": 1,
+      "end_frame": 1675,
+      "start_frame": 1650,
+      "end_npt": 67.0,
+      "start_npt": 66.0
+    }
+  ],
+  [
+    {
+      "name": "Guy Mollet",
+      "project": "antract",
+      "track_id": 250,
+      "confidence": 0.7340227322235402,
+      "locator": "http://www.ina.fr/media/AFE86003542",
+      "bounding": {
+        "x": 149,
+        "y": 48,
+        "w": 184,
+        "h": 197,
+        "xywh": "149,48,184,197"
+      },
+      "rect": [
+        149.0,
+        48.0,
+        333.0,
+        245.0
+      ],
+      "end_sample": 10,
+      "start_sample": 1,
+      "end_frame": 15300,
+      "start_frame": 15075,
+      "end_npt": 612.0,
+      "start_npt": 603.0
+    }
+  ],
+  [
+    {
+      "name": "Guy Mollet",
+      "project": "antract",
+      "track_id": 251,
+      "confidence": 0.606699773493367,
+      "locator": "http://www.ina.fr/media/AFE86003533",
+      "bounding": {
+        "x": 211,
+        "y": 79,
+        "w": 97,
+        "h": 113,
+        "xywh": "211,79,97,113"
+      },
+      "rect": [
+        211.0,
+        79.0,
+        308.0,
+        192.0
+      ],
+      "end_sample": 14,
+      "start_sample": 1,
+      "end_frame": 12100,
+      "start_frame": 11775,
+      "end_npt": 484.0,
+      "start_npt": 471.0
+    }
+  ],
+  [],
+  [
+    {
+      "name": "Guy Mollet",
+      "project": "antract",
+      "track_id": 261,
+      "confidence": 0.6058964943158285,
+      "locator": "http://www.ina.fr/media/AFE86003538",
+      "bounding": {
+        "x": 181,
+        "y": 97,
+        "w": 120,
+        "h": 143,
+        "xywh": "181,97,120,143"
+      },
+      "rect": [
+        181.0,
+        97.0,
+        301.0,
+        240.0
+      ],
+      "end_sample": 6,
+      "start_sample": 2,
+      "end_frame": 1375,
+      "start_frame": 1275,
+      "end_npt": 55.0,
+      "start_npt": 51.0
+    }
+  ],
+  [
+    {
+      "name": "Guy Mollet",
+      "project": "antract",
+      "track_id": 262,
+      "confidence": 0.7622310859781531,
+      "locator": "http://www.ina.fr/media/AFE86003518",
+      "bounding": {
+        "x": 104,
+        "y": 7,
+        "w": 75,
+        "h": 132,
+        "xywh": "104,7,75,132"
+      },
+      "rect": [
+        104.0,
+        7.0,
+        179.0,
+        139.0
+      ],
+      "end_sample": 2,
+      "start_sample": 1,
+      "end_frame": 8425,
+      "start_frame": 8400,
+      "end_npt": 337.0,
+      "start_npt": 336.0
+    }
+  ],
+  [
+    {
+      "name": "Guy Mollet",
+      "project": "antract",
+      "track_id": 267,
+      "confidence": 0.4076820728675301,
+      "locator": "http://www.ina.fr/media/AFE86003538",
+      "bounding": {
+        "x": 218,
+        "y": 120,
+        "w": 135,
+        "h": 132,
+        "xywh": "218,120,135,132"
+      },
+      "rect": [
+        218.0,
+        120.0,
+        353.0,
+        252.0
+      ],
+      "end_sample": 8,
+      "start_sample": 4,
+      "end_frame": 600,
+      "start_frame": 500,
+      "end_npt": 24.0,
+      "start_npt": 20.0
+    }
+  ],
+  [],
+  [
+    {
+      "name": "Guy Mollet",
+      "project": "antract",
+      "track_id": 279,
+      "confidence": 0.5846787068827295,
+      "locator": "http://www.ina.fr/media/AFE86003533",
+      "bounding": {
+        "x": 208,
+        "y": 75,
+        "w": 98,
+        "h": 124,
+        "xywh": "208,75,98,124"
+      },
+      "rect": [
+        208.0,
+        75.0,
+        306.0,
+        199.0
+      ],
+      "end_sample": 33,
+      "start_sample": 2,
+      "end_frame": 11750,
+      "start_frame": 10975,
+      "end_npt": 470.0,
+      "start_npt": 439.0
+    }
+  ],
+  [
+    {
+      "name": "Guy Mollet",
+      "project": "antract",
+      "track_id": 280,
+      "confidence": 0.5991390207399592,
+      "locator": "http://www.ina.fr/media/AFE86003532",
+      "bounding": {
+        "x": 197,
+        "y": 56,
+        "w": 157,
+        "h": 146,
+        "xywh": "197,56,157,146"
+      },
+      "rect": [
+        197.0,
+        56.0,
+        354.0,
+        202.0
+      ],
+      "end_sample": 22,
+      "start_sample": 2,
+      "end_frame": 7625,
+      "start_frame": 7125,
+      "end_npt": 305.0,
+      "start_npt": 285.0
+    }
+  ],
+  [
+    {
+      "name": "Guy Mollet",
+      "project": "antract",
+      "track_id": 281,
+      "confidence": 0.7002941598679651,
+      "locator": "http://www.ina.fr/media/AFE86003542",
+      "bounding": {
+        "x": 161,
+        "y": 90,
+        "w": 188,
+        "h": 174,
+        "xywh": "161,90,188,174"
+      },
+      "rect": [
+        161.0,
+        90.0,
+        349.0,
+        264.0
+      ],
+      "end_sample": 18,
+      "start_sample": 2,
+      "end_frame": 15050,
+      "start_frame": 14650,
+      "end_npt": 602.0,
+      "start_npt": 586.0
+    }
+  ],
+  [
+    {
+      "name": "Guy Mollet",
+      "project": "antract",
+      "track_id": 284,
+      "confidence": 0.7154225979581089,
+      "locator": "http://www.ina.fr/media/AFE86003542",
+      "bounding": {
+        "x": 174,
+        "y": 67,
+        "w": 211,
+        "h": 211,
+        "xywh": "174,67,211,211"
+      },
+      "rect": [
+        174.0,
+        67.0,
+        385.0,
+        278.0
+      ],
+      "end_sample": 18,
+      "start_sample": 1,
+      "end_frame": 15750,
+      "start_frame": 15325,
+      "end_npt": 630.0,
+      "start_npt": 613.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Georges Bidault",
+      "project": "antract",
+      "track_id": 414,
+      "confidence": 0.5355539216352985,
+      "locator": "http://www.ina.fr/media/AFE86004588",
+      "bounding": {
+        "x": 7,
+        "y": 204,
+        "w": 46,
+        "h": 62,
+        "xywh": "7,204,46,62"
+      },
+      "rect": [
+        7.0,
+        204.0,
+        53.0,
+        266.0
+      ],
+      "end_sample": 4,
+      "start_sample": 2,
+      "end_frame": 7450,
+      "start_frame": 7400,
+      "end_npt": 298.0,
+      "start_npt": 296.0
+    }
+  ],
+  [],
+  [],
+  [
+    {
+      "name": "Georges Bidault",
+      "project": "antract",
+      "track_id": 425,
+      "confidence": 0.5774676222393484,
+      "locator": "http://www.ina.fr/media/AFE86004734",
+      "bounding": {
+        "x": 212,
+        "y": 66,
+        "w": 88,
+        "h": 103,
+        "xywh": "212,66,88,103"
+      },
+      "rect": [
+        212.0,
+        66.0,
+        300.0,
+        169.0
+      ],
+      "end_sample": 4,
+      "start_sample": 1,
+      "end_frame": 5475,
+      "start_frame": 5400,
+      "end_npt": 219.0,
+      "start_npt": 216.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Charles De Gaulle",
+      "project": "antract",
+      "track_id": 532,
+      "confidence": 0.5554185304706286,
+      "locator": "http://www.ina.fr/media/AFE86004018",
+      "bounding": {
+        "x": 192,
+        "y": 35,
+        "w": 150,
+        "h": 199,
+        "xywh": "192,35,150,199"
+      },
+      "rect": [
+        192.0,
+        35.0,
+        342.0,
+        234.0
+      ],
+      "end_sample": 34,
+      "start_sample": 1,
+      "end_frame": 2900,
+      "start_frame": 2075,
+      "end_npt": 116.0,
+      "start_npt": 83.0
+    }
+  ],
+  [],
+  [],
+  [
+    {
+      "name": "Georges Pompidou",
+      "project": "antract",
+      "track_id": 581,
+      "confidence": 0.746749844018939,
+      "locator": "http://www.ina.fr/media/AFE86003966",
+      "bounding": {
+        "x": 9,
+        "y": 89,
+        "w": 105,
+        "h": 84,
+        "xywh": "9,89,105,84"
+      },
+      "rect": [
+        9.0,
+        89.0,
+        114.0,
+        173.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 2725,
+      "start_frame": 2700,
+      "end_npt": 109.0,
+      "start_npt": 108.0
+    }
+  ],
+  [
+    {
+      "name": "Konrad Adenauer",
+      "project": "antract",
+      "track_id": 590,
+      "confidence": 0.6287399635781816,
+      "locator": "http://www.ina.fr/media/AFE86003763",
+      "bounding": {
+        "x": 347,
+        "y": 72,
+        "w": 73,
+        "h": 70,
+        "xywh": "347,72,73,70"
+      },
+      "rect": [
+        347.0,
+        72.0,
+        420.0,
+        142.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 1225,
+      "start_frame": 1200,
+      "end_npt": 49.0,
+      "start_npt": 48.0
+    }
+  ],
+  [
+    {
+      "name": "Dwight Eisenhower",
+      "project": "antract",
+      "track_id": 599,
+      "confidence": 0.771363530903431,
+      "locator": "http://www.ina.fr/media/AFE86003841",
+      "bounding": {
+        "x": 346,
+        "y": 111,
+        "w": 74,
+        "h": 65,
+        "xywh": "346,111,74,65"
+      },
+      "rect": [
+        346.0,
+        111.0,
+        420.0,
+        176.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 9900,
+      "start_frame": 9875,
+      "end_npt": 396.0,
+      "start_npt": 395.0
+    }
+  ],
+  [],
+  [
+    {
+      "name": "Charles De Gaulle",
+      "project": "antract",
+      "track_id": 613,
+      "confidence": 0.5677789993478888,
+      "locator": "http://www.ina.fr/media/AFE86004018",
+      "bounding": {
+        "x": 235,
+        "y": 67,
+        "w": 129,
+        "h": 160,
+        "xywh": "235,67,129,160"
+      },
+      "rect": [
+        235.0,
+        67.0,
+        364.0,
+        227.0
+      ],
+      "end_sample": 3,
+      "start_sample": 1,
+      "end_frame": 2050,
+      "start_frame": 2000,
+      "end_npt": 82.0,
+      "start_npt": 80.0
+    }
+  ],
+  [
+    {
+      "name": "Charles De Gaulle",
+      "project": "antract",
+      "track_id": 614,
+      "confidence": 0.5225354593252461,
+      "locator": "http://www.ina.fr/media/AFE86003847",
+      "bounding": {
+        "x": 170,
+        "y": 69,
+        "w": 124,
+        "h": 163,
+        "xywh": "170,69,124,163"
+      },
+      "rect": [
+        170.0,
+        69.0,
+        294.0,
+        232.0
+      ],
+      "end_sample": 13,
+      "start_sample": 2,
+      "end_frame": 775,
+      "start_frame": 500,
+      "end_npt": 31.0,
+      "start_npt": 20.0
+    }
+  ],
+  [],
+  [
+    {
+      "name": "Nikita Khrouchtchev",
+      "project": "antract",
+      "track_id": 631,
+      "confidence": 0.5153996407726376,
+      "locator": "http://www.ina.fr/media/AFE86003717",
+      "bounding": {
+        "x": 210,
+        "y": 49,
+        "w": 93,
+        "h": 116,
+        "xywh": "210,49,93,116"
+      },
+      "rect": [
+        210.0,
+        49.0,
+        303.0,
+        165.0
+      ],
+      "end_sample": 4,
+      "start_sample": 1,
+      "end_frame": 5900,
+      "start_frame": 5825,
+      "end_npt": 236.0,
+      "start_npt": 233.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Vincent Auriol",
+      "project": "antract",
+      "track_id": 675,
+      "confidence": 0.49836141878513884,
+      "locator": "http://www.ina.fr/media/AFE86004018",
+      "bounding": {
+        "x": 291,
+        "y": 81,
+        "w": 48,
+        "h": 60,
+        "xywh": "291,81,48,60"
+      },
+      "rect": [
+        291.0,
+        81.0,
+        339.0,
+        141.0
+      ],
+      "end_sample": 2,
+      "start_sample": 1,
+      "end_frame": 4075,
+      "start_frame": 4050,
+      "end_npt": 163.0,
+      "start_npt": 162.0
+    },
+    {
+      "name": "Vincent Auriol",
+      "project": "antract",
+      "track_id": 676,
+      "confidence": 0.5833840248870008,
+      "locator": "http://www.ina.fr/media/AFE86004018",
+      "bounding": {
+        "x": 139,
+        "y": 159,
+        "w": 59,
+        "h": 61,
+        "xywh": "139,159,59,61"
+      },
+      "rect": [
+        139.0,
+        159.0,
+        198.0,
+        220.0
+      ],
+      "end_sample": 2,
+      "start_sample": 1,
+      "end_frame": 4075,
+      "start_frame": 4050,
+      "end_npt": 163.0,
+      "start_npt": 162.0
+    }
+  ],
+  [
+    {
+      "name": "Vincent Auriol",
+      "project": "antract",
+      "track_id": 677,
+      "confidence": 0.6345165059894202,
+      "locator": "http://www.ina.fr/media/AFE86004737",
+      "bounding": {
+        "x": 216,
+        "y": 107,
+        "w": 152,
+        "h": 216,
+        "xywh": "216,107,152,216"
+      },
+      "rect": [
+        216.0,
+        107.0,
+        368.0,
+        323.0
+      ],
+      "end_sample": 3,
+      "start_sample": 1,
+      "end_frame": 12150,
+      "start_frame": 12100,
+      "end_npt": 486.0,
+      "start_npt": 484.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Vincent Auriol",
+      "project": "antract",
+      "track_id": 724,
+      "confidence": 0.5406539246247027,
+      "locator": "http://www.ina.fr/media/AFE86004780",
+      "bounding": {
+        "x": 280,
+        "y": 81,
+        "w": 121,
+        "h": 89,
+        "xywh": "280,81,121,89"
+      },
+      "rect": [
+        280.0,
+        81.0,
+        401.0,
+        170.0
+      ],
+      "end_sample": 4,
+      "start_sample": 2,
+      "end_frame": 2400,
+      "start_frame": 2350,
+      "end_npt": 96.0,
+      "start_npt": 94.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Vincent Auriol",
+      "project": "antract",
+      "track_id": 756,
+      "confidence": 0.5680440188434294,
+      "locator": "http://www.ina.fr/media/AFE86004869",
+      "bounding": {
+        "x": 171,
+        "y": 33,
+        "w": 332,
+        "h": 178,
+        "xywh": "171,33,332,178"
+      },
+      "rect": [
+        171.0,
+        33.0,
+        503.0,
+        211.0
+      ],
+      "end_sample": 3,
+      "start_sample": 1,
+      "end_frame": 7325,
+      "start_frame": 7275,
+      "end_npt": 293.0,
+      "start_npt": 291.0
+    }
+  ],
+  [],
+  [],
+  [
+    {
+      "name": "Konrad Adenauer",
+      "project": "antract",
+      "track_id": 776,
+      "confidence": 0.7178221306191694,
+      "locator": "http://www.ina.fr/media/AFE86003598",
+      "bounding": {
+        "x": 193,
+        "y": 157,
+        "w": 85,
+        "h": 109,
+        "xywh": "193,157,85,109"
+      },
+      "rect": [
+        193.0,
+        157.0,
+        278.0,
+        266.0
+      ],
+      "end_sample": 3,
+      "start_sample": 1,
+      "end_frame": 2600,
+      "start_frame": 2550,
+      "end_npt": 104.0,
+      "start_npt": 102.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Konrad Adenauer",
+      "project": "antract",
+      "track_id": 845,
+      "confidence": 0.7341009773195153,
+      "locator": "http://www.ina.fr/media/AFE86004657",
+      "bounding": {
+        "x": 155,
+        "y": 70,
+        "w": 137,
+        "h": 173,
+        "xywh": "155,70,137,173"
+      },
+      "rect": [
+        155.0,
+        70.0,
+        292.0,
+        243.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 7725,
+      "start_frame": 7700,
+      "end_npt": 309.0,
+      "start_npt": 308.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Konrad Adenauer",
+      "project": "antract",
+      "track_id": 875,
+      "confidence": 0.6287399635781816,
+      "locator": "http://www.ina.fr/media/AFE86003763",
+      "bounding": {
+        "x": 347,
+        "y": 72,
+        "w": 73,
+        "h": 70,
+        "xywh": "347,72,73,70"
+      },
+      "rect": [
+        347.0,
+        72.0,
+        420.0,
+        142.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 1225,
+      "start_frame": 1200,
+      "end_npt": 49.0,
+      "start_npt": 48.0
+    }
+  ],
+  [],
+  [],
+  [
+    {
+      "name": "Dwight Eisenhower",
+      "project": "antract",
+      "track_id": 886,
+      "confidence": 0.8253239308667762,
+      "locator": "http://www.ina.fr/media/AFE86004726",
+      "bounding": {
+        "x": 207,
+        "y": 60,
+        "w": 94,
+        "h": 117,
+        "xywh": "207,60,94,117"
+      },
+      "rect": [
+        207.0,
+        60.0,
+        301.0,
+        177.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 6225,
+      "start_frame": 6200,
+      "end_npt": 249.0,
+      "start_npt": 248.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Dwight Eisenhower",
+      "project": "antract",
+      "track_id": 941,
+      "confidence": 0.771363530903431,
+      "locator": "http://www.ina.fr/media/AFE86003841",
+      "bounding": {
+        "x": 346,
+        "y": 111,
+        "w": 74,
+        "h": 65,
+        "xywh": "346,111,74,65"
+      },
+      "rect": [
+        346.0,
+        111.0,
+        420.0,
+        176.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 9900,
+      "start_frame": 9875,
+      "end_npt": 396.0,
+      "start_npt": 395.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Dwight Eisenhower",
+      "project": "antract",
+      "track_id": 966,
+      "confidence": 0.7253218859047387,
+      "locator": "http://www.ina.fr/media/AFE86004430",
+      "bounding": {
+        "x": 207,
+        "y": 61,
+        "w": 141,
+        "h": 145,
+        "xywh": "207,61,141,145"
+      },
+      "rect": [
+        207.0,
+        61.0,
+        348.0,
+        206.0
+      ],
+      "end_sample": 4,
+      "start_sample": 2,
+      "end_frame": 10700,
+      "start_frame": 10650,
+      "end_npt": 428.0,
+      "start_npt": 426.0
+    }
+  ],
+  [
+    {
+      "name": "Elisabeth II",
+      "project": "antract",
+      "track_id": 967,
+      "confidence": 0.42618901152085564,
+      "locator": "http://www.ina.fr/media/AFE86004544",
+      "bounding": {
+        "x": 54,
+        "y": 107,
+        "w": 160,
+        "h": 190,
+        "xywh": "54,107,160,190"
+      },
+      "rect": [
+        54.0,
+        107.0,
+        214.0,
+        297.0
+      ],
+      "end_sample": 5,
+      "start_sample": 1,
+      "end_frame": 6475,
+      "start_frame": 6375,
+      "end_npt": 259.0,
+      "start_npt": 255.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Elisabeth II",
+      "project": "antract",
+      "track_id": 979,
+      "confidence": 0.4182769019634215,
+      "locator": "http://www.ina.fr/media/AFE86004544",
+      "bounding": {
+        "x": 133,
+        "y": 93,
+        "w": 131,
+        "h": 166,
+        "xywh": "133,93,131,166"
+      },
+      "rect": [
+        133.0,
+        93.0,
+        264.0,
+        259.0
+      ],
+      "end_sample": 5,
+      "start_sample": 1,
+      "end_frame": 6350,
+      "start_frame": 6250,
+      "end_npt": 254.0,
+      "start_npt": 250.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Elisabeth II",
+      "project": "antract",
+      "track_id": 1006,
+      "confidence": 0.42110068522195176,
+      "locator": "http://www.ina.fr/media/AFE86004783",
+      "bounding": {
+        "x": 346,
+        "y": 80,
+        "w": 104,
+        "h": 112,
+        "xywh": "346,80,104,112"
+      },
+      "rect": [
+        346.0,
+        80.0,
+        450.0,
+        192.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 7475,
+      "start_frame": 7450,
+      "end_npt": 299.0,
+      "start_npt": 298.0
+    }
+  ],
+  [
+    {
+      "name": "Georges Bidault",
+      "project": "antract",
+      "track_id": 1021,
+      "confidence": 0.5355539216352985,
+      "locator": "http://www.ina.fr/media/AFE86004588",
+      "bounding": {
+        "x": 7,
+        "y": 204,
+        "w": 46,
+        "h": 62,
+        "xywh": "7,204,46,62"
+      },
+      "rect": [
+        7.0,
+        204.0,
+        53.0,
+        266.0
+      ],
+      "end_sample": 4,
+      "start_sample": 2,
+      "end_frame": 7450,
+      "start_frame": 7400,
+      "end_npt": 298.0,
+      "start_npt": 296.0
+    }
+  ],
+  [
+    {
+      "name": "Elisabeth II",
+      "project": "antract",
+      "track_id": 1026,
+      "confidence": 0.45933404470589984,
+      "locator": "http://www.ina.fr/media/AFE86004614",
+      "bounding": {
+        "x": 196,
+        "y": 90,
+        "w": 123,
+        "h": 165,
+        "xywh": "196,90,123,165"
+      },
+      "rect": [
+        196.0,
+        90.0,
+        319.0,
+        255.0
+      ],
+      "end_sample": 4,
+      "start_sample": 2,
+      "end_frame": 1775,
+      "start_frame": 1725,
+      "end_npt": 71.0,
+      "start_npt": 69.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Viatcheslav Molotov",
+      "project": "antract",
+      "track_id": 1087,
+      "confidence": 0.47880779198815865,
+      "locator": "http://www.ina.fr/media/AFE86003516",
+      "bounding": {
+        "x": 220,
+        "y": 111,
+        "w": 45,
+        "h": 53,
+        "xywh": "220,111,45,53"
+      },
+      "rect": [
+        220.0,
+        111.0,
+        265.0,
+        164.0
+      ],
+      "end_sample": 4,
+      "start_sample": 2,
+      "end_frame": 2075,
+      "start_frame": 2025,
+      "end_npt": 83.0,
+      "start_npt": 81.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "name": "Georges Pompidou",
+      "project": "antract",
+      "track_id": 1161,
+      "confidence": 0.5450144602379777,
+      "locator": "http://www.ina.fr/media/AFE86003865",
+      "bounding": {
+        "x": 207,
+        "y": 224,
+        "w": 68,
+        "h": 51,
+        "xywh": "207,224,68,51"
+      },
+      "rect": [
+        207.0,
+        224.0,
+        275.0,
+        275.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 7075,
+      "start_frame": 7050,
+      "end_npt": 283.0,
+      "start_npt": 282.0
+    }
+  ],
+  [
+    {
+      "name": "Georges Pompidou",
+      "project": "antract",
+      "track_id": 1191,
+      "confidence": 0.6997098465172786,
+      "locator": "http://www.ina.fr/media/AFE86003875",
+      "bounding": {
+        "x": 113,
+        "y": 75,
+        "w": 221,
+        "h": 169,
+        "xywh": "113,75,221,169"
+      },
+      "rect": [
+        113.0,
+        75.0,
+        334.0,
+        244.0
+      ],
+      "end_sample": 2,
+      "start_sample": 1,
+      "end_frame": 875,
+      "start_frame": 850,
+      "end_npt": 35.0,
+      "start_npt": 34.0
+    }
+  ],
+  [
+    {
+      "name": "Georges Pompidou",
+      "project": "antract",
+      "track_id": 1201,
+      "confidence": 0.746749844018939,
+      "locator": "http://www.ina.fr/media/AFE86003966",
+      "bounding": {
+        "x": 9,
+        "y": 89,
+        "w": 105,
+        "h": 84,
+        "xywh": "9,89,105,84"
+      },
+      "rect": [
+        9.0,
+        89.0,
+        114.0,
+        173.0
+      ],
+      "end_sample": 3,
+      "start_sample": 2,
+      "end_frame": 2725,
+      "start_frame": 2700,
+      "end_npt": 109.0,
+      "start_npt": 108.0
+    }
+  ],
+  [
+    {
+      "name": "Georges Pompidou",
+      "project": "antract",
+      "track_id": 1207,
+      "confidence": 0.6013297243459749,
+      "locator": "http://www.ina.fr/media/AFE86003871",
+      "bounding": {
+        "x": 168,
+        "y": 59,
+        "w": 148,
+        "h": 111,
+        "xywh": "168,59,148,111"
+      },
+      "rect": [
+        168.0,
+        59.0,
+        316.0,
+        170.0
+      ],
+      "end_sample": 2,
+      "start_sample": 1,
+      "end_frame": 1600,
+      "start_frame": 1575,
+      "end_npt": 64.0,
+      "start_npt": 63.0
+    }
+  ],
+  [],
+  [],
+  [
+    {
+      "name": "Georges Pompidou",
+      "project": "antract",
+      "track_id": 1223,
+      "confidence": 0.7947804406604898,
+      "locator": "http://www.ina.fr/media/AFE86004141",
+      "bounding": {
+        "x": 179,
+        "y": 58,
+        "w": 180,
+        "h": 235,
+        "xywh": "179,58,180,235"
+      },
+      "rect": [
+        179.0,
+        58.0,
+        359.0,
+        293.0
+      ],
+      "end_sample": 12,
+      "start_sample": 1,
+      "end_frame": 13750,
+      "start_frame": 13475,
+      "end_npt": 550.0,
+      "start_npt": 539.0
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  []
+]
