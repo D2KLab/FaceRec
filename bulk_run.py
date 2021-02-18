@@ -9,6 +9,7 @@ from bson import json_util as json
 
 from src import clusterize, database
 from src.tracker import Tracker
+from src.classifier import FacerecClassifier
 from src.utils import uri_utils
 
 os.makedirs('database', exist_ok=True)

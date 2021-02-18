@@ -10,6 +10,7 @@ from flask_restx import Api, Resource
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from src import *
+from src.classifier import FacerecClassifier
 from src.connectors import antract_connector as antract
 from src.utils import utils, uri_utils
 from bson.json_util import dumps
