@@ -1,11 +1,11 @@
 import os
 
 import argparse
-import json
 import sys
 
 import pandas as pd
 from tqdm import tqdm
+from bson import json_util as json
 
 from src import clusterize, database
 from src.tracker import Tracker
@@ -16,8 +16,6 @@ os.makedirs('database', exist_ok=True)
 database.init()
 
 
-# 'evaluation/dataset_memad.csv'
-# 'memad-gt'
 def main(input, project, skip_tracking=False):
     if not skip_tracking:
         # TODO check if input is a csv or a folder
@@ -31,7 +29,7 @@ def main(input, project, skip_tracking=False):
             if 'type' in x and x['type'] != 'VIDEO':
                 continue
             start = int(x['start']) if 'start' in x else None
-            end = int(x['end']) if 'end' in x else None
+            end = int(x['end']) if 'end' in x else 10000
             fragment = f'{start},{end + 1}' if start is not None else None
 
             if 'media' in x:
@@ -41,21 +39,22 @@ def main(input, project, skip_tracking=False):
                     v, metadata = uri_utils.uri2video(media)
                     database.save_metadata(metadata)
             else:
-                v = '/data/memad-uc22/' + x['Name']
+                v = './video/' + x['Name']
                 video_id = x['kgURI']
                 _, metadata = uri_utils.uri2video(video_id)
+                video_id = metadata['locator']
                 database.save_metadata(metadata)
 
             database.clean_analysis(video_id, project)
             database.save_status(video_id, project, 'RUNNING')
-            res = tr.run(v, export_frames=True, fragment=fragment, video_id=video_id, verbose=False)
+            res = tr.run(v, export_frames=True, fragment=fragment, video_id=video_id, verbose=False, cluster_features=False)
             all_results.append(res)
         with open(f'results_{project}.json', 'w') as f:
-            json.dump(all_results, f)
+            f.write(json.dumps(all_results))
 
     else:
         with open(f'results_{project}.json', 'r') as f:
-            all_results = json.load(f)
+            all_results = f.read(json.loads(f))
 
     clusters = []
     for r in all_results:
@@ -64,7 +63,7 @@ def main(input, project, skip_tracking=False):
         clusters.append(c)
 
     with open(f'results_{project}_clusters.json', 'w') as f:
-        json.dump(clusters, f)
+        f.write(json.dumps(clusters))
 
 
 def parse_arguments(argv):
@@ -84,3 +83,5 @@ if __name__ == '__main__':
     main(args.input, args.project, args.skip_tracking)
 
 # python bulk_run.py -i evaluation/dataset_antract.csv --project antract
+# python bulk_run.py -i evaluation/dataset_memad.csv --project memad
+# python bulk_run.py -i evaluation/dataset_memad.csv --project memad_gt
