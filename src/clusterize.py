@@ -49,8 +49,8 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.6, weighted_dom
         name = ""
         dominant, count = weighted_mode(predicted, confidences)
         dominant2, count2 = mode(predicted)
-        if count[0] / float(len(predicted)) > weighted_dominant_ratio and dominant[0] == dominant2[0] and count2[
-            0] / float(len(predicted)) > dominant_ratio:
+        if count[0] / float(len(predicted)) > weighted_dominant_ratio \
+                and dominant[0] == dominant2[0] and count2[0] / float(len(predicted)) > dominant_ratio:
             name = dominant[0]
         interest_cluster.update({track: name})
 

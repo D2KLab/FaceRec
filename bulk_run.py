@@ -17,7 +17,7 @@ os.makedirs('database', exist_ok=True)
 database.init()
 
 
-def main(input, project, skip_tracking=False):
+def main(input, project, speed=25, skip_tracking=False):
     if not skip_tracking:
         # TODO check if input is a csv or a folder
         df = pd.read_csv(input)
@@ -48,7 +48,8 @@ def main(input, project, skip_tracking=False):
 
             database.clean_analysis(video_id, project)
             database.save_status(video_id, project, 'RUNNING')
-            res = tr.run(v, export_frames=True, fragment=fragment, video_id=video_id, verbose=False, cluster_features=False)
+            res = tr.run(v, export_frames=True, fragment=fragment, video_id=video_id,
+                         video_speedup=speed, verbose=False, cluster_features=False)
             all_results.append(res)
         with open(f'results_{project}.json', 'w') as f:
             f.write(json.dumps(all_results))
@@ -73,6 +74,8 @@ def parse_arguments(argv):
                         help='The csv containing the videos to analyse.')
     parser.add_argument('--project', type=str, default='general',
                         help='Name of the collection to be part of')
+    parser.add_argument('--speed', type=int, default=25,
+                        help='Speed up for the video')
     parser.add_argument('--skip_tracking', action='store_true', default=False,
                         help='Only recompute clustering')
 
@@ -81,7 +84,7 @@ def parse_arguments(argv):
 
 if __name__ == '__main__':
     args = parse_arguments(sys.argv[1:])
-    main(args.input, args.project, args.skip_tracking)
+    main(args.input, args.project, args.speed, args.skip_tracking)
 
 # python bulk_run.py -i evaluation/dataset_antract.csv --project antract
 # python bulk_run.py -i evaluation/dataset_memad.csv --project memad
