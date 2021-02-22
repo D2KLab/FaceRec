@@ -17,7 +17,12 @@
       <button class="button" @click="reset()">Reset</button>
     </div>
 
-    <ul class='pics'>
+    <p>{{paths.length - disabledCount}} enabled / {{disabledCount}} disabled</p>
+    <b-field>
+      <label>Blurred images <b-switch v-model="isBlurred"></b-switch></label>
+    </b-field>
+
+    <ul class='pics' :class="{isBlurred:isBlurred}">
       <li v-for="p in paths" @click="togglePath($event, p)" :class="{disabled: disabled.includes(p)}">
         <img :src='p' />
       </li>
@@ -30,6 +35,6 @@
       <li v-for="a in appearences">
         <router-link :to="{name: 'video', query: {v: a, project: $store.state.proj}}">{{a}}</router-link>
       </li>
-      </ul>
+    </ul>
   </div>
 </div>

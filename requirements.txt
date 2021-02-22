@@ -20,3 +20,4 @@ pyyaml
 pymongo
 mtcnn
 Werkzeug
+h5py==2.10.0

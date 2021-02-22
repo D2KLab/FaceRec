@@ -35,7 +35,15 @@ export default {
       disabled: [],
       disabledOrigin: [],
       crawling: false,
+      isBlurred: true,
     };
+  },
+  computed: {
+    disabledCount() {
+      if (!this.disabled) return 0;
+      if (!this.paths) return 0;
+      return this.disabled.filter((x) => this.paths.includes(x)).length;
+    },
   },
   mounted() {
     this.person = this.$route.query.p;

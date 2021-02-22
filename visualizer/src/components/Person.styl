@@ -39,14 +39,18 @@ ul.pics
       img
         border-color green_color
     &.disabled
+      order:2
       &:after
         background red_color
       img
-        filter blur(2px)
         &:hover
           border-color red_color
-          filter none
+          filter none !important
     img
       border: 4px solid white
       border-radius: 10px
       max-height 100%
+
+  &.isBlurred
+    li.disabled img
+      filter blur(2px)

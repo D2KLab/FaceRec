@@ -93,7 +93,7 @@ class Crawler(Resource):
         project = request.args.get('project', default='general')
 
         for keyword in q.split(';'):
-            crawler.main(keyword, max_num=30, project=project)
+            crawler.main(keyword, max_num=50, project=project)
 
         return jsonify({
             'task': 'crawl',
