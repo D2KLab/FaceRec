@@ -27,6 +27,7 @@ python -m src.crawler --keyword "De Gasperi Alcide" --max_num 20 --project proj_
 Face alignment using MTCNN
 ```sh
 python -m src.FaceDetector  proj_name --image_size 160
+python -m src.FaceDetector  memad
 ```
 ### 3. Train a classifier on own images
 We perform training a classifier using the following command:
@@ -95,7 +96,7 @@ A service is available as Docker image.
 
 ```sh
 docker build -t_parser facerec .
-docker run -d -p 5050:5000 -p 27017:27017 --name facerec-mongo mongo
+docker run -d -p 27027:27017 --name facerec-mongo mongo
 docker run -d -p 5050:5000 --restart=unless-stopped  -v /home/semantic/Repositories/Face-Celebrity-Recognition/video:/app/video -v /home/semantic/Repositories/Face-Celebrity-Recognition/data:/app/data -v /home/semantic/Repositories/Face-Celebrity-Recognition/config:/app/config --name facerec1 facerec
 ```
 

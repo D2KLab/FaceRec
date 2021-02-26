@@ -1,0 +1,9 @@
+http://127.0.0.1:5000/training_img_aligned/memad/Asseri_Kinnunen/download-10.png
+
+http://127.0.0.1:5000/training_img_aligned/memad/Annastiina_Heikkilä/000038.png
+http://127.0.0.1:5000/training_img_aligned/memad/Annastiina_Heikkilä/000049.png
+
+http://127.0.0.1:5000/training_img_aligned/memad/Emilie_Tran_Nguyen/000009.png
+http://127.0.0.1:5000/training_img_aligned/memad/Emilie_Tran_Nguyen/000012.png
+http://127.0.0.1:5000/training_img_aligned/memad/Emilie_Tran_Nguyen/000022.png
+http://127.0.0.1:5000/training_img_aligned/memad/Emilie_Tran_Nguyen/000036.png

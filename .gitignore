@@ -1,8 +1,9 @@
 .DS_Store
-/data/
+/data/*
+!/data/classifier/
+!/data/training_img_aligned/
 /video/
 /database/
-/data/classifier/
 /results
 
 evaluation/dataset/

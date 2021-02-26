@@ -51,6 +51,7 @@ import { getProjects } from '@/services/face-recognition';
 
 const projLabel = {
   memad: 'MeMAD',
+  memad_gt: 'MeMAD Ground Truth',
   antract: 'ANTRACT',
 };
 // http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e
