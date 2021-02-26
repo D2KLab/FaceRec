@@ -2,13 +2,13 @@
 \toprule
                     index &  precision &   recall &   fscore &  support \\
 \midrule
-         Le Saint, Sophie &   0.692308 & 0.900000 & 0.782609 &       10 \\
-      Delahousse, Laurent &   0.555556 & 1.000000 & 0.714286 &        5 \\
-             Lucet, Elise &   0.818182 & 0.900000 & 0.857143 &       10 \\
-          Gastrin, Sophie &   0.888889 & 0.800000 & 0.842105 &       10 \\
-Rincquesen, Nathanaël de &   0.450000 & 0.900000 & 0.600000 &       10 \\
-           Drucker, Marie &   0.625000 & 1.000000 & 0.769231 &       10 \\
-                        0 &   0.772727 & 0.377778 & 0.507463 &       45 \\
-         tot (excluded 0) &   0.682210 & 0.909091 & 0.765133 &      100 \\
+         Le Saint, Sophie &   0.900000 & 0.900000 & 0.900000 &       10 \\
+      Delahousse, Laurent &   1.000000 & 1.000000 & 1.000000 &        7 \\
+             Lucet, Elise &   1.000000 & 0.900000 & 0.947368 &       10 \\
+          Gastrin, Sophie &   1.000000 & 0.900000 & 0.947368 &       10 \\
+Rincquesen, Nathanaël de &   1.000000 & 0.800000 & 0.888889 &       10 \\
+           Drucker, Marie &   1.000000 & 1.000000 & 1.000000 &       10 \\
+                        0 &   0.893617 & 0.976744 & 0.933333 &       43 \\
+         tot (excluded 0) &   0.982456 & 0.912281 & 0.944496 &      100 \\
 \bottomrule
 \end{tabular}
