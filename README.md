@@ -1,98 +1,99 @@
-Face-Celebrity-Recognition
-==========================
+FaceRec: a Complete Pipeline for Recongising Faces in Videos
+============================================================
 
-## Install
+FaceRec is face recognition system for videos which leverage images crawled from web search engines.
+The system is based on a combination of MTCNN (face detection) and FaceNet (face embedding), whose vector representations of faces are used to feed a classifier.
+A tracking system is included in order to increase the robustness of the library towards recognition errors in individual frames for getting more consistent person identifications.
+
+The FaceRec ecosystem is composed by:
+- The video processing pipeline (folder [`src`](./src))
+- The API server ([`server.py`](./server.py))
+- The Web Visualizer ([`visualizer`](./visualizer))
+- An [evaluation](./evaluation)) on a ground truth 
+
+Demo:
+- API at http://facerec.eurecom.fr/
+- Visualizer at http://facerec.eurecom.fr/visualizer
+
+## Application schema
+
+Training phase: 
+
+![Training](./assets/training.jpg)
+
+Recognition phase:
+
+![Recognition](./assets/prediction.jpg)
+
+The system relies on the following main dependencies:
+- [icrawler](https://github.com/hellock/icrawler) (image crawling)
+- [MTCNN](https://github.com/ipazc/mtcnn) (face detection)
+- [FaceNet](https://github.com/davidsandberg/facenet) (face embedding)
+- [SORT](https://github.com/Linzaer/Face-Track-Detect-Extract) (tracking)
+- [scikit-learn](https://scikit-learn.org/) (machine-learning, classification)
+- [OpenCV](https://github.com/opencv/opencv-python) (video processing)
+- [Flask](https://flask.palletsprojects.com/en/1.1.x/) (server implementation)
+
+## Usage
 
 Install dependencies
 
     pip install -r requirements.txt
     
-If you have errors like `'thread._local' object has no attribute 'value'`, run
+If you have errors, try to run the following patches
 
-    `sh mtcnn_patch.sh`
+    sh mtcnn_patch.sh
+    sh icrawler_patch.sh
     
 If you want to use also the server capabilities, you need to install [MongoDB](mongodb.com) and run it on default port.
 
-### 1. Building a Training Dataset
-Create a directory for raw images utilized for training. In order to download automatically images of celebrity to build the training dataset we need to call the following command:
+#### 1. Building a Training Dataset
+Download automatically images of celebrity to build the training dataset.
+Then, faces are detected, aligned, and scaled.
 ```sh
 python -m src.crawler --keyword "Churchill Winston" --max_num 20 --project proj_name
 python -m src.crawler --keyword "Roosevelt Franklin" --max_num 20 --project proj_name
 python -m src.crawler --keyword "De Gasperi Alcide" --max_num 20 --project proj_name
 ```
 
-> NOTE: The crawler is temporarly out of service because of https://github.com/hellock/icrawler/issues/65
- 
-### 2. Preprocess the raw images (Face detection)
-Face alignment using MTCNN
-```sh
-python -m src.FaceDetector  proj_name --image_size 160
-python -m src.FaceDetector  memad
-```
-### 3. Train a classifier on own images
-We perform training a classifier using the following command:
+The final faces are stored in the `data\training_img_aligned\<project>`.
+You can disable wrong images by adding them in the `disabled.txt` file or simply deleting them.
+
+> Please note that for every new person added, you should add as many images of that person as of previous ones, and then retrain the model.
+
+#### 2. Train a classifier 
 ```sh
 python -m src.classifier --project proj_name --classifier SVM
 ```
-### 4. Perform face recognition on Video
-The below command helps us to recognize people from video using the trained classifier from the previous step:
-```sh
-python -m src.FaceRecogniser --video video/xxx.mp4 --output_path data/output.txt --project proj_name --video_speedup 1 --folder_containing_frame data/output
-```
-### 5. Adding new persons (or images of existing persons) into a system
-First, creating a directory for raw images of new persons as follow. 
-```sh
-$ tree data/new_person
-person-1
-├── image-1.jpg
-├── image-2.png
-...
-└── image-p.png
+#### 3. Perform face recognition on videos
 
-...
-
-person-m
-├── image-1.png
-├── image-2.jpg
-...
-└── image-q.png
+The below command helps us to recognize people from video using the trained classifier from the previous step.
+In the same way, we perform tracking (with SORT), and assign a track id to all detections.
+```sh
+python -m src.tracker --video video/my_video.mp4 --project proj_name --video_speedup 25
 ```
 
-Please note that for every new person added, you should add as many images of that person as of previous ones.
-
-```sh
-python -m src.crawler --keyword "Bardot Brigitte" --max_num 20 --project proj_name
-```
-
-Then, retrain the model.
-
-> Note: Please empty the data/new_person directory before adding other persons.
-
-### 6. Combine FaceNet + Tracker to perform face recognition on Video
-
-Now we apply **SORT** algorithm to track every face.
-**FaceNet** is also applied to every detected frame. 
-
-We track the face from the first frame in which it is detected, and we assign to it the object ID until the tracker lost that ID, and used Facenet to find out the label (the class name) for that ID in all frames having that ID. The Object ID and the temporary label for every face will be generated. After that, the system will try to guess the label for each face by using the majority rule.
-
-
-Execute the following command:
-```sh
-python -m src.tracker --video video/xxx.mp4 --project proj_name 
-```
+`--video_speedup` is the sampling period (25 == 1 frame per second).
+`--video` can be a local path, a URL pointing to a video resource or a URL in the ANTRACT or [MeMAD](http://data.memad.eu) Knowledge Graph.
 
          
-### 7. Combine Tracker + FaceNet + Cosine Similarity to perform face recognition on Video
-We apply **SORT** Tracker to track every face and put them into clusters. Clusters will be generated and stored in `data/out/{video_name}/cluster/{clusterid}`. After that, the system will try to guess the label for each cluster using **majority rule**. A cosine similarity computed between each vector of features in our face training dataset and the ones from each face in our cluster labeled from the previous step is the third step. A cluster is considered to be recognized as a known person if the mean of the three maximum cosine similarities between each face in the cluster and each face in that person training dataset is higher than 0.66 (this value depends on your own dataset, you should do some statistic to pick the fitted one).
-
-Execute the following command (after src.tracker):
+#### 4. Generate common per-tracking preditions
+For each tracking, a single prediction is generated 
 ```sh
-python -m src.clusterize --video video/xxx.mp4 --confidence_threshold 0.7 --dominant_ratio 0.8 --merge_cluster
+python -m src.clusterize --video video/my_video.mp4 --confidence_threshold 0.7 --dominant_ratio 0.8 --merge_cluster
 ```
 
 ## FaceRec as a service
 
-A service is available as Docker image.
+FaceRec can be used from a server, running: 
+
+    python server.py
+    cd visualizer
+    npm run serve
+
+> IMPORTANT: A MongoDB running instance is required
+
+The service is also available as Docker image.
 
 ```sh
 docker build -t_parser facerec .
@@ -106,7 +107,8 @@ or
 docker-compose up
 ```
 
-### Special Thanks to:
-*  [**Face-Recognition-using-Tensorflow**](https://github.com/davidsandberg/facenet)
-*  [**Face-Track-Detect-Extract**](https://github.com/Linzaer/Face-Track-Detect-Extract)
+## Acknowledgements
 
+This software is the result of different [contributions](https://github.com/D2KLab/Face-Celebrity-Recognition/graphs/contributors).
+
+This work has been partially supported by the French National Research Agency (ANR) within the ANTRACT project (grant number ANR-17-CE38-0010) and by the European Union’s Horizon 2020 research and innovation program within the [MeMAD project](https://memad.eu/) (grant agreement No. 780069).
