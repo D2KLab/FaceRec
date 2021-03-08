@@ -123,6 +123,8 @@ def main(predictions, confidence_threshold=0.7, dominant_ratio=0.6, weighted_dom
 
 
 def unknown_clusterise(feat_clusters, assigned_tracks, raw_tracks):
+    assigned_tracks = [item for sublist in assigned_tracks for item in sublist]
+
     tracks_done = []
     for clus in feat_clusters:
         elems = clus['elements']

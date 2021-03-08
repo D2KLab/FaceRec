@@ -54,7 +54,7 @@ export default {
         .filter((d) => d.confidence >= this.confidence || (this.showunknown && d.unknown));
     },
     classes() {
-      const classes = [...new Set(this.data.map((c) => c.name))];
+      const classes = [...new Set(this.data.map((c) => c.name))].sort();
 
       const colours = palette('mpn65', classes.length);
       // other palettes at http://google.github.io/palette.js/
@@ -131,12 +131,13 @@ export default {
           this.boxes.push(box);
           this.$refs.container.appendChild(box);
         }
+        const d = this.classes.find((c) => c.label === frag.name);
         box.style.top = `${dim.y}px`;
         box.style.left = `${dim.x}px`;
         box.style.width = `${dim.w}px`;
         box.style.height = `${dim.h}px`;
-        box.style.display = 'block';
-        box.style.borderColor = this.classes.find((c) => c.label === frag.name).colour;
+        box.style.display = d.selected ? 'block' : 'none';
+        box.style.borderColor = d.colour;
         box.dataset.class = frag.classLabel;
       });
     },
