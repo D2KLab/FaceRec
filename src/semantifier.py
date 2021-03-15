@@ -26,7 +26,7 @@ def init_graph():
 
 
 def semantify(res):
-    data = res['tracks']
+    data = res['tracks'] if 'tracks' in res else []
     video = res['locator']
 
     g = init_graph()
@@ -68,7 +68,7 @@ def semantify(res):
 
         g.add((annotation, a, OA['Annotation']))
         g.add((annotation, DCTERMS['creator'], EURECOM))
-        g.add((annotation, DCTERMS['created'], Literal(data['timestamp'], datatype=XSD['datetime'])))
+        # g.add((annotation, DCTERMS['created'], Literal(data['timestamp'], datatype=XSD['datetime'])))
         g.add((annotation, DCTERMS['motivatedBy'], OA['identifying']))
         g.add((annotation, OA['hasTarget'], frag))
         g.add((annotation, OA['hasBody'], body))
