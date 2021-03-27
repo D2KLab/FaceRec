@@ -1,15 +1,13 @@
-FaceRec: a Complete Pipeline for Recongising Faces in Videos
+FaceRec: A Interactive Framework for Recognising Faces in Videos
 ============================================================
 
-FaceRec is face recognition system for videos which leverage images crawled from web search engines.
-The system is based on a combination of MTCNN (face detection) and FaceNet (face embedding), whose vector representations of faces are used to feed a classifier.
-A tracking system is included in order to increase the robustness of the library towards recognition errors in individual frames for getting more consistent person identifications.
+FaceRec is face recognition system for videos which leverage images crawled from web search engines. The system is based on a combination of MTCNN (face detection) and FaceNet (face embedding), whose vector representations of faces are used to feed a classifier. A tracking system is included in order to increase the robustness of the library towards recognition errors in individual frames for getting more consistent person identifications.
 
-The FaceRec ecosystem is composed by:
+The FaceRec ecosystem is composed of:
 - The video processing pipeline (folder [`src`](./src))
 - The API server ([`server.py`](./server.py))
-- The Web Visualizer ([`visualizer`](./visualizer))
-- An [evaluation](./evaluation)) on a ground truth 
+- A Web Application for visualizing the results ([`visualizer`](./visualizer))
+- A thorough [evaluation](./evaluation)) on two datasets with a ground truth 
 
 Demo:
 - API at http://facerec.eurecom.fr/
