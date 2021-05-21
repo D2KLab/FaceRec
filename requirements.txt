@@ -3,7 +3,7 @@ scikit-learn
 numpy
 scipy
 icrawler
-tensorflow==2.4.1
+tensorflow==2.5.0
 opencv-python
 Pillow
 filterpy
