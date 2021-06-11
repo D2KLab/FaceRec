@@ -13,6 +13,23 @@ Demo:
 - API at http://facerec.eurecom.fr/
 - Visualizer at http://facerec.eurecom.fr/visualizer
 
+:arrow_right: More info on our [paper](https://zenodo.org/record/4764633#.YMNlx5MzZQI).
+
+If you use FaceRec in your work, please cite it as:
+```bib
+@inproceedings{lisena2021facerec,
+  title =       {{FaceRec: An Interactive Framework for Face Recognition in Video Archives}},
+  author =      {Lisena, Pasquale and Laaksonen, Jorma and Troncy, Rapha\"{e}l},
+  booktitle =   {2nd International Workshop on Data-driven Personalisation of Television (DataTV-2021)},
+  address =     {New York, USA},
+  eventdate =   {2021-06-21/2021-06-23},
+  month =       {06},
+  year =        {2021},
+  url =         {https://doi.org/10.5281/zenodo.4764632}
+}
+```
+
+
 ## Application schema
 
 Training phase: 
@@ -104,6 +121,11 @@ or
 ```
 docker-compose up
 ```
+
+## Academic Publications
+
+- Lisena P., Laaksonen J. & Troncy R. **FaceRec: An Interactive Framework for Face Recognition in Video Archives**. In *[2nd International Workshop on Data-driven Personalisation of Television (DataTV-2021)](http://datatv2021.iti.gr/)* at the [ACM International Conference on Interactive Media Experiences (IMX 2021)](https://imx.acm.org/2021/), 21-23 June, 2021, New York City, USA [Online]. https://doi.org/10.5281/zenodo.4764632 - [BIB](http://pasqlisena.github.io/publication/lisena2021facerec.bib)
+- Carrive J., Lisena P. et al. **Transdisciplinary Analysis of a Corpus of French Newsreels: The ANTRACT Project**. In *Digital Humanities Quarterly (DHQ)*, Volume 15, Number 1, January 2021. http://www.digitalhumanities.org/dhq/vol/15/1/000523/000523.html - [BIB](http://pasqlisena.github.io/publication/carrive2021antract.bib)
 
 ## Acknowledgements
 
