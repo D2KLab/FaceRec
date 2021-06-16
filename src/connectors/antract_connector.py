@@ -1,4 +1,5 @@
 import yaml
+import json
 from SPARQLWrapper import SPARQLWrapper, JSON
 from SPARQLTransformer import sparqlTransformer
 
@@ -48,7 +49,7 @@ SELECT DISTINCT * WHERE {
  }""" % (PREFIXES, media)
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
-    return sparql.query().convert()["results"]["bindings"]
+    return sparql.query()._convertJSON()["results"]["bindings"]
 
 
 def get_notice(media):
@@ -66,7 +67,7 @@ def get_notice(media):
  }""" % (PREFIXES, media)
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
-    return sparql.query().convert()["results"]["bindings"]
+    return sparql.query()._convertJSON()["results"]["bindings"]
 
 
 def get_metadata_for(uri):
@@ -126,4 +127,4 @@ def get_segment_for(person):
 
     sparql.setQuery(q)
     sparql.setReturnFormat(JSON)
-    return sparql.query().convert()["results"]["bindings"]
+    return sparql.query()._convertJSON()["results"]["bindings"]
