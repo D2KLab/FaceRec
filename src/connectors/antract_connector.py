@@ -104,8 +104,18 @@ def get_metadata_for(uri):
             'antract': 'http://www.ina.fr/antract#',
         }
     }
-    return sparqlTransformer(query, {'endpoint': ENDPOINT})
+    return sparqlTransformer(query, {'endpoint': ENDPOINT, 'sparqlFunction': _default_sparql(ENDPOINT)})
 
+
+def _default_sparql(endpoint):
+    sparql = SPARQLWrapper(endpoint)
+    sparql.setReturnFormat(JSON)
+
+    def exec_query(q):
+        sparql.setQuery(q)
+        return sparql.query()._convertJSON()
+
+    return exec_query
 
 def get_segment_for(person):
     q = '''%s
