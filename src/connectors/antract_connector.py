@@ -77,12 +77,21 @@ def get_metadata_for(uri):
         'proto': {
             'id': '?media',
             'title': '?title',
-            "date": "?date",
+            'date': '?date',
             'segments': {
                 'id': '?notice',
                 'label': '$rdfs:label$required',
                 'start': '$core:beginTime$required',
                 'end': '$core:endTime',
+                'place': {
+                    'id': '$ina:aPourLieu',
+                    'label': '$rdfs:label$required'
+                },
+                'participant': {
+                    'id': '$ina:imageContient$asList',
+                    'label': '$rdfs:label$required',
+                    'profession': '$ina:aPourNoteQualite$required'
+                }
             }
         },
         '$where': [
@@ -116,6 +125,7 @@ def _default_sparql(endpoint):
         return sparql.query()._convertJSON()
 
     return exec_query
+
 
 def get_segment_for(person):
     q = '''%s

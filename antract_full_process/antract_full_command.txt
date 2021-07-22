@@ -1,0 +1,218 @@
+python -m src.crawler --keyword "Gaulle , Charles de" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Auriol , Vincent" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Philip Edinburgh 1960" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Elizabeth II 1960" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Schuman , Robert" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Juin , Alphonse" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Coty , René" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bidault , Georges" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Eisenhower , Dwight David" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Khrouchtchev , Nikita" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Truman , Harry" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bobet , Louison" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Naegelen , Marcel Edmond" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Couve de Murville , Maurice" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Pleven , René" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Adenauer , Konrad" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Debré , Michel" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Gaulle , Yvonne de" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Auriol , Michelle" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Chaban Delmas , Jacques" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Elizabeth d' Angleterre" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Faure , Edgar" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Malraux , André" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Churchill , Winston" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Herriot , Edouard" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Acheson , Dean" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Spaak , Paul Henri" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Johnson , Lyndon B" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Boulganine , Nikolaï Aleksandrovitch" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Dulles , John Foster" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Jazy , Michel" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Monnerville , Gaston" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bourguiba , Habib" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Eden , Anthony" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Elizabeth-Reine Mère" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Koenig , Marie Pierre" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Messmer , Pierre" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Moch , Jules" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Rainier III de Monaco" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bevin , Ernest" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Jacquinot , Louis" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Pompidou , Georges" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Tito" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Baudouin Ier" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Charles d' Angleterre" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Joxe , Louis" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Lattre de Tassigny , Jean Marie de" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Nehru , Jawaharlal" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Pinay , Antoine" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Pineau , Christian" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Frey , Roger" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Herzog , Maurice" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Lacoste , Robert" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Lamine , Pacha Sidi Mohamed" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Ramadier , Paul" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Vichinsky , Andrei" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Béatrix des Pays Bas" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Chevalier , Maurice" --max_num 50 --project antract_full
+python -m src.crawler --keyword "George VI" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Gromyko , Andreï" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Marie , André" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Perillat , Guy" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Queuille , Henri" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Coppi , Fausto" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Coty , Germaine" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Le Troquer , André" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Mimoun , Alain" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Anquetil , Jacques" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Clair , René" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Defferre , Gaston" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Goitschel , Marielle" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Killy , Jean Claude" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Mao , Tsé Toung" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Marais , Jean" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Mollet , Guy" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Molotov , Viatcheslav" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Morice , André" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Nasser , Gamal Abdel" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Auriol , Jacqueline" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Jeanneney , Jean Marcel" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Jouhaux , Léon" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Laniel , Joseph" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Mac Arthur , Douglas" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Mac Millan , Harold" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Mayer , René" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Mendès France , Pierre" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Pflimlin , Pierre" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Pie XII" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Franco , Francisco" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Jean XXIII" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Malenkov , Gueorgui Maksimilianovitch" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Marshall , George Catlett" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Robic , Jean" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Carol , Martine" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Cerdan , Marcel" --max_num 50 --project antract_full
+python -m src.crawler --keyword "De Gasperi , Alcide" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Duclos , Jacques" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Eisenhower , Mamie Doud" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Fernandel" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Frederik IX de Danemark" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Kossyguine , Alexis" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Leclerc de Hauteclocque , Thérèse" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Nixon , Richard" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Reza Pahlavi , Mohammad" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Senghor , Léopold Sédar" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Ben Bella , Ahmed" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Erhard , Ludwig" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Leclerc de Hauteclocque , Philippe" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Peyrefitte , Alain" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Reynaud , Paul" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Sarraut , Albert" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Frachon , Benoît" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Gaillard , Félix" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Hailé Sélassié Ier" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Hassan II" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Kennedy , John Fitzgerald" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Kopa , Raymond" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Maurois , André" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Papon , Maurice" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Paul VI" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Soustelle , Jacques" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Attlee , Clément Richard" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Brandt , Willy" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Duhamel , Georges" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Chaban Delmas , Jacques" --max_num 50 --project antract_full
+python -m src.crawler --keyword "chaban Delmas , Jacques" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Mitterrand , François" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Morgan , Michèle" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Wilson , Harold" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Blum , Léon" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bourgès Maunoury , Maurice" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Brejnev , Leonid" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Christian Jaque" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Fouchet , Christian" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Genevoix , Maurice" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Salan , Raoul" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Schumann , Maurice" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bordeneuve , Jacques" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Lejeune , Max" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Petsche , Maurice" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Thorez , Maurice" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Cornu , André" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Giscard d' Estaing , Valéry" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Marcellin , Raymond" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Monnet , Jean" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Pétain , Philippe" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Pisani , Edgard" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Thorez Vermeersch , Jeannette" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Tillon , Charles" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Gazier , Albert" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Gouin , Félix" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Holleaux , André" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Massu , Jacques" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Teitgen , Pierre Henri" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Terrenoire , Louis" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Billères , René" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bollaert , Emile" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Missoffe , François" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Parodi , Alexandre" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Prigent , Robert" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Margaret Rose d' Angleterre" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bernhard des Pays Bas" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Léonard , Roger" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Perillier , Louis" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Guillaume , Augustin" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Juliana des Pays Bas" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Humez , Charles" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Petiot , Lucien" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Becognee , Claude" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Labaume , Bernard" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Montgomery , Bernard Law" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Chataigneau , Yves" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Flaud , Jacques" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Mons , Jean" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Peron , Juan" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Darrigade , André" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Duval , Raymond Francis" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Gauthier , Bernard" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Anne d' Angleterre" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bonnet , Henri" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Grace de Monaco" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Kübler , Ferdinand" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Paul Ier de Grèce" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Schneiter , Pierre" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Triboulet , Raymond" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bartali , Gino" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Caron , Christine" --max_num 50 --project antract_full
+python -m src.crawler --keyword "De Gloucester , Henry" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Delouvrier , Paul" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Frederika de Grèce" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Letourneau , Jean" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Schaer , Fritz" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Berthoin , Jean" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bozon , Charles" --max_num 50 --project antract_full
+python -m src.crawler --keyword "François Poncet , André" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Ganeval , Jean" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Geminiani , Raphaël" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Irène des Pays Bas" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Mountbatten , Louis" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Vanier , Georges" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Achard , Marcel" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Bao Dai" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Buron , Robert" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Caffery , Jefferson" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Chou , En Lai" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Fourre Cormeray , Michel" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Koblet , Hugo" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Labonne , Eirik" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Mikoyan , Anastase" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Roncalli , Angelo Giuseppe" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Trichet , Adolphe" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Armstrong Jones , Antony" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Ben Ammar , Tahar" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Delecour , Jocelyn" --max_num 50 --project antract_full
+python -m src.crawler --keyword "El Mabrouk , Patrick" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Oreiller , Henri" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Sologne , Madeleine" --max_num 50 --project antract_full
+python -m src.crawler --keyword "Van Steenbergen , Henri" --max_num 50 --project antract_full

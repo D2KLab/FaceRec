@@ -39,7 +39,6 @@
       </li>
     </ul>
   </div>
-
   <div v-if='data.segments'>
 
     <h2>Segments</h2>
@@ -47,6 +46,8 @@
       <li v-for="seg in data.segments">
         <a @click="toSeg(seg)">{{seg.label}}</a>
         <small>{{seg.start}} - {{seg.end}}</small>
+        <small v-if="seg.place">{{seg.place.label}}</small>
+        <small v-for="p in seg.participant">- {{p.label}} ({{p.profession}})</small>
       </li>
     </ul>
   </div>

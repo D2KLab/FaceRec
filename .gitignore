@@ -1,7 +1,7 @@
 .DS_Store
 /data/*
 !/data/classifier/
-!/data/training_img_aligned/
+!/data/training_img_aligned/antract/
 /video/
 /database/
 /results
