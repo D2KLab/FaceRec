@@ -52,7 +52,7 @@ Pineau , Christian	http://www.ina.fr/thesaurus/pp/concept_10139387	http://www.in
 Frey , Roger	http://www.ina.fr/thesaurus/pp/concept_10148266	http://www.ina.fr/core#Male	Homme politique. France	https://isni.org/isni/0000000000786710	Q926639	France	1913	personnalités politiques françaises
 Herzog , Maurice	http://www.ina.fr/thesaurus/pp/concept_10216736	http://www.ina.fr/core#Male	Alpiniste, homme politique. France	https://isni.org/isni/0000000439578985	Q505819	France	1919	personnalités politiques françaises
 Lacoste , Robert	http://www.ina.fr/thesaurus/pp/concept_10073851	http://www.ina.fr/core#Male	Homme politique. France	https://isni.org/isni/0000000458639683	Q3435624	France	1898	personnalités politiques françaises
-Lamine , Pacha Sidi Mohamed	http://www.ina.fr/thesaurus/pp/concept_10057152		Bey de Tunis			Tunisia		personnalités politiques étrangères
+Lamine , Pacha Sidi Mohamed	http://www.ina.fr/thesaurus/pp/concept_10057152	http://www.ina.fr/core#Male	Bey de Tunis			Tunisia		personnalités politiques étrangères
 Ramadier , Paul	http://www.ina.fr/thesaurus/pp/concept_10188898	http://www.ina.fr/core#Male	Homme politique. France	https://isni.org/isni/0000000432514241	Q328235	France	1888	personnalités politiques françaises
 Vichinsky , Andrei	http://www.ina.fr/thesaurus/pp/concept_10198613	http://www.ina.fr/core#Male	Homme politique. URSS	https://isni.org/isni/0000000082360229		Soviet Union	1883	personnalités politiques étrangères
 Béatrix des Pays Bas	http://www.ina.fr/thesaurus/pp/concept_10115812	http://www.ina.fr/core#Female	Reine. Pays Bas	https://isni.org/isni/0000000452848054	Q29574	Kingdom of the Netherlands	1938	personnalités politiques étrangères
@@ -124,12 +124,11 @@ Attlee , Clément Richard	http://www.ina.fr/thesaurus/pp/concept_10214877	http:/
 Brandt , Willy	http://www.ina.fr/thesaurus/pp/concept_10148181	http://www.ina.fr/core#Male	Homme politique. Allemagne RF	https://isni.org/isni/0000000369206595	Q2514	West Germany	1913	personnalités politiques étrangères
 Duhamel , Georges	http://www.ina.fr/thesaurus/pp/concept_10115570	http://www.ina.fr/core#Male	Ecrivain. France	https://isni.org/isni/0000000399487068	Q20733	France	1884	artistes, écrivains
 Chaban Delmas , Jacques	http://www.ina.fr/thesaurus/pp/concept_10118982	http://www.ina.fr/core#Male	Homme politique. France	https://isni.org/isni/0000000121287387	Q12940	France	1915	personnalités politiques françaises
-chaban Delmas , Jacques				https://isni.org/isni/0000000121287387	Q12940		1915	personnalités politiques françaises
 Mitterrand , François	http://www.ina.fr/thesaurus/pp/concept_10080266	http://www.ina.fr/core#Male	Homme politique, écrivain. France	https://isni.org/isni/0000000138777972	Q2038	France	1916	personnalités politiques françaises
 Morgan , Michèle	http://www.ina.fr/thesaurus/pp/concept_10083450	http://www.ina.fr/core#Female	Actrice. France	https://isni.org/isni/0000000483184000	Q234897	France	1920	artistes, écrivains
 Wilson , Harold	http://www.ina.fr/thesaurus/pp/concept_10106004	http://www.ina.fr/core#Male	Homme politique. Grande Bretagne	https://isni.org/isni/0000000500070671	Q128956	United Kingdom	1916	personnalités politiques étrangères
 Blum , Léon	http://www.ina.fr/thesaurus/pp/concept_10150106	http://www.ina.fr/core#Male	Homme politique. France	https://isni.org/isni/0000000122537595	Q18434	France	1872	personnalités politiques françaises
-Bourgès Maunoury , Maurice				https://isni.org/isni/0000000044655499	Q380992		1914	personnalités politiques françaises
+Bourgès Maunoury , Maurice		http://www.ina.fr/core#Male		https://isni.org/isni/0000000044655499	Q380992		1914	personnalités politiques françaises
 Brejnev , Leonid	http://www.ina.fr/thesaurus/pp/concept_10089391	http://www.ina.fr/core#Male	Homme politique. URSS	https://isni.org/isni/0000000483305677	Q765165	Soviet Union	1906	personnalités politiques étrangères
 Christian Jaque	http://www.ina.fr/thesaurus/pp/concept_10115445	http://www.ina.fr/core#Male	Réalisateur. France	https://isni.org/isni/0000000108137974	Q728214	France	1904	artistes, écrivains
 Fouchet , Christian	http://www.ina.fr/thesaurus/pp/concept_10080255	http://www.ina.fr/core#Male	Homme politique. France	https://isni.org/isni/0000000066533572	Q1079532	France	1911	personnalités politiques françaises
@@ -180,8 +179,8 @@ Gauthier , Bernard	http://www.ina.fr/thesaurus/pp/concept_10091152	http://www.in
 Anne d' Angleterre	http://www.ina.fr/thesaurus/pp/concept_10183224	http://www.ina.fr/core#Female	Fille d'Elizabeth II	https://isni.org/isni/0000000110202640		United Kingdom	1936	femme ou mari de
 Bonnet , Henri	http://www.ina.fr/thesaurus/pp/concept_10160672	http://www.ina.fr/core#Male	Homme politique, diplomate. France	https://isni.org/isni/0000000435232899	Q3130710	France	1888	personnalités politiques françaises
 Grace de Monaco	http://www.ina.fr/thesaurus/pp/concept_10116426	http://www.ina.fr/core#Female	Princesse régnante de Monaco	https://isni.org/isni/0000000120955240		Monaco	1929	femme ou mari de
-Kübler , Ferdinand				https://isni.org/isni/0000000118751572	Q458713		1919	sportifs
-Paul Ier de Grèce	http://www.ina.fr/thesaurus/pp/concept_10144816			https://isni.org/isni/0000000382782810	Q155394		1901	personnalités politiques étrangères
+Kübler , Ferdinand		http://www.ina.fr/core#Male		https://isni.org/isni/0000000118751572	Q458713		1919	sportifs
+Paul Ier de Grèce	http://www.ina.fr/thesaurus/pp/concept_10144816	http://www.ina.fr/core#Male		https://isni.org/isni/0000000382782810	Q155394		1901	personnalités politiques étrangères
 Schneiter , Pierre	http://www.ina.fr/thesaurus/pp/concept_10090210	http://www.ina.fr/core#Male	Homme politique. France	https://isni.org/isni/0000000113635951	Q2093898	France	1905	personnalités politiques françaises
 Triboulet , Raymond	http://www.ina.fr/thesaurus/pp/concept_10156291	http://www.ina.fr/core#Male	Homme politique. France	https://isni.org/isni/0000000114413832	Q2695709	France	1906	personnalités politiques françaises
 Bartali , Gino	http://www.ina.fr/thesaurus/pp/concept_10056819	http://www.ina.fr/core#Male	Coureur cycliste. Italie	https://isni.org/isni/0000000024105668	Q155010	Italy	1914	sportifs
@@ -209,7 +208,7 @@ Koblet , Hugo	http://www.ina.fr/thesaurus/pp/concept_10129616	http://www.ina.fr/
 Labonne , Eirik	http://www.ina.fr/thesaurus/pp/concept_10208821	http://www.ina.fr/core#Male	Diplomate. France	https://isni.org/isni/0000000002114424	Q1353996	France	1888	personnalités politiques françaises
 Mikoyan , Anastase	http://www.ina.fr/thesaurus/pp/concept_10143383	http://www.ina.fr/core#Male	Homme politique. URSS	https://isni.org/isni/0000000108884494	Q152738	Soviet Union	1895	personnalités politiques étrangères
 Trichet , Adolphe	http://www.ina.fr/thesaurus/pp/concept_295599	http://www.ina.fr/core#Male						artistes, écrivains
-Armstrong Jones , Antony				https://isni.org/isni/0000000120186277	Q335260		1930	artistes, écrivains
+Armstrong Jones , Antony		http://www.ina.fr/core#Male		https://isni.org/isni/0000000120186277	Q335260		1930	artistes, écrivains
 Ben Ammar , Tahar	http://www.ina.fr/thesaurus/pp/concept_10216734	http://www.ina.fr/core#Male	Homme politique. Tunisie	https://isni.org/isni/0000000122439274	Q495676	Tunisia	1889	personnalités politiques étrangères
 Delecour , Jocelyn	http://www.ina.fr/thesaurus/pp/concept_10089783	http://www.ina.fr/core#Male	Athlète course à pied, spécialiste du 100 et du 200 mètres. France		Q1632411	France	1935	sportifs
 El Mabrouk , Patrick	http://www.ina.fr/thesaurus/pp/concept_292001	http://www.ina.fr/core#Male	Athlète. France, Algérie		Q3369420	France	1928	sportifs
