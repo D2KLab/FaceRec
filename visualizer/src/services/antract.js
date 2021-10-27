@@ -14,8 +14,8 @@ export async function get(video) {
   const d = data.data;
   if (d.segments) {
     d.segments.forEach((s) => {
-      s.start = s.start.replace(DATE_REGEX, '$1');
-      s.end = s.end.replace(DATE_REGEX, '$1');
+      s.start = s.start ? s.start.replace(DATE_REGEX, '$1') : null;
+      s.end = s.end ? s.end.replace(DATE_REGEX, '$1') : null;
     });
     d.segments = d.segments.sort((a, b) => ((a.start > b.start) ? 1 : -1));
   }

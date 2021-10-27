@@ -5,6 +5,7 @@
 /video/
 /database/
 /results
+*/processed/*
 
 evaluation/dataset/
 evaluation/data/

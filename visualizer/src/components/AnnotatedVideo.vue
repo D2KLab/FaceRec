@@ -78,7 +78,8 @@ export default {
 
     this.trigService();
 
-    this.$root.$on('toSeg', (x) => {
+    this.$root.$on('to-seg', (x) => {
+      console.log('here');
       const start = x.start.split(':').map((ss) => parseInt(ss, 10));
       const sec = start[0] * 3600 + start[1] * 60 + start[2];
       this.goToSecond(sec);
