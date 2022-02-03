@@ -1,3 +1,5 @@
+primary = #7957D5
+
 #app
     font-family 'Avenir', Helvetica, Arial, sans-serif
     -webkit-font-smoothing antialiased
@@ -14,6 +16,10 @@
 
 .dropdown-trigger
   color: #000
+
+#app // overwrite bulma default
+  .is-primary
+        background-color: primary
 
 @media screen and (min-width: 1024px)
     .mobile-only
@@ -46,4 +52,4 @@
             display inline-block
             cursor pointer
         .dropdown-item.is-active
-          color blue
+          color primary
