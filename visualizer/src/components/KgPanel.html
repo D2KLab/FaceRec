@@ -1,7 +1,7 @@
 <div class="kg-panel">
   <div v-if="data.title">
-    <h1 :inner-html.prop='data.title[0] | kgvalue'></h1>
-    <small v-for='t in data.title.slice(1)' :inner-html.prop='t | kgvalue'></small>
+    <h1 :inner-html='kgvalue(data.title[0])'></h1>
+    <small v-for='t in data.title.slice(1)' :inner-html='kgvalue(t)'></small>
   </div>
 
   <div v-if='data.channel'>
@@ -34,7 +34,7 @@
     <h2>Brodcasted on</h2>
     <ul>
       <li v-for="p in data.publication ">
-        <span>{{p.date|formatDate}}</span>
+        <span>{{formatDate(p.date)}}</span>
         - <a :href='p.channel.id'>{{p.channel.name}}</a>
       </li>
     </ul>

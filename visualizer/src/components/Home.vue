@@ -1,8 +1,8 @@
 <template src="./Home.html" ></template>
 
 <script>
-import { getTrainingSet, train } from '@/services/face-recognition';
-import antract from '@/services/antract';
+import { getTrainingSet, train } from '../services/face-recognition';
+import antract from '../services/antract';
 
 const EXAMPLES = {
   memad: 'http://data.memad.eu/yle/a-studio/8a3a9588e0f58e1e40bfd30198274cb0ce27984e',

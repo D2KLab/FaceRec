@@ -1,12 +1,12 @@
 <template>
   <div id="app">
-    <b-navbar class="is-primary">
-      <template slot="brand">
-        <b-navbar-item tag="router-link" :to="{ path: '/' }">
+    <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <router-link class="navbar-item" tag="router-link" :to="{ path: '/' }">
           <b>FaceRec Visualizer</b>
-        </b-navbar-item>
+        </router-link>
 
-        <b-navbar-item>
+        <div class="navbar-item">
           <form class="field has-addons" :action="$router.resolve('video').href">
             <div class="control">
               <input name="v" class="input" type="url"
@@ -16,34 +16,38 @@
               <button type="submit" class="button">GO</button>
             </div>
           </form>
-        </b-navbar-item>
+        </div>
 
-      </template>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="nav-menu">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
 
-      <template slot="end">
+      </div>
 
-        <b-navbar-item class="has-dropdown" tag="div">
-          <b-dropdown class="navbar-link" v-model="proj" aria-role="menu">
-              <span slot="trigger">
-                  <template>
-                      <strong class='mobile-only'>Project:</strong> <span>{{labelFrom(proj)}}</span>
-                  </template>
-              </span>
+      <div id="nav-menu" class="navbar-menu">
 
-              <b-dropdown-item :value="p" aria-role="menuitem"
-              v-for="p in projects" class="navbar-item"
-              :key="p" @click="changeProject(p)">
-                    {{labelFrom(p)}}
-              </b-dropdown-item>
-          </b-dropdown>
-        </b-navbar-item>
+        <div class="navbar-end">
 
-      </template>
+            <o-dropdown v-model="proj" aria-role="list" rootClass="is-right">
+              <template variant="info" #trigger="{ active }">
+                <strong class='mobile-only'>Project:</strong> <span>{{labelFrom(proj)}}</span>
+                <o-icon customSize="mdi-18px" :icon="active ? 'chevron-up' : 'chevron-down'"></o-icon>
+              </template>
 
-    </b-navbar>
+              <o-dropdown-item class="navbar-item" :value="p" aria-role="listitem" v-for="p in projects" :key="p" @click="changeProject(p)">
+              {{labelFrom(p)}}
+            </o-dropdown-item>
+          </o-dropdown>
 
-    <router-view></router-view>
-  </div>
+      </div>
+    </div>
+
+  </nav>
+
+  <router-view></router-view>
+</div>
 </template>
 
 <script>
@@ -60,6 +64,7 @@ export default {
   data() {
     return {
       projects: [],
+      active: false
     };
   },
   computed: {
@@ -72,23 +77,24 @@ export default {
       && this.proj !== 'undefined'
       && this.$route.query.project
       && this.proj !== this.$route.query.project) {
-      this.changeProject(this.$route.query.project);
-    }
-    getProjects().then((p) => {
-      this.projects = p;
-      if (!this.proj || this.proj === 'undefined') this.changeProject(p[0]);
-    });
-  },
-  methods: {
-    changeProject(project) {
-      this.$store.commit('SET_PROJ', project);
-      this.$router.go();
+        this.changeProject(this.$route.query.project);
+      }
+      getProjects().then((p) => {
+        this.projects = p;
+        if (!this.proj || this.proj === 'undefined') this.changeProject(p[0]);
+      });
     },
-    labelFrom(project) {
-      return projLabel[project] || project;
+    methods: {
+      changeProject(project) {
+        console.info('Setting project:', project)
+        this.$store.commit('SET_PROJ', project);
+        this.$router.go();
+      },
+      labelFrom(project) {
+        return projLabel[project] || project;
+      },
     },
-  },
-};
-</script>
+  };
+  </script>
 
-<style lang="stylus" src='./App.styl'></style>
+  <style lang="stylus" src='./App.styl'></style>

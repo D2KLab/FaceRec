@@ -12,7 +12,8 @@
     font-size 0.6em
     display: block
 
-
+.dropdown-trigger
+  color: #000
 
 @media screen and (min-width: 1024px)
     .mobile-only
@@ -39,6 +40,10 @@
             &.navbar-link
                 padding 0
         .dropdown-trigger
+            color: #fff
             height 100%
-            padding 0.9rem 2.5rem 0.5rem 0.75rem
+            padding 0.9rem 1.5rem 0.5rem 0.75rem
             display inline-block
+            cursor pointer
+        .dropdown-item.is-active
+          color blue

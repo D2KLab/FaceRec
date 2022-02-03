@@ -32,18 +32,19 @@ export default {
         this.data = d;
       });
   },
-  filters: {
+  methods: {
+    toSeg(seg) {
+      this.$emit('to-seg', seg);
+    },
     kgvalue(value) {
       if (!value) return '';
       if (typeof value !== 'object') return value;
 
       return `<span class="flag-icon flag-icon-${value.language}"></span>${value.value}`;
     },
-  },
-  methods: {
-    toSeg(seg) {
-      this.$root.$emit('to-seg', seg);
-    },
+    formatDate(value){
+      return value && moment(String(value)).format('DD/MM/YYYY hh:mm')
+    }
   },
 };
 </script>

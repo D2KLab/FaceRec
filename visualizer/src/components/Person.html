@@ -18,9 +18,13 @@
     </div>
 
     <p>{{paths.length - disabledCount}} enabled / {{disabledCount}} disabled</p>
-    <b-field>
-      <label>Blurred images <b-switch v-model="isBlurred"></b-switch></label>
-    </b-field>
+    <o-field>
+      <label>
+        <o-switch v-model="isBlurred" position="left">
+            Blurred images
+        </o-switch>
+      </label>
+    </o-field>
 
     <ul class='pics' :class="{isBlurred:isBlurred}">
       <li v-for="p in paths" @click="togglePath($event, p)" :class="{disabled: disabled.includes(p)}">

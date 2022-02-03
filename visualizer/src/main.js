@@ -1,25 +1,23 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import VueRouter from 'vue-router';
-import Buefy from 'buefy';
-import moment from 'moment';
-import numeral from 'numeral';
+import { createApp } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import { createStore } from 'vuex'
+import Oruga from '@oruga-ui/oruga-next'
+import { bulmaConfig } from '@oruga-ui/theme-bulma'
 import App from './App.vue';
 import routes from './routes';
-import 'buefy/dist/buefy.css';
+import '@oruga-ui/theme-bulma/dist/bulma.css'
+import '@mdi/font/css/materialdesignicons.css'
 
-Vue.config.productionTip = false;
-Vue.use(VueRouter);
-Vue.use(Buefy);
-Vue.use(Vuex);
+import config from '../app.config'
 
-Vue.filter('formatDate', (value) => value && moment(String(value)).format('DD/MM/YYYY hh:mm'));
+const app = createApp(App)
 
-Vue.filter('formatNumber', (value) => numeral(value).format('0.00'));
 
-const store = new Vuex.Store({ // eslint-disable-line no-new
-  state: {
-    proj: localStorage.project || '',
+const store = createStore({ // eslint-disable-line no-new
+  state() {
+    return {
+      proj: localStorage.project || '',
+    }
   },
   mutations: {
     SET_PROJ(state, value) {
@@ -29,14 +27,13 @@ const store = new Vuex.Store({ // eslint-disable-line no-new
   },
 });
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(config.base),
   routes,
 });
 
-new Vue({
-  router,
-  store,
-  render: (h) => h(App),
-}).$mount('#app');
+app.use(router)
+app.use(store)
+app.use(Oruga, bulmaConfig);
+
+app.mount('#app')

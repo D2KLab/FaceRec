@@ -1,35 +1,29 @@
 {
-  "name": "visualizer",
-  "version": "0.1.0",
-  "private": true,
+  "name": "facerec-visualizer",
+  "version": "0.0.0",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
+    "@mdi/font": "^6.5.95",
+    "@oruga-ui/oruga-next": "^0.5.3",
+    "@oruga-ui/theme-bulma": "^0.2.1",
     "axios": "^0.25.0",
-    "buefy": "^0.9.4",
-    "core-js": "^3.8.3",
+    "eslint-plugin-vue": "^8.4.0",
     "google-palette": "^1.1.0",
-    "moment": "^2.29.1",
     "nib": "^1.1.2",
     "numeral": "^2.0.6",
     "rupture": "^0.7.1",
-    "vue": "^2.6.12",
-    "vue-router": "^3.5.1",
-    "vuex": "^3.6.2"
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.12",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.5.11",
-    "@vue/cli-plugin-eslint": "^4.5.11",
-    "@vue/cli-service": "^4.5.11",
-    "@vue/eslint-config-airbnb": "^5.1.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.8.0",
-    "eslint-plugin-vue": "^7.1.0",
-    "stylus": "^0.54.8",
-    "stylus-loader": "^3.0.2",
-    "vue-template-compiler": "^2.6.12"
+    "@vitejs/plugin-vue": "^2.1.0",
+    "eslint": "^8.8.0",
+    "stylus": "^0.56.0",
+    "vite": "^2.7.13"
   }
 }

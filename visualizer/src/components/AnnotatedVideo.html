@@ -1,6 +1,6 @@
 <div class="root">
   <div class="side">
-    <kg-panel v-if="displayKgWidget" :url="url"></kg-panel>
+    <kg-panel v-if="displayKgWidget" :url="url" @to-seg="goToSecondRaw"></kg-panel>
   </div>
   <div class="main">
     <div class="video-container" ref="container">
@@ -15,7 +15,7 @@
       <div class="column is-two-thirds">
         <label>
           Min confidence:
-          <input type="range" min="0.0" max="1.0" value="0.7" step="0.05"
+          <input type="range" min="0.0" max="1.0" step="0.05"
           v-model="confidence" name="confidence"/>
           <span>{{confidence}}</span>
         </label>
@@ -23,8 +23,8 @@
           <li v-for="d in data.filter(d=>!deselected.includes(d.name))"
             v-bind:key="d.start_npt + d.name + d.track_id">
             <a v-on:click="goToSecond(d.start_npt)">
-              <strong>{{d.start_npt | hhmmss }} - {{d.end_npt | hhmmss}}</strong></a>
-              {{d.name}} <small>Confidence: {{d.confidence | formatNumber}}</small>
+              <strong>{{hhmmss(d.start_npt)}} - {{hhmmss(d.end_npt)}}</strong></a>
+              {{d.name}} <small>Confidence: {{formatNumber(d.confidence)}}</small>
             </li>
           </ul>
           <label>
@@ -61,4 +61,3 @@
 
     </div>
   </div>
-</div>

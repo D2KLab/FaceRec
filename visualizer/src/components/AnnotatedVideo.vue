@@ -14,8 +14,9 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 
 import palette from 'google-palette';
+import numeral from 'numeral';
 import { recognise, getLocator } from '@/services/face-recognition';
-import { hhmmss } from '@/utils';
+import { hhmmss } from '../utils';
 import KgPanel from '@/components/KgPanel.vue';
 
 function adaptDimension(bounding, origW, origH, destW, destH) {
@@ -77,19 +78,25 @@ export default {
       .then((d) => { this.locator = d; });
 
     this.trigService();
-
-    this.$root.$on('to-seg', (x) => {
-      const start = x.start.split(':').map((ss) => parseInt(ss, 10));
-      const sec = start[0] * 3600 + start[1] * 60 + start[2];
-      this.goToSecond(sec);
-    });
   },
   methods: {
+    formatNumber(value){
+      return numeral(value).format('0.00')
+    },
+    hhmmss(value) {
+      if (!value) return '';
+      return hhmmss(value);
+    },
     onPersonToggle($event, person) {
       if (this.deselected.includes(person)) {
         this.deselected.splice(this.deselected.indexOf(person), 1);
       } else this.deselected.push(person);
     },
+    goToSecondRaw(x) {
+      const start = x.start.split(':').map((ss) => parseInt(ss, 10));
+        const sec = start[0] * 3600 + start[1] * 60 + start[2];
+        this.goToSecond(sec);
+   },
     goToSecond(second) {
       this.$refs.video.currentTime = second;
     },
@@ -140,12 +147,6 @@ export default {
         box.style.borderColor = d.colour;
         box.dataset.class = frag.classLabel;
       });
-    },
-  },
-  filters: {
-    hhmmss(value) {
-      if (!value) return '';
-      return hhmmss(value);
     },
   },
 
