@@ -34,7 +34,7 @@ def main(keyword, max_num=50, project='general', discard_multi_face=False, debug
                                         downloader_threads=25, storage={'root_dir': image_dir})
     # filters = dict(type='photo')  # I find photo more accurate than 'face'
     start = time.time()
-    google_crawler.crawl(keyword=keyword, offset=0, max_num=max_num, filters=dict(type='photo'),
+    google_crawler.crawl(keyword=keyword, offset=0, max_num=max_num, #filters=dict(type='photo'),
                          min_size=(200, 200), max_size=None, file_idx_offset=0)
 
     detector = FaceDetector(detect_multiple_faces=True)

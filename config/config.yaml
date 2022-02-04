@@ -1,9 +1,9 @@
 limecraft:
-    username: xxx
-    password: xxx
+    username: pasqLisena
+    password: 9PZqpJ5XXhneiMU
 mongo:
-    server: mongo
+    server: 0.0.0.0
     port: 27017
 okapi:
-    username: xxx
-    password: xxx
+    username: okapi_reader
+    password: AN3tr@cT@19

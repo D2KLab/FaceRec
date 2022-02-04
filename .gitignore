@@ -2,6 +2,7 @@
 /data/*
 !/data/classifier/
 !/data/training_img_aligned/antract/
+!/data/training_img_aligned/antract_selection/
 /video/
 /database/
 /results
@@ -10,6 +11,9 @@
 evaluation/dataset/
 evaluation/data/
 evaluation/frames/
+evaluation/isni/
+evaluation/isni_cache/
+evaluation/wikidata_cache
 
 challenge/data/
 

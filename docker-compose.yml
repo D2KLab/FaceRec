@@ -1,15 +1,15 @@
 version: '3'
 services:
-  app:
-    build: .
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./video/:/app/video
-      - ./data/:/app/data
-      - ./config/:/app/config
-    links:
-      - mongo
+#  app:
+#    build: .
+#    ports:
+#      - "5000:5000"
+#    volumes:
+#      - ./video/:/app/video
+#      - ./data/:/app/data
+#      - ./config/:/app/config
+#    links:
+#      - mongo
   mongo:
     image: mongo
     ports:

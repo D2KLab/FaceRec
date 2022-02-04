@@ -20,6 +20,9 @@ primary = #7957D5
 #app // overwrite bulma default
   .is-primary
         background-color: primary
+  .navbar.is-primary .navbar-brand > a.navbar-item
+        &:hover, &:focus, &.is-active
+            background-color: darken(primary, 5)
 
 @media screen and (min-width: 1024px)
     .mobile-only
